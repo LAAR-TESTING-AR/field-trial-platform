@@ -297,7 +297,7 @@
                 </div>
 
                 ${
-  window.PlatformSettings.isEnabled("visitScore")
+  localStorage.getItem("visitScore") === "true"
     ? `
       <div class="field-photo-campo">
         <label for="fieldPhotoVisitScore">
