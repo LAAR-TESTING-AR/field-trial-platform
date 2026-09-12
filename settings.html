@@ -112,6 +112,8 @@ function updateSettingsStatus() {
   status.textContent =
     JSON.stringify(
       {
+        trialVisits:
+  localStorage.getItem("trialVisits"),
         trialPhotos:
           localStorage.getItem("trialPhotos"),
         visitComments:
