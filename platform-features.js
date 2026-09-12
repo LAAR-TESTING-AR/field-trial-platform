@@ -1,6 +1,8 @@
 window.FIELD_TRIAL_FEATURES = {
 
-  VISITS: true,
+ VISITS:
+  localStorage.getItem("trialVisits") === "true",
+
 
   ACCESS_PHOTOS: true,
 
