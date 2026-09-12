@@ -297,7 +297,7 @@
                 </div>
 
                 ${
-  PlatformSettings.isEnabled("visitScore")
+  window.PlatformSettings.isEnabled("visitScore")
     ? `
       <div class="field-photo-campo">
         <label for="fieldPhotoVisitScore">
