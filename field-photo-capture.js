@@ -296,23 +296,30 @@
                   </select>
                 </div>
 
-                <div class="field-photo-campo">
-                  <label for="fieldPhotoVisitScore">
-                    Evaluación general de la visita
-                  </label>
-                  <select id="fieldPhotoVisitScore">
-                    <option value="">Sin evaluar</option>
-                    <option value="9">9 · Excelente</option>
-                    <option value="8">8 · Muy bueno</option>
-                    <option value="7">7 · Bueno</option>
-                    <option value="6">6 · Aceptable</option>
-                    <option value="5">5 · Cuestionable</option>
-                    <option value="4">4 · Cuestionable</option>
-                    <option value="3">3 · Descartable</option>
-                    <option value="2">2 · Descartable</option>
-                    <option value="1">1 · Descartable</option>
-                  </select>
-                </div>
+                ${
+  PlatformSettings.isEnabled("visitScore")
+    ? `
+      <div class="field-photo-campo">
+        <label for="fieldPhotoVisitScore">
+          Evaluación general de la visita
+        </label>
+
+        <select id="fieldPhotoVisitScore">
+          <option value="">Sin evaluar</option>
+          <option value="9">9 · Excelente</option>
+          <option value="8">8 · Muy bueno</option>
+          <option value="7">7 · Bueno</option>
+          <option value="6">6 · Aceptable</option>
+          <option value="5">5 · Cuestionable</option>
+          <option value="4">4 · Cuestionable</option>
+          <option value="3">3 · Descartable</option>
+          <option value="2">2 · Descartable</option>
+          <option value="1">1 · Descartable</option>
+        </select>
+      </div>
+    `
+    : ""
+}
               `
               : ""
           }
@@ -531,21 +538,40 @@
           fondo.querySelector("#fieldPhotoComments")?.value || ""
         ).trim();
 
-        const cropStage = esTrial
-          ? String(
-              fondo.querySelector("#fieldPhotoCropStage")?.value || ""
-            ).trim()
-          : "";
+const cropStageEnabled =
+  window.PlatformSettings &&
+  PlatformSettings.isEnabled(
+    "cropStage"
+  );
 
-        const scoreSeleccionado = esTrial
-          ? String(
-              fondo.querySelector("#fieldPhotoVisitScore")?.value || ""
-            ).trim()
-          : "";
+const visitScoreEnabled =
+  window.PlatformSettings &&
+  PlatformSettings.isEnabled(
+    "visitScore"
+  );
+        
+const cropStage = (
+  esTrial &&
+  cropStageEnabled
+)
+  ? String(
+      fondo.querySelector("#fieldPhotoCropStage")?.value || ""
+    ).trim()
+  : "";
 
-        const visitScore = scoreSeleccionado
-          ? Number(scoreSeleccionado)
-          : null;
+const scoreSeleccionado = (
+  esTrial &&
+  visitScoreEnabled
+)
+  ? String(
+      fondo.querySelector("#fieldPhotoVisitScore")?.value || ""
+    ).trim()
+  : "";
+
+        const visitScore =
+  visitScoreEnabled && scoreSeleccionado
+    ? Number(scoreSeleccionado)
+    : null;
 
         if (!archivosSeleccionados.length) {
           mostrarMensaje("Primero seleccioná o tomá al menos una fotografía.", "error");
