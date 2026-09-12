@@ -1086,5 +1086,27 @@ console.log(
 );
 
 </script>
+
+<script>
+
+if (
+  window.PlatformSettings &&
+  PlatformSettings.isEnabled("visitComments")
+) {
+
+  console.log(
+    "Visit Comments ENABLED"
+  );
+
+} else {
+
+  console.log(
+    "Visit Comments DISABLED"
+  );
+
+}
+
+</script>
+  
 </body>
 </html>
