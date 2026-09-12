@@ -1005,7 +1005,7 @@ class="logo">
 
     </div>
 
-    <div class="card" id="harvestingCard">
+    <div class="card">
 
      <div class="icono icono-harvesting" aria-hidden="true">
   <span class="espiga-tallo"></span>
@@ -1077,35 +1077,6 @@ Coming Soon
 <script src="platform.js?v=1"></script>
 <script src="platform-install.js"></script>
 <script src="platform-settings.js"></script>
- <script>
-
-console.log(
-  "Platform Settings:",
-  PlatformSettings.getAll()
-);
-
-</script>
-
-<script>
-
-const harvestingCard =
-  document.getElementById(
-    "harvestingCard"
-  );
-
-if (
-  harvestingCard &&
-  !PlatformSettings.isEnabled(
-    "cropStage"
-  )
-) {
-
-  harvestingCard.style.display =
-    "none";
-
-}
-
-</script>
   
 </body>
 </html>
