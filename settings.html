@@ -132,6 +132,28 @@ saveButton.addEventListener(
   () => {
 
     alert(
+      JSON.stringify({
+        trialPhotos:
+          localStorage.getItem("trialPhotos"),
+        visitComments:
+          localStorage.getItem("visitComments"),
+        visitScore:
+          localStorage.getItem("visitScore"),
+        cropStage:
+          localStorage.getItem("cropStage"),
+        timeline:
+          localStorage.getItem("timeline")
+      })
+    );
+
+  }
+);
+
+saveButton.addEventListener(
+  "click",
+  () => {
+
+    alert(
       "Platform Settings Saved"
     );
 
