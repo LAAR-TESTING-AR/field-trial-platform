@@ -1,6 +1,6 @@
 window.FIELD_TRIAL_FEATURES = {
 
-  VISITS: false,
+  VISITS: true,
 
   ACCESS_PHOTOS: true,
 
