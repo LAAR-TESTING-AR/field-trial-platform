@@ -289,12 +289,21 @@
           ${
             esTrial
               ? `
-                <div class="field-photo-campo">
-                  <label for="fieldPhotoCropStage">Estadio del cultivo</label>
-                  <select id="fieldPhotoCropStage">
-                    ${crearOpcionesEtapa(sitio.crop)}
-                  </select>
-                </div>
+               ${
+  localStorage.getItem("cropStage") === "true"
+    ? `
+      <div class="field-photo-campo">
+        <label for="fieldPhotoCropStage">
+          Estadio del cultivo
+        </label>
+
+        <select id="fieldPhotoCropStage">
+          ${crearOpcionesEtapa(sitio.crop)}
+        </select>
+      </div>
+    `
+    : ""
+}
 
                 ${
   localStorage.getItem("visitScore") === "true"
