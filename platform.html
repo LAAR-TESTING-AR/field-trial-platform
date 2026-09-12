@@ -1089,22 +1089,19 @@ console.log(
 
 <script>
 
-if (
-  window.PlatformSettings &&
-  PlatformSettings.isEnabled("visitComments")
-) {
+console.log(
+  "Visit Comments:",
+  PlatformSettings.isEnabled(
+    "visitComments"
+  )
+);
 
-  console.log(
-    "Visit Comments ENABLED"
-  );
-
-} else {
-
-  console.log(
-    "Visit Comments DISABLED"
-  );
-
-}
+console.log(
+  "Crop Stage:",
+  PlatformSettings.isEnabled(
+    "cropStage"
+  )
+);
 
 </script>
   
