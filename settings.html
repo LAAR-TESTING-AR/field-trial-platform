@@ -74,7 +74,8 @@
 </div>
 
 </div>
-<script>
+
+  <script>
 
 const settings = [
   "trialPhotos",
@@ -84,33 +85,35 @@ const settings = [
   "timeline"
 ];
 
-settings.forEach(id => {
+window.addEventListener("DOMContentLoaded", () => {
 
-  const checkbox =
-    document.getElementById(id);
+  settings.forEach(id => {
 
-  if (!checkbox) return;
+    const checkbox =
+      document.getElementById(id);
 
-  const saved =
-    localStorage.getItem(id);
+    if (!checkbox) return;
 
-  checkbox.checked =
-    saved === "true";
+    checkbox.checked =
+      localStorage.getItem(id) === "true";
 
-  checkbox.addEventListener(
-    "change",
-    () => {
+    checkbox.addEventListener(
+      "change",
+      () => {
 
-      localStorage.setItem(
-        id,
-        checkbox.checked
-      );
+        localStorage.setItem(
+          id,
+          checkbox.checked
+        );
 
-    }
-  );
+      }
+    );
+
+  });
 
 });
 
 </script>
+  
 </body>
 </html>
