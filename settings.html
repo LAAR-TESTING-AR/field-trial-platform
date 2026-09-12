@@ -76,6 +76,11 @@
 <button id="saveSettings">
   Save Settings
 </button>
+<hr>
+
+<h3>Current Configuration</h3>
+
+<pre id="settingsStatus"></pre>
 
 </div>
   
@@ -91,7 +96,32 @@ const settings = [
   "cropStage",
   "timeline"
 ];
+function updateSettingsStatus() {
 
+  const status =
+    document.getElementById(
+      "settingsStatus"
+    );
+
+  status.textContent =
+    JSON.stringify(
+      {
+        trialPhotos:
+          localStorage.getItem("trialPhotos"),
+        visitComments:
+          localStorage.getItem("visitComments"),
+        visitScore:
+          localStorage.getItem("visitScore"),
+        cropStage:
+          localStorage.getItem("cropStage"),
+        timeline:
+          localStorage.getItem("timeline")
+      },
+      null,
+      2
+    );
+
+}
 window.addEventListener("DOMContentLoaded", () => {
 
   settings.forEach(id => {
@@ -112,12 +142,12 @@ window.addEventListener("DOMContentLoaded", () => {
           id,
           checkbox.checked
         );
-
+updateSettingsStatus();
       }
     );
 
   });
-
+updateSettingsStatus();
 });
 const saveButton =
   document.getElementById("saveSettings");
