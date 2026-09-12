@@ -74,6 +74,43 @@
 </div>
 
 </div>
+<script>
 
+const settings = [
+  "trialPhotos",
+  "visitComments",
+  "visitScore",
+  "cropStage",
+  "timeline"
+];
+
+settings.forEach(id => {
+
+  const checkbox =
+    document.getElementById(id);
+
+  if (!checkbox) return;
+
+  const saved =
+    localStorage.getItem(id);
+
+  checkbox.checked =
+    saved === "true";
+
+  checkbox.addEventListener(
+    "change",
+    () => {
+
+      localStorage.setItem(
+        id,
+        checkbox.checked
+      );
+
+    }
+  );
+
+});
+
+</script>
 </body>
 </html>
