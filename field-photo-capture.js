@@ -540,13 +540,13 @@
 
 const cropStageEnabled =
   window.PlatformSettings &&
-  PlatformSettings.isEnabled(
+  window.PlatformSettings.isEnabled(
     "cropStage"
   );
 
 const visitScoreEnabled =
   window.PlatformSettings &&
-  PlatformSettings.isEnabled(
+  window.PlatformSettings.isEnabled(
     "visitScore"
   );
         
