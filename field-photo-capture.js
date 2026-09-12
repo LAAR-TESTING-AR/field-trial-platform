@@ -539,16 +539,10 @@
         ).trim();
 
 const cropStageEnabled =
-  window.PlatformSettings &&
-  window.PlatformSettings.isEnabled(
-    "cropStage"
-  );
+  localStorage.getItem("cropStage") === "true";
 
 const visitScoreEnabled =
-  window.PlatformSettings &&
-  window.PlatformSettings.isEnabled(
-    "visitScore"
-  );
+  localStorage.getItem("visitScore") === "true";
         
 const cropStage = (
   esTrial &&
