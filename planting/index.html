@@ -54,9 +54,12 @@
 <div class="subtitulo">
   Argentina 2026-27
 </div>
-      <div class="submodulo">
-        Module 02 · Sowing
-      </div><div class="subtitulo">
+      <div
+  class="submodulo"
+  id="moduleTitleSowing">
+  Module 02 · Sowing
+</div>
+        <div class="subtitulo">
 
     </div>
 
@@ -303,7 +306,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (boton) {
       boton.href = "../viewer.html";
     }
+const tituloSowing =
+  document.getElementById(
+    "moduleTitleSowing"
+  );
 
+if (tituloSowing) {
+  tituloSowing.innerHTML =
+    'Module 02 · Sowing <span style="font-weight:bold;color:#a8ffb0;">· VIEWER MODE</span>';
+}
     const estilo =
       document.createElement("style");
 
