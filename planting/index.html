@@ -291,17 +291,31 @@ document.addEventListener("DOMContentLoaded", () => {
     window.FieldTrialAppMode &&
     window.FieldTrialAppMode.isViewer
   ) {
-console.log(
-  "Viewer:",
-  window.FieldTrialAppMode
-);
+
+    console.log(
+      "Viewer:",
+      window.FieldTrialAppMode
+    );
+
     const boton =
       document.querySelector(".btn-dashboard");
 
     if (boton) {
-      boton.href =
-        "../platform.html?mode=viewer";
+      boton.href = "../viewer.html";
     }
+
+    const estilo =
+      document.createElement("style");
+
+    estilo.textContent = `
+      .btn-registrar-siembra,
+      #btnGuardarSiembra,
+      #modalSiembra {
+        display:none !important;
+      }
+    `;
+
+    document.head.appendChild(estilo);
 
   }
 
