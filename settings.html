@@ -39,7 +39,16 @@
 </head>
 
 <body>
+<script>
+  const SETTINGS_PASSWORD = "FTP2026";
 
+  const enteredPassword = prompt("Enter the Platform Settings password:");
+
+  if (enteredPassword !== SETTINGS_PASSWORD) {
+    alert("Incorrect password. Access denied.");
+    window.location.href = "index.html";
+  }
+</script>
 <div class="card">
 
   <h1>⚙ Platform Settings</h1>
