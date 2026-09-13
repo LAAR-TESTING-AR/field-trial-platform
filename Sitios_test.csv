@@ -85,7 +85,7 @@ ACCY04NHER2T,Hernando,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-
 ACCY04NHRENT,Huinca Renancó,Contractor,Corn,IMPACT 3R,Late,XL,Córdoba,Oeste,-34.81137,-64.29639,,,,,Ultra baja,,Milani,Open Rio IV,,
 ACCY04NJMART,Jesus Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Centro,-30.1734,-64.16247,,,,,Ultra baja,,Attme,Capristo,,
 ANCY04NLCOCT,La Cocha,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-28.08803,-65.39169,,,,,Baja,,Guzman,Aris,,
-ANCY04NLCEJT,Las Cejas,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-26.99911,-64.68746,,,,,Ultra baja,,Guzman,Aris,,
+ANCY04NLCEJT,Las Cejas,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-26.99911,-64.68746,,,09/12/2026,,Ultra baja,,Guzman,Aris,,
 ANCY04NLFRET,Los Frentones,SPD,Corn,IMPACT 3R; IMPACT TROP; R2; OGCA,Late,AN,Chaco,NEA,-26.46564,-61.60989,,,09/12/2026,,Baja,,Puntano,Oggero,,Ver Genetic Disc. 2
 AACY04NSURGT,Los Surgentes,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Córdoba,Nucleo,-32.94124,-61.94253,,,,,Alta,,Perassi,Paz,,
 ANCY04NMETAT,Metan,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Salta,NOA,-25.43167,-64.81481,,,,,Ultra baja,,Miranda,Aris,,
@@ -143,7 +143,7 @@ ACCY04NPORTS,Porteña,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Centro,-31.0
 ANCY04NQUIMS,Quimili,SPD,Corn - Stewarded,R3; GCA,Late,AN,Santiago Del Estero,NEA,-27.78477,-62.19608,,,,,Estandar,,New FTS Jr - Quimili,Oggero,,
 ANCY04NRAPES,Rapelli,SPD,Corn - Stewarded,R3; GCA,Late,AN,Santiago Del Estero,NOA,-26.43294,-64.51268,,,,,Estandar,,Guzman,Aris,,
 AAJY07NFERRS,Ferre,Contractor,Mustard - Stewarded,R0,Early,XL,Buenos Aires,Nucleo,-34.116516,-61.205039,,,06/17/2026,,60 kg MAP + 150 kg UREA + 100 kg Sulfato Amonio,,Romero Cuny,Mazzini,,
-AAJY07NLCEJS,Las Cejas,Contractor,Mustard - Stewarded,R0,Early,XL,Tucuman,NOA,-26.827933,-64.8244,-26.8186961799827,-65.2088007760592,06/11/2026,,60 kg MAP + 150 kg UREA + 100 kg Sulfato Amonio,,Guzman,Oggero,,
+AAJY07NLCEJS,Las Cejas,Contractor,Mustard - Stewarded,R0,Early,XL,Tucuman,NOA,-26.827933,-64.8244,,,06/11/2026,,60 kg MAP + 150 kg UREA + 100 kg Sulfato Amonio,,Guzman,Oggero,,
 AAJY07NRNOGS,Rincon de Nogoya,Contractor,Mustard - Stewarded,R0,Early,XL,Entre Ríos,Litoral,-32.846661,-59.793735,,,06/19/2026,,60 kg MAP + 150 kg UREA + 100 kg Sulfato Amonio,,Vilchez,Bernardi,,
 Completar,Altos de Chipion,SPD,Soybean, -  - R4 5E /  -  -  -  -  - R3 5H,Early,AC,Cordoba,II - 1,-31.02742,-62.3462,,,,,30 Kg Microstar CMB,,Arias,Traggiay,,
 Completar,Ameghino,SPD,Soybean,R4 4E - R4 4L -  /  - R2 4H -  - R3 4E -  - ,Early,AA,Buenos Aires,II - 6,-34.850222,-62.392708,,,,,30 Kg Microstar CMB,,Antunes,Peralta Martinez,,
