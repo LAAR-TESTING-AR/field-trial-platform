@@ -216,7 +216,85 @@
 
     return buscarActualizacionPWA();
   }
+function mostrarProgreso(valor, mensaje) {
 
+  let overlay =
+    document.getElementById("syncOverlay");
+
+  if (!overlay) {
+
+    overlay = document.createElement("div");
+
+    overlay.id = "syncOverlay";
+
+    overlay.innerHTML = `
+      <div style="
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.4);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        z-index:99999;
+      ">
+
+        <div style="
+          background:white;
+          padding:25px;
+          border-radius:12px;
+          width:320px;
+          text-align:center;
+        ">
+
+          <h3 id="syncMessage">
+            Synchronizing Photo...
+          </h3>
+
+          <div style="
+            width:100%;
+            height:20px;
+            background:#ddd;
+            border-radius:10px;
+            overflow:hidden;
+          ">
+            <div id="syncBar"
+              style="
+              height:100%;
+              width:0%;
+              background:#0b6b3a;
+              transition:.5s;
+            ">
+            </div>
+          </div>
+
+          <p id="syncPercent">0%</p>
+
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+  }
+
+  document.getElementById("syncBar").style.width =
+    valor + "%";
+
+  document.getElementById("syncPercent").textContent =
+    valor + "%";
+
+  document.getElementById("syncMessage").textContent =
+    mensaje;
+}
+
+function ocultarProgreso() {
+
+  const overlay =
+    document.getElementById("syncOverlay");
+
+  if (overlay) {
+    overlay.remove();
+  }
+}
   async function enviarRegistro(registro) {
     if (!navigator.onLine) {
       throw new Error("El dispositivo está sin conexión.");
@@ -231,10 +309,21 @@
     if (!registro?.recordId) {
       throw new Error("El registro pendiente no tiene recordId.");
     }
-
+mostrarProgreso(
+  10,
+  "Preparing photo..."
+);
     const imageBase64 = await blobABase64(registro.photoBlob);
+    mostrarProgreso(
+  30,
+  "Converting image..."
+);
       const payload = construirPayload(registro, imageBase64);
-
+mostrarProgreso(
+  60,
+  "Uploading photo..."
+);
+``
     const response = await fetch(obtenerUrl(), {
       method: "POST",
       headers: {
@@ -246,7 +335,10 @@
     });
 
     const respuesta = await leerRespuesta(response);
-
+mostrarProgreso(
+  85,
+  "Processing response..."
+);
     if (!response.ok) {
       throw new Error(
         respuesta?.message ||
@@ -354,7 +446,14 @@
       });
 
       await buscarActualizacionSiNoQuedanPendientes();
+mostrarProgreso(
+  100,
+  "Completed"
+);
 
+setTimeout(() => {
+  ocultarProgreso();
+}, 1200);
       return {
         success: true,
         recordId: registro.recordId,
@@ -376,7 +475,7 @@
           );
         }
       }
-
+ocultarProgreso();
       throw error;
     }
   }
