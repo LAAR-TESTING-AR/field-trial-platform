@@ -1,155 +1,1082 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Field Trial Map Viewer</title>
-  <meta name="description" content="Consulta de ensayos, accesos e historial de visitas de Research Argentina.">
-  <meta name="theme-color" content="#0b6b3a">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Trial Viewer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="manifest" href="manifest-viewer.webmanifest">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="icon-192.png">
+<title>Field Trial Platform</title>
+<link rel="manifest" href="manifest.webmanifest">
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="summary-toolbar.css?v=1">
-  <link rel="stylesheet" href="foto-access-addon.css?v=3">
-  <link rel="stylesheet" href="popup-mobile-addon.css?v=3">
-  <link rel="stylesheet" href="drop-trial-addon.css?v=1">
-  <link rel="stylesheet" href="filtros-dependientes-v3.css?v=1">
-  <link rel="stylesheet" href="field-photo-capture.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-capture.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-pending.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-sync-ui.css?v=1">
-  <link rel="stylesheet" href="field-photo-history.css?v=1">
-  <link rel="stylesheet" href="pwa-ui.css?v=2">
-  <link rel="stylesheet" href="header-app.css?v=3">
+<meta name="theme-color" content="#0b6b3a">
+
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<meta name="apple-mobile-web-app-title" content="Field Trial Platform">
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5f7f6;
+}
+
+header{
+  position:relative;
+  overflow:hidden;
+  min-height:150px;
+  padding:24px 20px;
+  color:white;
+  background:
+    linear-gradient(
+      110deg,
+      #064526 0%,
+      #0b6b3a 48%,
+      #087343 100%
+    );
+}
+
+/* Surcos diagonales minimalistas */
+header::before{
+  content:"";
+  position:absolute;
+  inset:-80px -40px;
+  background:
+    repeating-linear-gradient(
+      118deg,
+      transparent 0,
+      transparent 23px,
+      rgba(255,255,255,0.055) 24px,
+      rgba(255,255,255,0.055) 26px,
+      transparent 27px,
+      transparent 48px
+    );
+  transform:perspective(500px) rotateX(18deg);
+  transform-origin:center bottom;
+  pointer-events:none;
+}
+
+/* Luz suave detrás del logo */
+header::after{
+  content:"";
+  position:absolute;
+  left:calc(50% - 630px);
+  top:50%;
+  width:210px;
+  height:210px;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      rgba(139,195,74,0.20) 0%,
+      rgba(139,195,74,0.07) 45%,
+      transparent 72%
+    );
+  pointer-events:none;
+}
+
+.header-container{
+  position:relative;
+  z-index:1;
+  max-width:1200px;
+  min-height:102px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:24px;
+}
+
+.logo{
+  width:88px;
+  height:88px;
+  flex-shrink:0;
+  object-fit:cover;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,0.32);
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.22),
+    0 0 0 6px rgba(255,255,255,0.06);
+}
+
+.header-container h1{
+  margin:0;
+  font-size:clamp(30px,4vw,44px);
+  line-height:1.05;
+  letter-spacing:-1px;
+}
+
+.subtitulo{
+  margin-top:8px;
+  font-size:17px;
+  font-weight:500;
+  letter-spacing:0.4px;
+  color:rgba(255,255,255,0.88);
+}
+
+h1{
+  margin:0;
+}
+
+.subtitulo{
+  margin-top:5px;
+}
+
+main{
+  max-width:1200px;
+  margin:auto;
+  padding:30px 20px;
+}
+
+.modulos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:25px;
+}
+
+.card{
+  --modulo-color:#0b6b3a;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  min-height:310px;
+  overflow:hidden;
+  padding:30px;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f7faf8 100%
+    );
+  border:1px solid rgba(11,107,58,0.18);
+  border-top:6px solid var(--modulo-color);
+  border-radius:20px;
+  box-shadow:
+    0 12px 30px rgba(16,65,40,0.10),
+    0 2px 8px rgba(16,65,40,0.08);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    border-color .25s ease;
+}
+
+.card:nth-child(1){
+  --modulo-color:#075c34;
+}
+
+.card:nth-child(2){
+  --modulo-color:#69a928;
+}
+
+.card:nth-child(3){
+  --modulo-color:#c89419;
+}
+
+.card::before{
+  content:"";
+  position:absolute;
+  right:-55px;
+  bottom:-70px;
+  width:190px;
+  height:190px;
+  border:35px solid var(--modulo-color);
+  border-radius:50%;
+  opacity:.045;
+  pointer-events:none;
+}
+
+.card::after{
+  content:"";
+  position:absolute;
+  right:24px;
+  top:28px;
+  width:52px;
+  height:2px;
+  background:var(--modulo-color);
+  box-shadow:
+    0 8px 0 var(--modulo-color),
+    0 16px 0 var(--modulo-color);
+  opacity:.18;
+  transform:rotate(-18deg);
+  pointer-events:none;
+}
+
+.card:hover{
+  transform:translateY(-7px);
+  border-color:var(--modulo-color);
+  box-shadow:
+    0 20px 40px rgba(16,65,40,0.16),
+    0 4px 10px rgba(16,65,40,0.10);
+}
+
+.card h2{
+  position:relative;
+  margin:20px 0 10px;
+  color:#123d29;
+  font-size:27px;
+  line-height:1.1;
+}
+
+.card p{
+  position:relative;
+  flex:1;
+  margin:0;
+  color:#4c5d53;
+  font-size:16px;
+  line-height:1.55;
+}
+
+.icono{
+  position:relative;
+  width:70px;
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  border-radius:18px;
+  background:var(--modulo-color);
+  box-shadow:
+    0 9px 18px rgba(11,107,58,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+}
+
+/* Icono Master List: capas de información */
+.icono-master{
+  flex-direction:column;
+  gap:7px;
+}
+
+.icono-linea{
+  display:block;
+  width:34px;
+  height:6px;
+  border:2px solid white;
+  border-radius:6px;
+  transform:skewX(-18deg);
+}
+
+.icono-linea:nth-child(2){
+  margin-left:8px;
+}
+
+/* Icono Sowing: brote minimalista */
+.tallo{
+  position:absolute;
+  bottom:15px;
+  left:34px;
+  width:4px;
+  height:31px;
+  background:white;
+  border-radius:5px;
+}
+
+.hoja{
+  position:absolute;
+  width:21px;
+  height:12px;
+  background:white;
+}
+
+.hoja-izquierda{
+  left:15px;
+  top:23px;
+  border-radius:18px 3px 18px 3px;
+  transform:rotate(24deg);
+}
+
+.hoja-derecha{
+  right:14px;
+  top:17px;
+  border-radius:3px 18px 3px 18px;
+  transform:rotate(-22deg);
+}
+
+/* Icono Harvesting: espiga minimalista */
+.espiga-tallo{
+  position:absolute;
+  bottom:13px;
+  left:34px;
+  width:4px;
+  height:43px;
+  background:white;
+  border-radius:4px;
+}
+
+.grano{
+  position:absolute;
+  width:15px;
+  height:8px;
+  background:white;
+}
+
+.grano-1{
+  left:20px;
+  top:20px;
+  border-radius:14px 2px 14px 2px;
+  transform:rotate(25deg);
+}
+
+.grano-2{
+  right:18px;
+  top:27px;
+  border-radius:2px 14px 2px 14px;
+  transform:rotate(-25deg);
+}
+
+.grano-3{
+  left:20px;
+  top:36px;
+  border-radius:14px 2px 14px 2px;
+  transform:rotate(25deg);
+}
+
+.grano-4{
+  right:18px;
+  top:43px;
+  border-radius:2px 14px 2px 14px;
+  transform:rotate(-25deg);
+}
+
+.boton{
+  position:relative;
+  align-self:flex-start;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:46px;
+  margin-top:25px;
+  padding:12px 22px;
+  border:1px solid var(--modulo-color);
+  border-radius:12px;
+  background:var(--modulo-color);
+  color:white;
+  text-decoration:none;
+  font-weight:700;
+  box-shadow:0 7px 14px rgba(11,107,58,0.16);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.boton:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(11,107,58,0.23);
+}
+
+.disabled{
+  background:#e7e9e8;
+  border-color:#d2d6d4;
+  color:#758079;
+  box-shadow:none;
+  pointer-events:none;
+}
+
+.boton{
+  display:inline-block;
+  margin-top:20px;
+  padding:12px 20px;
+  background:#0b6b3a;
+  color:white;
+  text-decoration:none;
+  border-radius:10px;
+  font-weight:bold;
+}
+
+.disabled{
+  background:#999;
+  pointer-events:none;
+}
+.kpi-dashboard{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px,1fr)
+    );
+
+  gap:18px;
+
+  margin-bottom:30px;
+}
+
+.kpi-card{
+
+  --kpi-color:#0b6b3a;
+
+  background:white;
+
+  border-radius:18px;
+
+  padding:22px;
+
+  text-align:center;
+
+  border-top:5px solid var(--kpi-color);
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.08);
+}
+
+  .kpi-card:nth-child(1){
+  --kpi-color:#0b6b3a;
+}
+
+.kpi-card:nth-child(2){
+  --kpi-color:#7cb342;
+}
+
+.kpi-card:nth-child(3){
+  --kpi-color:#d32f2f;
+}
+
+.kpi-card:nth-child(4){
+  --kpi-color:#202020;
+}
+
+.kpi-valor{
+
+  display:block;
+
+  font-size:34px;
+
+  font-weight:700;
+
+  color:var(--kpi-color);
+}
+
+.kpi-label{
+
+  display:block;
+
+  margin-top:6px;
+
+  color:#666;
+
+  font-size:14px;
+
+  letter-spacing:.5px;
+
+  text-transform:uppercase;
+}
+
+  .mini-kpi{
+  margin-top:15px;
+}
+
+.mini-kpi-valor{
+  font-size:26px;
+  font-weight:700;
+  color:#69a928;
+}
+
+.mini-kpi-label{
+  color:#666;
+  font-size:13px;
+}
+
+.mini-progress{
+  margin-top:10px;
+  width:100%;
+  height:8px;
+  border-radius:20px;
+  background:#e5e5e5;
+  overflow:hidden;
+}
+
+.mini-progress-fill{
+  height:100%;
+  background:#69a928;
+  border-radius:20px;
+}
+  .master-stats{
+
+  display:flex;
+
+  gap:12px;
+
+  margin-top:12px;
+
+  flex-wrap:wrap;
+
+}
+
+.master-stats span{
+
+  padding:4px 10px;
+
+  border-radius:20px;
+
+  background:#edf5ee;
+
+  color:#0b6b3a;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}
+.sowing-stats{
+
+  display:flex;
+
+  gap:12px;
+
+  margin-top:12px;
+
+  flex-wrap:wrap;
+
+}
+
+.sowing-stats span{
+
+  padding:4px 10px;
+
+  border-radius:20px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}
+
+#sowingCompleted{
+
+  background:#edf7e8;
+
+  color:#69a928;
+
+}
+
+#sowingPending{
+
+  background:#fdeaea;
+
+  color:#d32f2f;
+
+}
+.harvest-badge{
+
+  display:inline-block;
+
+  margin-top:14px;
+
+  padding:5px 12px;
+
+  border-radius:20px;
+
+  background:#fff5da;
+
+  color:#c89419;
+
+  font-size:12px;
+
+  font-weight:700;
+
+  letter-spacing:.5px;
+}
+
+.harvest-roadmap{
+
+  margin-top:10px;
+
+  color:#777;
+
+  font-size:13px;
+
+  font-weight:600;
+}
+  .dashboard-title{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:15px;
+
+  margin-bottom:26px;
+
+}
+
+.dashboard-title-line{
+
+  flex:1;
+
+  max-width:120px;
+
+  height:1px;
+
+  background:
+    linear-gradient(
+      to right,
+      transparent,
+      rgba(11,107,58,.35),
+      transparent
+    );
+}
+
+.dashboard-title-text{
+
+  font-size:12px;
+
+  font-weight:700;
+
+  letter-spacing:2px;
+
+  color:#0b6b3a;
+
+  text-transform:uppercase;
+
+}
+
+.platform-status-bar{
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+  margin-bottom:22px;
+
+}
+
+.platform-version{
+
+  font-size:13px;
+
+  font-weight:700;
+
+  color:#0b6b3a;
+
+}
+
+#platformConnection{
+
+  font-size:13px;
+
+  font-weight:600;
+
+  color:#444;
+
+}
+
+.install-app-btn{
+
+  border:none;
+
+  cursor:pointer;
+
+  padding:8px 14px;
+
+  border-radius:10px;
+
+  background:#0b6b3a;
+
+  color:white;
+
+  font-size:13px;
+
+  font-weight:600;
+}
+.platform-viewer-badge{
+  padding:6px 11px;
+  border:1px solid rgba(11,107,58,.22);
+  border-radius:999px;
+  background:#e9f4ed;
+  color:#0b6b3a;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.8px;
+  white-space:nowrap;
+}  
+@media(max-width:700px){
+
+  header{
+    min-height:190px;
+    padding:24px 18px;
+  }
+
+  .header-container{
+    flex-direction:column;
+    justify-content:center;
+    text-align:center;
+    gap:14px;
+  }
+
+  .logo{
+    width:78px;
+    height:78px;
+  }
+
+  h1{
+    font-size:30px;
+  }
+
+  .subtitulo{
+    font-size:15px;
+  }
+  main{
+    padding:28px 16px;
+  }
+
+  .modulos{
+    grid-template-columns:1fr;
+    gap:20px;
+  }
+
+  .card{
+    min-height:285px;
+    padding:25px;
+    border-radius:18px;
+  }
+
+  .icono{
+    width:64px;
+    height:64px;
+    border-radius:16px;
+  }
+
+  .card h2{
+    margin-top:18px;
+    font-size:30px;
+  }
+
+  .card p{
+    font-size:17px;
+  }
+
+  .boton{
+    width:100%;
+    min-height:52px;
+    font-size:17px;
+  }
+    .kpi-dashboard{
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-bottom:20px;
+  }
+
+  .kpi-card{
+    padding:10px;
+    border-radius:14px;
+  }
+
+  .kpi-valor{
+    font-size:24px;
+  }
+
+  .kpi-label{
+    font-size:12px;
+  }
+
+   .dashboard-title{
+
+    gap:10px;
+
+    margin-bottom:20px;
+
+  }
+
+  .dashboard-title-text{
+
+    font-size:11px;
+
+    letter-spacing:1.5px;
+
+  }
+
+  .dashboard-title-line{
+
+    max-width:60px;
+
+  } 
+
+    .platform-status-bar{
+    gap:10px;
+    margin-bottom:18px;
+  }
+
+  .install-app-btn{
+    width:auto;
+    min-height:auto;
+  }
+}
+
+</style>
+
 </head>
 
 <body>
-  <header class="encabezado">
-    <div class="encabezado-textos">
-  <h1>Field Trial Map</h1>
 
-  <div class="encabezado-viewer-linea">
-    <p class="encabezado-subtitulo">Research Argentina 2026-27</p>
-    <span class="encabezado-viewer-badge">Modo consulta</span>
-  </div>
+<header>
 
-  <p class="encabezado-funciones">
-    Ensayos · Accesos · Historial · Navegación
-  </p>
-</div>
+  <div class="header-container">
+
+    <img
+src="icon-192.png"
+alt="Field Trial Platform"
+class="logo">
+
+    <div>
+
+      <h1>Field Trial Platform</h1>
+
+      <div class="subtitulo">
+        Argentina 2026-27
+      </div>
+
     </div>
-  </header>
 
-  <section class="panel">
-    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, región, provincia, FTS, SPA u operación">
-
-    <select id="filtroCultivo">
-      <option value="">Todos los cultivos</option>
-    </select>
-
-    <select id="filtroRegion">
-      <option value="">Todas las regiones</option>
-    </select>
-
-    <select id="filtroLocalidad">
-      <option value="">Todas las localidades</option>
-    </select>
-
-    <select id="filtroFTS">
-      <option value="">Todos los FTS</option>
-    </select>
-
-    <button id="limpiarFiltros" type="button">Limpiar filtros</button>
-  </section>
-
-  <div class="resumen">
-    <span id="contadorSitios">Cargando sitios...</span>
   </div>
 
-  <main id="mapa"></main>
+</header>
 
-  <script>
-    window.FIELD_TRIAL_FORCE_VIEWER = true;
-    window.FieldTrialAppMode = {
-      mode: "viewer",
-      isViewer: true,
-      isFull: false
-    };
-  </script>
+<main>
+<div class="platform-status-bar">
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <div class="platform-version">
+    v1.0
+  </div>
 
-  <script src="app.js?v=10"></script>
-  <script src="summary-toolbar.js?v=1"></script>
-  <script src="drop-trial-addon.js?v=2"></script>
-  <script src="foto-access-addon.js?v=4"></script>
-  <script src="popup-mobile-addon.js?v=4"></script>
-  <script src="filtros-dependientes-v3.js?v=2"></script>
+  <div id="platformConnection">
+    🟢 Online
+  </div>
 
-  <script src="field-photo-popup-integration.js?v=3"></script>
-  <script src="field-photo-history.js?v=1"></script>
-  <script src="field-photo-history-ui.js?v=2"></script>
-  <script src="field-photo-history-viewer.js?v=1"></script>
-  <script src="field-photo-timeline-icons.js?v=1"></script>
+  <button
+    id="installAppBtn"
+    class="install-app-btn">
+    📱 Install App
+  </button>
 
-  <script src="app-viewer-controls.js?v=1"></script>
-  <script src="pwa-ui.js?v=2"></script>
+</div>
+  <div class="kpi-dashboard">
 
-  <script>
-    let recargaPorActualizacion = false;
+  <div class="kpi-card">
+    <span class="kpi-valor">162</span>
+    <span class="kpi-label">AOI</span>
+  </div>
 
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", async () => {
-        try {
-          const registration = await navigator.serviceWorker.register(
-            "./service-worker.js",
-            { updateViaCache: "none" }
-          );
+  <div class="kpi-card">
+    <span class="kpi-valor">38%</span>
+    <span class="kpi-label">Sown</span>
+  </div>
 
-          window.fieldTrialServiceWorkerRegistration = registration;
+  <div class="kpi-card">
+    <span class="kpi-valor">101</span>
+    <span class="kpi-label">Pending</span>
+  </div>
 
-          if (registration.waiting) {
-            registration.waiting.postMessage({ type: "SKIP_WAITING" });
-          }
+  <div class="kpi-card">
+    <span class="kpi-valor">2</span>
+    <span class="kpi-label">Drop</span>
+  </div>
 
-          registration.addEventListener("updatefound", () => {
-            const nuevoWorker = registration.installing;
-            if (!nuevoWorker) return;
+</div>
 
-            nuevoWorker.addEventListener("statechange", () => {
-              if (
-                nuevoWorker.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                nuevoWorker.postMessage({ type: "SKIP_WAITING" });
-              }
-            });
-          });
+<div class="dashboard-title">
 
-          await registration.update();
-        } catch (error) {
-          console.error(
-            "Error al registrar o actualizar Service Worker:",
-            error
-          );
-        }
-      });
+  <span class="dashboard-title-line"></span>
 
-      navigator.serviceWorker.addEventListener("controllerchange", () => {
-        if (recargaPorActualizacion) return;
-        recargaPorActualizacion = true;
-        window.location.reload();
-      });
-    }
-  </script>
+  <span class="dashboard-title-text">
+    FIELD OPERATIONS DASHBOARD
+  </span>
+
+  <span class="dashboard-title-line"></span>
+
+</div>
+  
+  <div class="modulos">
+
+    <div class="card">
+
+      <div class="icono icono-master" aria-hidden="true">
+  <span class="icono-linea"></span>
+  <span class="icono-linea"></span>
+  <span class="icono-linea"></span>
+</div>
+
+      <h2>Master List</h2>
+
+    <p>
+  Operational network overview.
+</p>
+
+<div class="mini-kpi">
+
+  <div
+    class="mini-kpi-valor"
+    id="masterAoi">
+    0
+  </div>
+
+  <div class="mini-kpi-label">
+    Active AOI
+  </div>
+<div class="master-stats">
+
+  <span id="masterRegions">
+    0 Regions
+  </span>
+
+  <span id="masterAccess">
+    0 Access
+  </span>
+
+</div>
+</div>
+
+      <a
+        class="boton"
+        href="index.html">
+        Open Module
+      </a>
+
+    </div>
+
+    <div class="card">
+
+      <div class="icono icono-sowing" aria-hidden="true">
+  <span class="tallo"></span>
+  <span class="hoja hoja-izquierda"></span>
+  <span class="hoja hoja-derecha"></span>
+</div>
+
+      <h2>Sowing</h2>
+
+      <p>
+        Planting Tracker, KPIs, Timeline y Dashboard.
+      </p>
+<div class="mini-kpi">
+
+  <div
+  class="mini-kpi-valor"
+  id="sowingProgress">
+  0%
+</div>
+
+  <div class="mini-kpi-label">
+    Planting Progress
+  </div>
+
+</div>
+
+<div class="mini-progress">
+
+  <div
+    class="mini-progress-fill"
+    style="width:0%;">
+  </div>
+
+</div>
+
+     <div class="sowing-stats">
+
+  <span id="sowingCompleted">
+    0 Sown
+  </span>
+
+  <span id="sowingPending">
+    0 Pending
+  </span>
+
+</div> 
+      
+     <a
+  class="boton"
+  href="planting/">
+  Open Module
+</a>
+
+    </div>
+
+    <div class="card">
+
+     <div class="icono icono-harvesting" aria-hidden="true">
+  <span class="espiga-tallo"></span>
+  <span class="grano grano-1"></span>
+  <span class="grano grano-2"></span>
+  <span class="grano grano-3"></span>
+  <span class="grano grano-4"></span>
+</div>
+      <h2>Harvesting</h2>
+
+      <p>
+  Harvest tracking architecture
+  already prepared within
+  Field Trial Platform.
+</p>
+
+<div class="harvest-badge">
+  MODULE 03
+</div>
+
+<div class="harvest-roadmap">
+  Next Release
+</div>
+
+      <a
+class="boton disabled"
+href="#">
+Coming Soon
+</a>
+</div>
+<div class="card">
+
+  <div icono" aria-hidden="true">
+    ⚙️
+  </div>
+
+  <h2>Platform Settings</h2>
+
+  <p>
+    Feature activation, laboratory tools,
+    Trial Photos, Visit Score, Comments,
+    Timeline and advanced configuration.
+  </p>
+
+  <div class="harvest-badge">
+    LAB MODULE
+  </div>
+
+  <div class="harvest-roadmap">
+    Experimental
+  </div>
+
+<a
+    class="boton"
+    href="settings.html">
+    Open Module
+</a>
+
+</div>
+      
+    </div>
+
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="platform-mode.js?v=1"></script>
+<script src="platform.js?v=1"></script>
+<script src="platform-install.js"></script>
+<script src="platform-settings.js"></script>
+  
 </body>
 </html>
