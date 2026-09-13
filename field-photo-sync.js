@@ -107,7 +107,7 @@
     if (!(blob instanceof Blob)) {
       throw new Error("La fotografía local no es válida.");
     }
-    
+    const dataUrl = await blobADataUrl(blob);
     const separador = dataUrl.indexOf(",");
 
     if (separador < 0) {
