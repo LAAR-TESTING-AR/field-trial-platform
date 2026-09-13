@@ -76,7 +76,7 @@
   Argentina 2026-27
 </p>
 
-<p class="encabezado-funciones">
+<p class="encabezado-funciones" id="moduleTitle">
   Module 01 · Master List
 </p>
       </div>
@@ -217,7 +217,13 @@ document.addEventListener("DOMContentLoaded", () => {
     window.FieldTrialAppMode &&
     window.FieldTrialAppMode.isViewer
   ) {
+const titulo =
+  document.getElementById("moduleTitle");
 
+if (titulo) {
+  titulo.innerHTML =
+    'Module 01 · Master List <span style="font-weight:bold;color:#a8ffb0;">· VIEWER MODE</span>';
+}
     const boton =
       document.querySelector(".btn-dashboard");
 
