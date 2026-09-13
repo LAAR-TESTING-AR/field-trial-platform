@@ -107,10 +107,6 @@
     if (!(blob instanceof Blob)) {
       throw new Error("La fotografía local no es válida.");
     }
-
-alert("Blob recibido");
-const dataUrl = await blobADataUrl(blob);
-alert("Blob convertido");
     
     const separador = dataUrl.indexOf(",");
 
@@ -239,11 +235,6 @@ alert("Blob convertido");
     const imageBase64 = await blobABase64(registro.photoBlob);
       const payload = construirPayload(registro, imageBase64);
 
-alert(
-  "Payload size: " +
-  JSON.stringify(payload).length
-);
-    alert("LLEGUE AL FETCH");
     const response = await fetch(obtenerUrl(), {
       method: "POST",
       headers: {
