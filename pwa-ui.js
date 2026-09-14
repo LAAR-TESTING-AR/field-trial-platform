@@ -92,7 +92,34 @@ aria-label="Actualizar datos">
     actualizarBotonInstalacion();
     actualizarFotosPendientes();
   }
+const syncBtn =
+  document.getElementById(
+    "syncMasterList"
+  );
 
+if (
+  syncBtn &&
+  window.location.pathname.includes("index")
+) {
+
+  syncBtn.addEventListener(
+    "click",
+    () => {
+
+      syncBtn.textContent = "⏳";
+
+      cargarSitios();
+
+      setTimeout(() => {
+
+        syncBtn.textContent = "🔄";
+
+      }, 3000);
+
+    }
+  );
+
+}
   async function actualizarFotosPendientes() {
     const boton = document.getElementById("pwaFotosPendientes");
     const cantidadElemento = document.getElementById(
