@@ -23,7 +23,44 @@
   font-size: 13px;
   font-weight: 700;
 }
+.pwa-boton-sync{
 
+  border:none;
+
+  cursor:pointer;
+
+  padding:10px 18px;
+
+  border-radius:999px;
+
+  background:#0b6b3a;
+
+  color:white;
+
+  font-size:14px;
+
+  font-weight:700;
+
+  min-height:40px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:6px;
+
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.15);
+
+}
+
+.pwa-boton-sync:hover{
+
+  background:#09552e;
+
+}
 .pwa-version {
   padding: 2px 7px;
   border-radius: 999px;
