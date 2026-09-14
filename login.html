@@ -108,23 +108,28 @@
           throw new Error(`El flujo respondió con estado ${response.status}.`);
         }
 
-        const data = await response.json();
+       const role =
+  typeof data.role === "string"
+    ? data.role
+    : data.role?.Value;
 
-        if (data.valid === true) {
-          localStorage.setItem("loggedIn", "true");
-          localStorage.setItem("userEmail", email);
-          console.log("Respuesta flujo:", data);
-          localStorage.setItem("userRole", data.role.Value || "Viewer");
-          localStorage.setItem("userName", data.name || "");
-          if (data.role.Value === "Viewer") {
-
-    window.location.href = "viewer.html";
-
-} else {
-
-    window.location.href = "platform.html";
-
+if (!role) {
+  throw new Error("El flujo no devolvió un rol válido.");
 }
+
+localStorage.setItem("loggedIn", "true");
+localStorage.setItem("userEmail", email);
+localStorage.setItem("userRole", role);
+localStorage.setItem("userName", data.name || "");
+
+if (role.trim().toLowerCase() === "viewer") {
+  window.location.href = "viewer.html";
+} else {
+  window.location.href = "platform.html";
+}
+
+return;
+
           return;
         }
 
