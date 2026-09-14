@@ -1,10 +1,20 @@
 let deferredPrompt = null;
 
+const pwaInstalada =
+  window.matchMedia(
+    "(display-mode: standalone)"
+  ).matches ||
+  window.navigator.standalone === true;
 const installBtn =
   document.getElementById(
     "installAppBtn"
   );
-
+if (
+  installBtn &&
+  pwaInstalada
+) {
+  installBtn.style.display = "none";
+}
 window.addEventListener(
   "beforeinstallprompt",
   event => {
