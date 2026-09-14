@@ -35,9 +35,9 @@
       ${
   window.location.pathname.includes("index.html")
   ? `
- <button
+<button
   id="syncMasterList"
-  class="master-sync-icon"
+  class="pwa-boton-sync"
   type="button"
   title="Actualizar datos">
   🔄
