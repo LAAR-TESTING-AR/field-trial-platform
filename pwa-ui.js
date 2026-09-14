@@ -37,7 +37,7 @@
   ? `
   <button
     id="syncMasterList"
-    class="pwa-boton-instalar"
+    class="pwa-boton-sync"
     type="button">
     🔄 Sync
   </button>
