@@ -445,7 +445,7 @@ mostrarProgreso(
         photoOrder: registro.photoOrder
       });
 
-      await buscarActualizacionSiNoQuedanPendientes();
+    //  await buscarActualizacionSiNoQuedanPendientes();
 mostrarProgreso(
   100,
   "Completed"
