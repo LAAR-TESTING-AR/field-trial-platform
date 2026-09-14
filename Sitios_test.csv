@@ -120,7 +120,7 @@ Completar,Pergamino Res4,SPD,Corn - Parent Chr,ARPC Restoration,Late,AA,Buenos A
 AACY04NAME1S,America,SPD,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Oeste,-35.63105,-63.07321,,,,,Alta,,Antunes,Peralta Martinez,,
 AACY04NCAS1S,Casilda,SPD,Corn - Stewarded,R3; GCA,Early,AA,Santa Fe,Nucleo,-33.03078,-61.10921,,,,,Estandar,,Vilchez,Traggiay,,En Ramallo
 AACY04NGCHUS,Gualeguaychu,SPD,Corn - Stewarded,R3; GCA,Early,AA,Entre Ríos,Litoral,-33.09575,-58.80542,,,,,Estandar,,Vilchez,Bernardi,,
-AACY04NCARLS,La Carlota,SPD,Corn - Stewarded,R3; GCA,Early,AA,Córdoba,Oeste,-33.26902,-63.29965,,,,,Baja,,Perassi,Paz,,
+AACY04NCARLS,La Carlota,SPD,Corn - Stewarded,R3; GCA,Early,AA,Córdoba,Oeste,-33.269807,-63.301441,,,,,Baja,,Perassi,Paz,,
 ACCY04NMAL1S,Malena,SPD,Corn - Stewarded,R3; GCA,Early,AC,Córdoba,Oeste,-33.48942,-64.4722,,,,,Estandar,,Milani,Open Rio IV,,
 AACY04NMBU1S,Monte Buey,SPD,Corn - Stewarded,R3; GCA,Early,AA,Córdoba,Nucleo,-33.00007,-62.45911,,,,,Estandar,,Perassi,Paz,,
 AACY04NFERRS,Ferre,Mixed,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Nucleo,-34.12044,-61.20371,,,,,Estandar,,Romero Cuny,Mazzini,,AG Idea Ferre. Junto con TCD. Se convierte en Regulado.
@@ -198,7 +198,7 @@ Completar,Reconquista,Mixed,Soybean, -  -  /  -  - R3 6H - R3 7H,Early,AN,Santa 
 Completar,Romang,Mixed,Soybean, -  -  /  -  - R3 6H - R3 7H,Early,AN,Santa Fe,I - 2,-29.472894,-59.752566,,,,,30 Kg Microstar CMB,,Puntano,Oggero,,New location
 Completar,Rosario de Lerma,SPD,Soybean, -  -  /  -  - R3 6H - R3 7H,Early,AN,Salta,I - 1,-24.942086,-65.494556,,,,,30 Kg Microstar CMB,,Miranda,Aris,,New location
 Completar,Roversi ,SPD,Soybean, -  -  / Lic M2 - Var M2 - R3 6H - R3 7H,Early,AN,Santiago del Estero,I - 2,-27.736837,-61.929635,,,,,30 Kg Microstar CMB,,New FTS Jr - Quimili,Oggero,,
-Completar,Runciman,SPD,Soybean,R4 4E - R4 4L -  / Var M0-1 - R2 4H -  - R3 4E - R3 4L - ,Early,AA,Santa Fe,II - 4,-33.9609,-61.64778,,,,,30 Kg Microstar CMB,,Perassi,Paz,,
+Completar,Runciman,SPD,Soybean,R4 4E - R4 4L -  / Var M0-1 - R2 4H -  - R3 4E - R3 4L - ,Early,AA,Santa Fe,II - 4,-34.068539,-61.941716,,,,,30 Kg Microstar CMB,,Perassi,Paz,,
 Completar,Sacanta,SPD,Soybean, - R4 4L - R4 5E /  -  - R2 5E -  - R3 4L - R3 5H,Early,AC,Cordoba,II - 2,-31.75465,-63.36537,,,,,30 Kg Microstar CMB,,Gomez,Capristo,,
 Completar,Sachayoj ,SPD,Soybean, -  -  / Lic M2 - Var M2 - R3 6H - R3 7H,Early,AN,Santiago del Estero,I - 2,-26.67471,-61.963361,,,,,30 Kg Microstar CMB,,Puntano,Oggero,,
 Completar,Salto,SPD,Soybean,R4 4E - R4 4L -  / Var M0-1 - R2 4H -  - R3 4E - R3 4L - ,Early,AA,Buenos Aires,II - 6,-34.34286,-60.30349,,,,,30 Kg Microstar CMB,,Romero Cuny,Mazzini,,En Gahan
