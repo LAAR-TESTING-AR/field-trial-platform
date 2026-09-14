@@ -48,7 +48,7 @@ AACY04NPAR1T,Paraná,Contractor,Corn,IMPACT 3R,Early,XL,Entre Ríos,Litoral,-31.
 AACY04NPERGT,Pergamino ,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Early,AA,Buenos Aires,Nucleo,-33.84191,-60.62474,,,,,Estandar,,Romero Cuny,Mazzini,,
 AACY04NPIERT-AACY04NPIEHT,Pieres,Mixed,Corn,IMPACT 3R; R3; HYPER,Early,AA,Buenos Aires,Sudeste,-38.36364,-58.63112,,,,,Estandar,,Cantero,Sarlangue,,Generar dos AOIs distintas
 AACY04NRAMAT,Ramallo,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Nucleo,-33.54156,-60.15158,,,,,Estandar,,Romero Cuny,Mazzini,,
-AACY04NRUNCT,Runciman,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Santa Fe,Nucleo,-33.91214,-61.81002,,,,,Alta,,Perassi,Paz,,
+AACY04NRUNCT,Runciman,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Santa Fe,Nucleo,-34.068923,-61.94338,,,,,Alta,,Perassi,Paz,,
 ACCY04NSAMPT,Sampacho,SPD,Corn,IMPACT 3R; R3,Early,AC,Córdoba,Oeste,-33.36933,-64.70011,,,,,Estandar,,Milani,Open Rio IV,,
 ACCB02FMRCST,Sampacho MRCV,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.65468,-64.4799,,,,,Estandar,,Milani,Open Rio IV,,
 ACCY04NSBAST,San Basilio,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-33.50465,-64.21658,,,,,Estandar,,Milani,Open Rio IV,,
@@ -87,7 +87,7 @@ ACCY04NJMART,Jesus Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Centro,-30.1734,-64
 ANCY04NLCOCT,La Cocha,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-28.08803,-65.39169,,,,,Baja,,Guzman,Aris,,
 ANCY04NLCEJT,Las Cejas,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-26.99911,-64.68746,,,,,Ultra baja,,Guzman,Aris,,
 ANCY04NLFRET,Los Frentones,SPD,Corn,IMPACT 3R; IMPACT TROP; R2; OGCA,Late,AN,Chaco,NEA,-26.46564,-61.60989,,,,,Baja,,Puntano,Oggero,,Ver Genetic Disc. 2
-AACY04NSURGT,Los Surgentes,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Córdoba,Nucleo,-32.94124,-61.94253,,,,,Alta,,Perassi,Paz,,
+AACY04NSURGT,Los Surgentes,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Córdoba,Nucleo,-33.033135,-61.880655,,,,,Alta,,Perassi,Paz,,
 ANCY04NMETAT,Metan,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Salta,NOA,-25.43167,-64.81481,,,,,Ultra baja,,Miranda,Aris,,
 ANCY04NNESPT,Nueva Esperanza,SPD,Corn,IMPACT 3R; IMPACT TROP; R2; OGCA,Late,AN,Santiago Del Estero,NOA,-26.06925,-64.30616,,,,,Ultra baja,,Guzman,Aris,,
 ANCY04NOTUMT,Otumpa,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Santiago Del Estero,NEA,-27.23878,-62.04941,,,,,Ultra baja,,New FTS Jr - Quimili,Oggero,,
