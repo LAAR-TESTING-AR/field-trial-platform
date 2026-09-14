@@ -88,11 +88,7 @@ aria-label="Actualizar datos">
       .getElementById("pwaBotonInstalar")
       .addEventListener("click", instalarAplicacion);
 
-    actualizarEstadoConexion();
-    actualizarBotonInstalacion();
-    actualizarFotosPendientes();
-  }
-const syncBtn =
+    const syncBtn =
   document.getElementById(
     "syncMasterList"
   );
@@ -120,6 +116,12 @@ if (
   );
 
 }
+
+    actualizarEstadoConexion();
+    actualizarBotonInstalacion();
+    actualizarFotosPendientes();
+  }
+
   async function actualizarFotosPendientes() {
     const boton = document.getElementById("pwaFotosPendientes");
     const cantidadElemento = document.getElementById(
