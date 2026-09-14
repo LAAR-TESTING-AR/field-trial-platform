@@ -866,7 +866,11 @@ class="logo">
     class="install-app-btn">
     📱 Install App
   </button>
-
+<button
+  id="logoutBtn"
+  class="install-app-btn">
+  🚪 Logout
+</button>
 </div>
   <div class="kpi-dashboard">
 
@@ -1071,7 +1075,32 @@ window.FieldTrialAppMode = {
 };
 
 console.log("Rol del usuario:", userRole);
+const logoutBtn =
+  document.getElementById(
+    "logoutBtn"
+  );
 
+if (logoutBtn) {
+
+  logoutBtn.addEventListener(
+    "click",
+    () => {
+
+      if (
+        !confirm(
+          "¿Cerrar sesión?"
+        )
+      ) return;
+
+      localStorage.clear();
+
+      window.location.href =
+        "login.html";
+
+    }
+  );
+
+}
 </script>
 </body>
 </html>
