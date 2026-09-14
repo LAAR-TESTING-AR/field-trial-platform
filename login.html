@@ -1,154 +1,60 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Field Trial Platform - Login</title>
-
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Arial, sans-serif;
-      background: #f4f6f4;
-    }
-
-    .login-box {
-      width: 320px;
-      padding: 30px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    h1 {
-      margin-top: 0;
-      color: #0b6b3a;
-      font-size: 22px;
-      text-align: center;
-    }
-
-    input,
-    button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px;
-      margin-top: 15px;
-    }
-
-    button {
-      border: 0;
-      border-radius: 6px;
-      background: #0b6b3a;
-      color: #ffffff;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: 0.65;
-      cursor: wait;
-    }
-
-    #mensaje {
-      min-height: 20px;
-      margin-top: 15px;
-      color: #b00020;
-      text-align: center;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Trial Platform - Login</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Arial,sans-serif;background:#f4f6f4;}
+.login-box{width:320px;padding:30px;background:#fff;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.15)}
+h1{margin-top:0;color:#0b6b3a;text-align:center}
+input,button{width:100%;box-sizing:border-box;padding:12px;margin-top:15px}
+button{border:0;border-radius:6px;background:#0b6b3a;color:#fff;cursor:pointer}
+#mensaje{margin-top:15px;text-align:center;color:#b00020}
+</style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Field Trial Platform</h1>
+<div class="login-box">
+<h1>Field Trial Platform</h1>
+<input type="email" id="email" placeholder="Ingrese su email">
+<button id="loginButton" type="button">Ingresar</button>
+<div id="mensaje"></div>
+</div>
+<script>
+const FLOW_URL = "PEGAR_AQUI_TU_URL";
 
-    <input
-      type="email"
-      id="email"
-      placeholder="Ingrese su email"
-      autocomplete="email"
-    >
+async function login(){
+ const email=document.getElementById('email').value.trim().toLowerCase();
+ const mensaje=document.getElementById('mensaje');
+ if(!email){mensaje.textContent='Ingrese un email';return;}
+ try{
+   const response=await fetch(FLOW_URL,{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({email:email})
+   });
 
-    <button id="loginButton" type="button">
-      Ingresar
-    </button>
+   const data=await response.json();
+   console.log('Respuesta flujo:',data);
 
-    <div id="mensaje"></div>
-  </div>
+   const role=(typeof data.role==='string') ? data.role : (data.role?.Value || 'Viewer');
 
-  <script>
-    const FLOW_URL = "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d7f7e0110a4a4390a6b4e8f31847304f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=slLPo92zmR1rIHI1Mvt86-aMxMR2X8QDETPAqj2iJcs";
+   localStorage.setItem('loggedIn','true');
+   localStorage.setItem('userEmail',email);
+   localStorage.setItem('userRole',role);
 
-    async function login() {
-      const emailInput = document.getElementById("email");
-      const mensaje = document.getElementById("mensaje");
-      const boton = document.getElementById("loginButton");
-      const email = emailInput.value.trim().toLowerCase();
-
-      if (!email) {
-        mensaje.textContent = "Ingrese un email.";
-        return;
-      }
-
-      mensaje.textContent = "Validando usuario...";
-      boton.disabled = true;
-
-      try {
-        const response = await fetch(FLOW_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ email })
-        });
-
-        if (!response.ok) {
-          throw new Error(`El flujo respondió con estado ${response.status}.`);
-        }
-
-       const role =
-  typeof data.role === "string"
-    ? data.role
-    : data.role?.Value;
-
-if (!role) {
-  throw new Error("El flujo no devolvió un rol válido.");
+   if(role.trim().toLowerCase()==='viewer'){
+      window.location.href='viewer.html';
+   } else {
+      window.location.href='platform.html';
+   }
+ }catch(error){
+   console.error(error);
+   mensaje.textContent='Error de conexión';
+ }
 }
 
-localStorage.setItem("loggedIn", "true");
-localStorage.setItem("userEmail", email);
-localStorage.setItem("userRole", role);
-localStorage.setItem("userName", data.name || "");
-
-if (role.trim().toLowerCase() === "viewer") {
-  window.location.href = "viewer.html";
-} else {
-  window.location.href = "platform.html";
-}
-
-return;
-
-          return;
-        }
-
-        mensaje.textContent = "Usuario no autorizado.";
-      } catch (error) {
-        console.error("Error de login:", error);
-        mensaje.textContent = "Error de conexión. Revisá la consola.";
-      } finally {
-        boton.disabled = false;
-      }
-    }
-
-    document.getElementById("loginButton").addEventListener("click", login);
-
-    document.getElementById("email").addEventListener("keydown", event => {
-      if (event.key === "Enter") {
-        login();
-      }
-    });
-  </script>
+document.getElementById('loginButton').addEventListener('click',login);
+</script>
 </body>
 </html>
