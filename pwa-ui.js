@@ -35,12 +35,14 @@
       ${
   window.location.pathname.includes("index.html")
   ? `
-  <button
-    id="syncMasterList"
-    class="pwa-boton-sync"
-    type="button">
-    🔄 Sync
-  </button>
+<button
+id="syncMasterList"
+class="master-sync-icon"
+type="button"
+title="Actualizar datos"
+aria-label="Actualizar datos">
+🔄
+</button>
   `
   : ""
 }
