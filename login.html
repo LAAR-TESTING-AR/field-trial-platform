@@ -115,7 +115,15 @@
           localStorage.setItem("userEmail", email);
           localStorage.setItem("userRole", data.role || "Viewer");
           localStorage.setItem("userName", data.name || "");
-          window.location.href = "platform.html";
+          if (data.role === "Viewer") {
+
+    window.location.href = "viewer.html";
+
+} else {
+
+    window.location.href = "platform.html";
+
+}
           return;
         }
 
