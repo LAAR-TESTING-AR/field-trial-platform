@@ -170,39 +170,6 @@
   .pwa-conexion { font-size: 11px; }
   .pwa-boton-instalar { min-height: 28px; padding: 4px 8px; font-size: 10px; }
 }
-.master-sync-icon{
-
-  width:28px;
-
-  height:28px;
-
-  border:none;
-
-  cursor:pointer;
-
-  padding:0;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  background:#4da3ff;
-
-  color:white;
-
-  border-radius:4px;
-
-  font-size:16px;
-
-  font-weight:700;
-
-}
-
-.master-sync-icon:hover{
-
-  background:#2b88e6;
 
 }
 .pwa-boton-sync{
