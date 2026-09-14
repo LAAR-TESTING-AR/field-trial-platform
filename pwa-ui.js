@@ -32,6 +32,18 @@
       </div>
 
       <div class="pwa-acciones">
+      ${
+  window.location.pathname.includes("index.html")
+  ? `
+  <button
+    id="syncMasterList"
+    class="pwa-boton-instalar"
+    type="button">
+    🔄 Sync
+  </button>
+  `
+  : ""
+}
         <span
           id="pwaEstadoConexion"
           class="pwa-conexion"
