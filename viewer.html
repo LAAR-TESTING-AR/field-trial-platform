@@ -1053,6 +1053,15 @@ Coming Soon
 <script src="platform-install.js"></script>
 <script src="platform-settings.js"></script>
 <script>
+
+// Protección de acceso
+const userRole = localStorage.getItem("userRole");
+
+if (!userRole) {
+    window.location.href = "login.html";
+}
+
+// Configuración Viewer
 window.FIELD_TRIAL_FORCE_VIEWER = true;
 
 window.FieldTrialAppMode = {
@@ -1060,6 +1069,9 @@ window.FieldTrialAppMode = {
   isViewer: true,
   isFull: false
 };
-</script>  
+
+console.log("Rol del usuario:", userRole);
+
+</script>
 </body>
 </html>
