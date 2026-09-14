@@ -468,7 +468,7 @@ if (syncBtn) {
 
         syncBtn.disabled = false;
         syncBtn.textContent =
-          "🔄 Sync";
+          "🔄";
 
       }, 3000);
 
