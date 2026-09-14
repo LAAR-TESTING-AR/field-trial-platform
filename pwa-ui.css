@@ -205,3 +205,24 @@
   background:#2b88e6;
 
 }
+.pwa-boton-sync{
+
+  border:none;
+
+  background:transparent;
+
+  color:#1e88ff;
+
+  cursor:pointer;
+
+  padding:0;
+
+  margin:0;
+
+  font-size:22px;
+
+  font-weight:700;
+
+  line-height:1;
+
+}
