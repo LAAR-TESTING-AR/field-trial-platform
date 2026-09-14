@@ -447,3 +447,32 @@ mapa.on("popupopen", ocultarLeyenda);
 mapa.on("click", ocultarLeyenda);
 agregarLeyendaPremium();
 cargarSitios();
+const syncBtn =
+  document.getElementById(
+    "syncMasterList"
+  );
+
+if (syncBtn) {
+
+  syncBtn.addEventListener(
+    "click",
+    () => {
+
+      syncBtn.disabled = true;
+      syncBtn.textContent =
+        "⏳ Syncing...";
+
+      cargarSitios();
+
+      setTimeout(() => {
+
+        syncBtn.disabled = false;
+        syncBtn.textContent =
+          "🔄 Sync";
+
+      }, 3000);
+
+    }
+  );
+
+}
