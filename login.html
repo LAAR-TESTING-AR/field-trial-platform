@@ -37,7 +37,24 @@ async function login(){
    const data=await response.json();
    console.log('Respuesta flujo:',data);
 
-   const role=(typeof data.role==='string') ? data.role : (data.role?.Value || 'Viewer');
+let role = data.role;
+
+if (typeof role === "string") {
+  try {
+    const roleParsed = JSON.parse(role);
+    role = roleParsed.Value || roleParsed.value || role;
+  } catch (_) {
+    role = role;
+  }
+} else if (role && typeof role === "object") {
+  role = role.Value || role.value;
+}
+
+role = String(role || "").trim();
+
+if (!role) {
+  throw new Error("El flujo no devolvió un rol válido.");
+}
 
    localStorage.setItem('loggedIn','true');
    localStorage.setItem('userEmail',email);
