@@ -114,9 +114,9 @@
           localStorage.setItem("loggedIn", "true");
           localStorage.setItem("userEmail", email);
           console.log("Respuesta flujo:", data);
-          localStorage.setItem("userRole", data.role || "Viewer");
+          localStorage.setItem("userRole", data.role.Value || "Viewer");
           localStorage.setItem("userName", data.name || "");
-          if (data.role === "Viewer") {
+          if (data.role.Value === "Viewer") {
 
     window.location.href = "viewer.html";
 
