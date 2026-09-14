@@ -327,7 +327,7 @@ mostrarProgreso(
     const response = await fetch(obtenerUrl(), {
       method: "POST",
       headers: {
-  "Content-Type": "text/plain;charset=UTF-8"
+  "Content-Type": "application/json; charset=utf-8"
 },
       body: JSON.stringify(payload),
       cache: "no-store",
