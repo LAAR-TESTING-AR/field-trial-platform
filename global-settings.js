@@ -2,7 +2,7 @@
   "use strict";
 
   const FLOW_GET_SETTINGS_URL =
-    "PEGAR_AQUI_URL_DE_Obtener_Platform_Settings";
+    "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3aac217eb2fc4adb8749f532f8c625ab/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=M6d0M-i3RnOlkq1uZP5vAzgxBXM_8O8BCJeUjQNHdF4";
 
   const SETTINGS_KEYS = [
     "trialVisits",
