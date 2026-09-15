@@ -231,31 +231,6 @@
           role
         );
 
-if (
-  role.toLowerCase() === "editor" ||
-  role.toLowerCase() === "admin"
-) {
-
-  localStorage.setItem("trialVisits", "true");
-  localStorage.setItem("trialPhotos", "true");
-  localStorage.setItem("visitComments", "true");
-  localStorage.setItem("visitScore", "true");
-  localStorage.setItem("cropStage", "true");
-  localStorage.setItem("timeline", "true");
-
-}
-if (
-  role.toLowerCase() === "viewer"
-) {
-
-  localStorage.setItem("trialVisits", "true");
-  localStorage.setItem("trialPhotos", "true");
-  localStorage.setItem("visitComments", "true");
-  localStorage.setItem("visitScore", "true");
-  localStorage.setItem("cropStage", "true");
-  localStorage.setItem("timeline", "true");
-
-}
         
         if(
           role.toLowerCase() ===
