@@ -7,11 +7,23 @@ window.FIELD_TRIAL_SETTINGS = {
   timeline: true
 };
 
-fetch("settings.json?v=" + Date.now())
+const FLOW_SETTINGS_URL =
+  "PEGAR_AQUI_URL_DE_Obtener_Platform_Settings";
+
+fetch(
+  FLOW_SETTINGS_URL,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }
+)
   .then(response => response.json())
   .then(settings => {
 
-    window.FIELD_TRIAL_SETTINGS = settings;
+    window.FIELD_TRIAL_SETTINGS =
+      settings;
 
     console.log(
       "Global Settings loaded",
@@ -22,7 +34,7 @@ fetch("settings.json?v=" + Date.now())
   .catch(error => {
 
     console.error(
-      "Unable to load settings.json",
+      "Unable to load settings",
       error
     );
 
