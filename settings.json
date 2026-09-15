@@ -1,0 +1,8 @@
+{
+  "trialVisits": true,
+  "trialPhotos": true,
+  "visitComments": true,
+  "visitScore": true,
+  "cropStage": true,
+  "timeline": true
+}
