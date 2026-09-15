@@ -177,16 +177,87 @@ updateSettingsStatus();
   });
 updateSettingsStatus();
 });
+const FLOW_UPDATE_URL =
+  "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e0e10681364a3eaa736939aa11e743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W7tZGXXB43tS95a2qyfGed8OeAQ8lhNxFbVvLshvPpU";
+
 const saveButton =
   document.getElementById("saveSettings");
 
 saveButton.addEventListener(
   "click",
-  () => {
+  async () => {
 
-    alert(
-      "Platform Settings Saved"
-    );
+    try {
+
+      const payload = {
+
+        trialVisits:
+          document.getElementById(
+            "trialVisits"
+          ).checked,
+
+        trialPhotos:
+          document.getElementById(
+            "trialPhotos"
+          ).checked,
+
+        visitComments:
+          document.getElementById(
+            "visitComments"
+          ).checked,
+
+        visitScore:
+          document.getElementById(
+            "visitScore"
+          ).checked,
+
+        cropStage:
+          document.getElementById(
+            "cropStage"
+          ).checked,
+
+        timeline:
+          document.getElementById(
+            "timeline"
+          ).checked
+
+      };
+
+      const response =
+        await fetch(
+          FLOW_UPDATE_URL,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body:
+              JSON.stringify(payload)
+          }
+        );
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Unable to save settings."
+        );
+
+      }
+
+      alert(
+        "Platform Settings Saved"
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error saving Platform Settings"
+      );
+
+    }
 
   }
 );
