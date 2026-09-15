@@ -54,7 +54,6 @@ ACCB02FMRCST,Sampacho MRCV,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.65468,
 ACCY04NSBAST,San Basilio,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-33.50465,-64.21658,,,,,Estandar,,Milani,Open Rio IV,,
 ACCY04NSJENT,San Jeronimo Norte,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Santa Fe,Centro,-31.4146,-61.02957,,,,,Estandar,,Arias,Traggiay,,
 AACY04NTANDT-AACY04NTANHT,Tandil,Mixed,Corn,IMPACT 3R; R3; HYPER,Early,AA,Buenos Aires,Sudeste,-37.46783,-58.91169,,,,,Baja,,Cantero,Sarlangue,,Generar dos AOIs distintas
-AACY04NTRENT,Trenque Lauquen,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Oeste,-35.77353,-62.83583,,,,,Estandar,,Focke,Peralta Martinez,,
 AACY04NTR1HT,Tres Arroyos,Mixed,Corn,HYPER,Early,AA,Buenos Aires,Sudeste,-38.16091,-60.23742,,,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense
 AACY04NURANT,Uranga,SPD,Corn,IMPACT 3R,Early,AA,Santa Fe,Nucleo,-33.29509,-60.4275,,,,,Estandar,,Vilchez,Mazzini,,
 AACY04NVICTT,Victoria,Contractor,Corn,IMPACT 3R,Early,XL,Entre Ríos,Litoral,-32.84509,-59.79271,,,,,Baja,,Vilchez,Bernardi,,
@@ -64,6 +63,7 @@ AACY04NVGU1T,Villaguay,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Early,AA,Entre R�
 AACY04NZAVAT,Zavalla,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Santa Fe,Nucleo,-33.03802,-60.90255,,,,,Estandar,,Vilchez,Traggiay,,
 ACCY04NADEMT,Adelia Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-33.65534,-64.47788,,,,,Ultra baja,,Milani,Open Rio IV,,
 ACCY04NALCHT,Altos de Chipion,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-31.02742,-62.3462,,,,,Alta,,Arias,Traggiay,,
+AACY04NTRENT,Trenque Lauquen,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Oeste,-35.77353,-62.83583,,,,,Estandar,,Focke,Peralta Martinez,,
 AACY04NAMG2T,Ameghino,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Oeste,-34.98381,-62.83995,,,,,Estandar,,Antunes,Peralta Martinez,,
 AACY04NANGUT,Anguil,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AA,La Pampa,Oeste,-36.64189,-63.9591,,,,,Baja,,Focke,Peralta Martinez,,
 AACY04NARR2T,Arrecifes,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Nucleo,-34.0357,-60.10664,,,,,Estandar,,Romero Cuny,Mazzini,,
