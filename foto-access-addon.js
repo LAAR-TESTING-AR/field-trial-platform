@@ -47,16 +47,20 @@
       comments: textoSinHTML(fila.Comments),
       publicPhotoUrl: extraerUrl(fila.PublicPhotoUrl),
       corporatePhotoUrl: extraerUrl(fila.PhotoLink),
-      captureDate: limpiar(fila.CaptureDate)
+      captureDate: limpiar(fila.CaptureDate),
+      photoType: limpiar(fila.PhotoType),
     };
   }
 
   function obtenerUltimaFoto(accessId) {
     return fotosAccess
-      .filter(
-        foto =>
-          normalizarId(foto.accessId) ===
-          normalizarId(accessId)
+     .filter(
+  foto =>
+    normalizarId(foto.accessId) ===
+      normalizarId(accessId) &&
+    limpiar(foto.photoType).toUpperCase() ===
+      "ACCESS"
+)
       )
       .sort((a, b) => {
         const fechaA = convertirFecha(a.captureDate);
