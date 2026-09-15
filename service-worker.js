@@ -205,19 +205,7 @@ self.addEventListener("fetch", event => {
   return;
 
 }
-          return response;
-        })
-        .catch(async () => {
-          return (
-            await caches.match(`${BASE_PATH}index.html`)
-          ) || (
-            await caches.match(`${BASE_PATH}offline.html`)
-          );
-        })
-    );
 
-    return;
-  }
 
   /* Sitios_test.csv: red primero y clave fija sin parametros. */
   if (url.pathname.endsWith("/Sitios_test.csv")) {
