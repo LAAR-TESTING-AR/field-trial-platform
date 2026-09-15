@@ -178,11 +178,7 @@ updateSettingsStatus();
 updateSettingsStatus();
 });
 const FLOW_UPDATE_URL =
-  "TU_URL_DEL_FLOW";
-
-console.log("URL:", FLOW_UPDATE_URL);
-
-alert("NUEVA VERSION CARGADA");
+  "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e0e10681364a3eaa736939aa11e743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W7tZGXXB43tS95a2qyfGed8OeAQ8lhNxFbVvLshvPpU";
 
 const saveButton =
   document.getElementById("saveSettings");
@@ -190,7 +186,7 @@ const saveButton =
 saveButton.addEventListener(
   "click",
   async () => {
-console.log("BOTON SAVE EJECUTADO");
+
     try {
 
       const payload = {
