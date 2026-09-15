@@ -26,93 +26,146 @@
     }
 
     .setting-item{
-  margin:15px 0;
-  font-size:18px;
-}
+      margin:15px 0;
+      font-size:18px;
+    }
 
-.setting-item input{
-  transform:scale(1.4);
-  margin-right:10px;
-}
-    
+    .setting-item input{
+      transform:scale(1.4);
+      margin-right:10px;
+    }
   </style>
 </head>
 
 <body>
+
 <script>
   const SETTINGS_PASSWORD = "FTP2026";
 
-  const enteredPassword = prompt("Enter the Platform Settings password:");
+  const enteredPassword =
+    prompt(
+      "Enter the Platform Settings password:"
+    );
 
-  if (enteredPassword !== SETTINGS_PASSWORD) {
-    alert("Incorrect password. Access denied.");
-    window.location.href = "index.html";
+  if (
+    enteredPassword !==
+    SETTINGS_PASSWORD
+  ) {
+
+    alert(
+      "Incorrect password. Access denied."
+    );
+
+    window.location.href =
+      "index.html";
+
   }
 </script>
+
 <div class="card">
 
   <h1>⚙ Platform Settings</h1>
-<button onclick="window.location.href='platform.html'"
-style="
-background:#0b6b3a;
-color:white;
-border:none;
-padding:10px 16px;
-border-radius:8px;
-cursor:pointer;
-margin-bottom:20px;
-">
-← Back to Dashboard
-</button>
+
+  <button
+    onclick="window.location.href='platform.html'"
+    style="
+      background:#0b6b3a;
+      color:white;
+      border:none;
+      padding:10px 16px;
+      border-radius:8px;
+      cursor:pointer;
+      margin-bottom:20px;
+    "
+  >
+    ← Back to Dashboard
+  </button>
+
   <p>
     Experimental laboratory for future platform features.
   </p>
-<div class="setting-item">
-  <input type="checkbox" id="trialVisits">
-  <label for="trialVisits">
-    Trial Visits (Master Switch)
-  </label>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="trialVisits"
+    >
+    <label for="trialVisits">
+      Trial Visits (Master Switch)
+    </label>
+  </div>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="trialPhotos"
+    >
+    <label for="trialPhotos">
+      Trial Photos
+    </label>
+  </div>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="visitComments"
+    >
+    <label for="visitComments">
+      Visit Comments
+    </label>
+  </div>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="visitScore"
+    >
+    <label for="visitScore">
+      Visit Score
+    </label>
+  </div>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="cropStage"
+    >
+    <label for="cropStage">
+      Crop Stage
+    </label>
+  </div>
+
+  <div class="setting-item">
+    <input
+      type="checkbox"
+      id="timeline"
+    >
+    <label for="timeline">
+      Timeline
+    </label>
+  </div>
+
+  <button id="saveSettings">
+    Save Settings
+  </button>
+
+  <hr>
+
+  <h3>
+    Current Configuration
+  </h3>
+
+  <pre id="settingsStatus"></pre>
+
 </div>
-<div class="setting-item">
-  <input type="checkbox" id="trialPhotos">
-  <label for="trialPhotos">Trial Photos</label>
-</div>
 
-<div class="setting-item">
-  <input type="checkbox" id="visitComments">
-  <label for="visitComments">Visit Comments</label>
-</div>
+<script>
 
-<div class="setting-item">
-  <input type="checkbox" id="visitScore">
-  <label for="visitScore">Visit Score</label>
-</div>
+const FLOW_GET_URL =
+  "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/3aac217eb2fc4adb8749f532f8c625ab/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=M6d0M-i3RnOlkq1uZP5vAzgxBXM_8O8BCJeUjQNHdF4";
 
-<div class="setting-item">
-  <input type="checkbox" id="cropStage">
-  <label for="cropStage">Crop Stage</label>
-</div>
-
-<div class="setting-item">
-  <input type="checkbox" id="timeline">
-  <label for="timeline">Timeline</label>
-</div>
-
-<button id="saveSettings">
-  Save Settings
-</button>
-<hr>
-
-<h3>Current Configuration</h3>
-
-<pre id="settingsStatus"></pre>
-
-</div>
-  
-  
-</div>
-
-  <script>
+const FLOW_UPDATE_URL =
+  "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e0e10681364a3eaa736939aa11e743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W7tZGXXB43tS95a2qyfGed8OeAQ8lhNxFbVvLshvPpU";
 
 const settings = [
   "trialVisits",
@@ -122,6 +175,7 @@ const settings = [
   "cropStage",
   "timeline"
 ];
+
 function updateSettingsStatus() {
 
   const status =
@@ -133,55 +187,107 @@ function updateSettingsStatus() {
     JSON.stringify(
       {
         trialVisits:
-  localStorage.getItem("trialVisits"),
+          document.getElementById(
+            "trialVisits"
+          ).checked,
+
         trialPhotos:
-          localStorage.getItem("trialPhotos"),
+          document.getElementById(
+            "trialPhotos"
+          ).checked,
+
         visitComments:
-          localStorage.getItem("visitComments"),
+          document.getElementById(
+            "visitComments"
+          ).checked,
+
         visitScore:
-          localStorage.getItem("visitScore"),
+          document.getElementById(
+            "visitScore"
+          ).checked,
+
         cropStage:
-          localStorage.getItem("cropStage"),
+          document.getElementById(
+            "cropStage"
+          ).checked,
+
         timeline:
-          localStorage.getItem("timeline")
+          document.getElementById(
+            "timeline"
+          ).checked
       },
       null,
       2
     );
 
 }
-window.addEventListener("DOMContentLoaded", () => {
 
-  settings.forEach(id => {
+window.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-    const checkbox =
-      document.getElementById(id);
+    try {
 
-    if (!checkbox) return;
-
-    checkbox.checked =
-      localStorage.getItem(id) === "true";
-
-    checkbox.addEventListener(
-      "change",
-      () => {
-
-        localStorage.setItem(
-          id,
-          checkbox.checked
+      const response =
+        await fetch(
+          FLOW_GET_URL,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: "{}"
+          }
         );
-updateSettingsStatus();
-      }
-    );
 
-  });
-updateSettingsStatus();
-});
-const FLOW_UPDATE_URL =
-  "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c5e0e10681364a3eaa736939aa11e743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=W7tZGXXB43tS95a2qyfGed8OeAQ8lhNxFbVvLshvPpU";
+      if (!response.ok) {
+
+        throw new Error(
+          "Unable to load Settings."
+        );
+
+      }
+
+      const currentSettings =
+        await response.json();
+
+      settings.forEach(id => {
+
+        const checkbox =
+          document.getElementById(id);
+
+        if (!checkbox) return;
+
+        checkbox.checked =
+          currentSettings[id] === true;
+
+        checkbox.addEventListener(
+          "change",
+          updateSettingsStatus
+        );
+
+      });
+
+      updateSettingsStatus();
+
+    } catch(error) {
+
+      console.error(error);
+
+      alert(
+        "Unable to load global Settings."
+      );
+
+    }
+
+  }
+);
 
 const saveButton =
-  document.getElementById("saveSettings");
+  document.getElementById(
+    "saveSettings"
+  );
 
 saveButton.addEventListener(
   "click",
@@ -240,16 +346,18 @@ saveButton.addEventListener(
       if (!response.ok) {
 
         throw new Error(
-          "Unable to save settings."
+          "Unable to save Settings."
         );
 
       }
+
+      updateSettingsStatus();
 
       alert(
         "Platform Settings Saved"
       );
 
-    } catch (error) {
+    } catch(error) {
 
       console.error(error);
 
@@ -262,8 +370,7 @@ saveButton.addEventListener(
   }
 );
 
-
 </script>
-  
+
 </body>
 </html>
