@@ -70,8 +70,26 @@ function transformarFila(fila) {
     region: limpiarTexto(fila["Region"]),
     latitudeTrial: convertirNumero(fila["Latitude Trial"]),
     longitudeTrial: convertirNumero(fila["Longitude Trial"]),
+    trialCoordinateStatus:
+  limpiarTexto(
+    fila["Trial Coordinate Status"]
+  ),
+
+trialCoordinateUpdateDate:
+  limpiarTexto(
+    fila["Trial Coordinate Update Date"]
+  ),
     latitudeAccess: convertirNumero(fila["Latitude Access"]),
     longitudeAccess: convertirNumero(fila["Longitude Access"]),
+    accessCoordinateStatus:
+  limpiarTexto(
+    fila["Access Coordinate Status"]
+  ),
+
+accessCoordinateUpdateDate:
+  limpiarTexto(
+    fila["Access Coordinate Update Date"]
+  ),
     plantingDate: limpiarTexto(fila["Planting Date (MM/DD/YYYY)"]),
     plantDensity: limpiarTexto(fila["Plant Density (plants/ha)"]),
     fertilization: limpiarTexto(fila["Fertilization"]),
@@ -159,23 +177,35 @@ function configuracionCultivo(cultivo) {
   return { tipo, icono, parent, claseEstado };
 }
 
-function contenidoMarcador(cultivo, modoLeyenda = false) {
+function contenidoMarcador(cultivo,modoLeyenda = false,sitio = null) {
   const cfg = configuracionCultivo(cultivo);
+  const trialStatus =
+  sitio?.["Trial Coordinate Status"] || "";
+
+const claseReferencia =
+  trialStatus === "REFERENCE"
+    ? "coordenada-reference"
+    : "";
   const pc = cfg.parent
     ? `<span class="insignia-pc${modoLeyenda ? " leyenda-pc" : ""}">PC</span>`
     : "";
-  return `<span class="${modoLeyenda ? "muestra-leyenda" : "marcador-cultivo"} cultivo-${cfg.tipo} ${cfg.claseEstado}"><span class="icono-cultivo">${cfg.icono}</span>${pc}</span>`;
+  return `<span class="${
+  modoLeyenda ? "muestra-leyenda" : "marcador-cultivo"
+} cultivo-${cfg.tipo} ${cfg.claseEstado} ${claseReferencia}">
+<span class="icono-cultivo">${cfg.icono}</span>${pc}</span>`;
 }
 
 function contenidoIconoAccess(modoLeyenda = false) {
   return `<span class="${modoLeyenda ? "muestra-access-leyenda" : "marcador-access"}" aria-hidden="true"><span class="pin-access-cabeza"></span><span class="pin-access-punta"></span></span>`;
 }
 
-function crearIconoTrial(cultivo) {
+function crearIconoTrial(cultivo, sitio) {
   return L.divIcon({
     className: "marcador-cultivo-contenedor",
-    html: contenidoMarcador(cultivo),
-    iconSize: [38, 46], iconAnchor: [19, 46], popupAnchor: [0, -43]
+    html: contenidoMarcador(cultivo, false, sitio),
+    iconSize: [38, 46],
+    iconAnchor: [19, 46],
+    popupAnchor: [0, -43]
   });
 }
 
