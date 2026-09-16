@@ -179,8 +179,8 @@ function configuracionCultivo(cultivo) {
 
 function contenidoMarcador(cultivo,modoLeyenda = false,sitio = null) {
   const cfg = configuracionCultivo(cultivo);
-  const trialStatus =
-  sitio?.["Trial Coordinate Status"] || "";
+const trialStatus =
+  sitio?.trialCoordinateStatus || "";
 
 const claseReferencia =
   trialStatus === "REFERENCE"
