@@ -180,7 +180,7 @@ function configuracionCultivo(cultivo) {
 function contenidoMarcador(cultivo,modoLeyenda = false,sitio = null) {
   const cfg = configuracionCultivo(cultivo);
 const trialStatus =
-  sitio?.trialCoordinateStatus || "";
+  (sitio?.trialCoordinateStatus || "").trim();
 
 const claseReferencia =
   trialStatus === "REFERENCE"
