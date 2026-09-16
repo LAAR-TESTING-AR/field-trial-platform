@@ -386,3 +386,6 @@ body { display: flex; flex-direction: column; }
   }
 
 }
+.coordenada-reference {
+  filter: grayscale(100%);
+}
