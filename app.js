@@ -299,7 +299,7 @@ function actualizarMapa() {
 
   sitiosFiltrados.forEach(sitio => {
     if (tieneTrial(sitio)) {
-      L.marker([sitio.latitudeTrial, sitio.longitudeTrial], { icon: crearIconoTrial(sitio.crop) })
+      L.marker([sitio.latitudeTrial, sitio.longitudeTrial],{icon: crearIconoTrial(sitio.crop,sitio)})
         .bindPopup(crearPopupTrial(sitio), { maxWidth: 390, minWidth: 285, maxHeight: 700 })
         .addTo(capaMarcadores);
       coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
