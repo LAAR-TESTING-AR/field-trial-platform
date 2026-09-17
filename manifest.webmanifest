@@ -1,10 +1,10 @@
 {
-  "id": "/field-trial-master-platform/",
+  "id": "/field-trial-platform/",
   "name": "Field Trial Platform Argentina 2026-27",
   "short_name": "Field Platform",
   "description": "Field Trial Platform para gestión integral de ensayos, siembra, acceso y cosecha en Research Argentina.",
-  "start_url": "/field-trial-master-platform/platform.html",
-  "scope": "/field-trial-master-platform/",
+  "start_url": "/field-trial-platform/login.html",
+  "scope": "/field-trial-platform/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#ffffff",
