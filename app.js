@@ -195,8 +195,30 @@ const claseReferencia =
 <span class="icono-cultivo">${cfg.icono}</span>${pc}</span>`;
 }
 
-function contenidoIconoAccess(modoLeyenda = false) {
-  return `<span class="${modoLeyenda ? "muestra-access-leyenda" : "marcador-access"}" aria-hidden="true"><span class="pin-access-cabeza"></span><span class="pin-access-punta"></span></span>`;
+function contenidoIconoAccess(
+  modoLeyenda = false,
+  sitio = null
+) {
+  const accessStatus =
+    (sitio?.accessCoordinateStatus || "")
+      .trim()
+      .toUpperCase();
+
+  const claseReferencia =
+    accessStatus === "REFERENCE"
+      ? "coordenada-access-reference"
+      : "";
+
+  return `
+    <span class="${
+      modoLeyenda
+        ? "muestra-access-leyenda"
+        : "marcador-access"
+    } ${claseReferencia}" aria-hidden="true">
+      <span class="pin-access-cabeza"></span>
+      <span class="pin-access-punta"></span>
+    </span>
+  `;
 }
 
 function crearIconoTrial(cultivo, sitio) {
@@ -209,11 +231,13 @@ function crearIconoTrial(cultivo, sitio) {
   });
 }
 
-function crearIconoAccess() {
+function crearIconoAccess(sitio = null) {
   return L.divIcon({
     className: "marcador-access-contenedor",
-    html: contenidoIconoAccess(false),
-    iconSize: [34, 46], iconAnchor: [17, 46], popupAnchor: [0, -43]
+    html: contenidoIconoAccess(false, sitio),
+    iconSize: [34, 46],
+    iconAnchor: [17, 46],
+    popupAnchor: [0, -43]
   });
 }
 
