@@ -142,7 +142,7 @@
 
         L.marker(
           [sitio.latitudeAccess, sitio.longitudeAccess],
-          { icon: crearIconoAccess(), zIndexOffset: 1000 }
+          { icon: crearIconoAccess(sitio), zIndexOffset: 1000 }
         )
           .bindPopup(crearPopupAccess(sitioAccess), {
             maxWidth: 390,
