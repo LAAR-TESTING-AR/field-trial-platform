@@ -28,7 +28,10 @@
   }
 
   window.crearIconoTrial = function (cultivo, sitio) {
-    if (!esTrialDrop(sitio)) return crearIconoTrialOriginal(cultivo);
+    if (!esTrialDrop(sitio)) return crearIconoTrialOriginal(
+    cultivo,
+    sitio
+);
 
     const cfg = configuracionCultivo(cultivo);
     return L.divIcon({
