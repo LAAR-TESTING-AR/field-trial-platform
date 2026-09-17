@@ -339,7 +339,7 @@ function actualizarMapa() {
     if (tieneAccess(sitio)) {
       const sitioAccess = { ...sitio, latitude: sitio.latitudeAccess, longitude: sitio.longitudeAccess };
       L.marker([sitio.latitudeAccess, sitio.longitudeAccess], {
-        icon: crearIconoAccess(),
+        icon: crearIconoAccess(sitio),
         zIndexOffset: 1000
       })
         .bindPopup(crearPopupAccess(sitioAccess), {
