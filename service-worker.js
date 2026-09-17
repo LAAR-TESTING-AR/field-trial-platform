@@ -1,4 +1,4 @@
-const CACHE_NAME = "field-trial-platform-v26";
+const CACHE_NAME = "field-trial-platform-v27";
 const BASE_PATH = "/field-trial-master-platform/";
 
 const APP_SHELL = [
