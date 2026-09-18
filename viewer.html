@@ -1064,6 +1064,8 @@ Coming Soon
 
 // Protección de acceso
 const userRole = localStorage.getItem("userRole");
+  document.getElementById("platformVersion").textContent =
+    window.APP_VERSION;
 
 if (!userRole) {
     window.location.href = "login.html";
