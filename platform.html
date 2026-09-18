@@ -1090,7 +1090,7 @@ Coming Soon
 const userRole = localStorage.getItem("userRole");
 console.log("APP VERSION:", APP_VERSION);
    document.getElementById("platformVersion").textContent =
-    "v" + APP_VERSION;
+    APP_VERSION;
 if (!userRole) {
     window.location.href = "login.html";
 }
