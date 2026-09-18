@@ -1088,9 +1088,12 @@ Coming Soon
  <script>
 
 const userRole = localStorage.getItem("userRole");
-console.log("APP VERSION:", APP_VERSION);
-   document.getElementById("platformVersion").textContent =
-    APP_VERSION;
+console.log("APP VERSION:", window.APP_VERSION);
+
+document.getElementById("platformVersion").textContent =
+    window.APP_VERSION;
+``
+   
 if (!userRole) {
     window.location.href = "login.html";
 }
