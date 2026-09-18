@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  const APP_VERSION = "v1.0";
+ const APP_VERSION = window.APP_VERSION || "2026.09.18.01";
   let eventoInstalacion = null;
 
   function esIOS() {
