@@ -260,7 +260,18 @@ self.addEventListener("fetch", event => {
 
     return;
   }
+/* version.json: siempre red primero */
+if (url.pathname.endsWith("/version.json")) {
 
+  event.respondWith(
+    fetch(request, {
+      cache: "no-store"
+    })
+  );
+
+  return;
+
+}
   /* JavaScript y CSS locales: red primero para recibir cambios nuevos. */
   if (
     url.origin === self.location.origin &&
