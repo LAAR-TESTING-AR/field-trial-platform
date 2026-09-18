@@ -1,1 +1,1 @@
-const APP_VERSION = "2026.09.18.01";
+window.APP_VERSION = "2026.09.18.01";
