@@ -159,6 +159,38 @@
 
     const FLOW_URL = "https://default3e20ecb29cb04df1ad7b914e31dcdd.a4.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/d7f7e0110a4a4390a6b4e8f31847304f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=slLPo92zmR1rIHI1Mvt86-aMxMR2X8QDETPAqj2iJcs";
 
+const loggedIn =
+  localStorage.getItem(
+    "loggedIn"
+  );
+
+const userRole =
+  localStorage.getItem(
+    "userRole"
+  );
+
+if (
+  loggedIn === "true" &&
+  userRole
+) {
+
+  if (
+    userRole.toLowerCase() ===
+    "viewer"
+  ) {
+
+    window.location.href =
+      "viewer.html";
+
+  } else {
+
+    window.location.href =
+      "platform.html";
+
+  }
+
+}
+    
     async function login(){
 
       const email =
