@@ -304,7 +304,23 @@
     const longitudeElement = fondo.querySelector("#fieldCoordinateLongitude");
     const accuracyElement = fondo.querySelector("#fieldCoordinateAccuracy");
     const distanceElement = fondo.querySelector("#fieldCoordinateDistance");
+const botonManual = fondo.querySelector("#fieldCoordinateManual");
 
+const panelManual = fondo.querySelector(
+  "#fieldCoordinateManualPanel"
+);
+
+const manualLatitude = fondo.querySelector(
+  "#fieldCoordinateManualLatitude"
+);
+
+const manualLongitude = fondo.querySelector(
+  "#fieldCoordinateManualLongitude"
+);
+
+const botonAplicarManual = fondo.querySelector(
+  "#fieldCoordinateApplyManual"
+);
     let watchId = null;
     let timeoutId = null;
     let mejorLectura = null;
@@ -444,7 +460,9 @@
     });
 
     botonMedir.addEventListener("click", iniciarMedicion);
-
+botonManual.addEventListener("click", () => {
+  panelManual.hidden = !panelManual.hidden;
+});
     botonGuardar.addEventListener("click", async () => {
       if (!mejorLectura) {
         mostrarEstado(
