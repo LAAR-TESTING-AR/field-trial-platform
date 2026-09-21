@@ -218,6 +218,43 @@
             <p>Precisión: <strong id="fieldCoordinateAccuracy">-</strong></p>
             <p>Desplazamiento: <strong id="fieldCoordinateDistance">-</strong></p>
           </div>
+
+<div
+  id="fieldCoordinateManualPanel"
+  class="field-coordinate-manual-panel"
+  hidden
+>
+  <p><strong>Ingreso manual de coordenadas</strong></p>
+
+  <label>
+    Latitud
+    <input
+      id="fieldCoordinateManualLatitude"
+      type="number"
+      step="any"
+      placeholder="-32.123456"
+    >
+  </label>
+
+  <label>
+    Longitud
+    <input
+      id="fieldCoordinateManualLongitude"
+      type="number"
+      step="any"
+      placeholder="-64.123456"
+    >
+  </label>
+
+  <button
+    id="fieldCoordinateApplyManual"
+    type="button"
+  >
+    Usar coordenadas ingresadas
+  </button>
+</div>
+
+          
         </div>
 
         <div class="field-coordinate-actions">
@@ -235,6 +272,14 @@
             type="button"
             disabled
           >
+<button
+  id="fieldCoordinateManual"
+  class="field-coordinate-manual"
+  type="button"
+>
+  ✏️ Ingresar coordenadas
+</button>
+          
             Guardar ubicación en el dispositivo
           </button>
 
