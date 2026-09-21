@@ -463,6 +463,41 @@ const botonAplicarManual = fondo.querySelector(
 botonManual.addEventListener("click", () => {
   panelManual.hidden = !panelManual.hidden;
 });
+
+botonAplicarManual.addEventListener("click", () => {
+  const latitude = Number(manualLatitude.value);
+  const longitude = Number(manualLongitude.value);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+    mostrarEstado(
+      "Ingresá una latitud y longitud válidas.",
+      "error"
+    );
+    return;
+  }
+
+  mejorLectura = {
+    latitude,
+    longitude,
+    accuracy: 0,
+    altitude: null,
+    altitudeAccuracy: null,
+    heading: null,
+    speed: null,
+    measuredAt: new Date().toISOString()
+  };
+
+  mostrarLectura(mejorLectura);
+
+  mostrarEstado(
+    "Coordenadas manuales cargadas. Ya podés guardarlas.",
+    "guardado"
+  );
+});
+    
     botonGuardar.addEventListener("click", async () => {
       if (!mejorLectura) {
         mostrarEstado(
