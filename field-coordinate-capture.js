@@ -272,6 +272,9 @@
             type="button"
             disabled
           >
+
+                      Guardar ubicación en el dispositivo
+          </button>
 <button
   id="fieldCoordinateManual"
   class="field-coordinate-manual"
@@ -280,8 +283,7 @@
   ✏️ Ingresar coordenadas
 </button>
           
-            Guardar ubicación en el dispositivo
-          </button>
+
 
           <button
             class="field-coordinate-cancel"
