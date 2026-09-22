@@ -21,7 +21,7 @@ AARB07FRNOGN,Rincon de Nogoya,Contractor,Canola - Parent Chr,PC,Early,XL,Entre R
 AACY04NALCOT,Alcorta,SPD,Corn,IMPACT 3R,Early,AA,Santa Fe,Nucleo,-33.536345,-61.072357,-33.535788,-61.071176,09/15/2026,,Estandar,,Vilchez,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAMG1T,Ameghino,SPD,Corn,IMPACT 3R,Early,AA,Buenos Aires,Oeste,-34.983142,-62.839914,-34.96383,-62.84203,,,Estandar,,Antunes,Peralta Martinez,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAMERT,America,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Early,AA,Buenos Aires,Oeste,-35.598842,-63.062086,-35.518679,-62.999512,,,Alta,,Antunes,Peralta Martinez,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
-AACY04NARR1T,Arrecifes,SPD,Corn,IMPACT 3R,Early,AA,Buenos Aires,Nucleo,-33.87202,-60.176413,-33.859044,-60.170983,,,Estandar,,Romero Cuny,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
+AACY04NARR1T,Arrecifes,SPD,Corn,IMPACT 3R,Early,AA,Buenos Aires,Nucleo,-33.87202,-60.176413,-33.859044,-60.170983,09/24/2026,,Estandar,,Romero Cuny,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 ACCY04NCARNT,Carnerillo,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-32.92824,-63.91633,,,,,Estandar,,Gomez,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCB02FMRC1T,Chajan MRCV 1,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.536781,-64.937555,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCB02FMRC2T,Chajan MRCV 2,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.538531,-64.936605,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
@@ -118,13 +118,13 @@ Completar,Pergamino Res2,SPD,Corn - Parent Chr,ARPC Restoration,Early,AA,Buenos 
 Completar,Pergamino Res3,SPD,Corn - Parent Chr,ARPC Restoration,Late,AA,Buenos Aires,Nucleo,-33.79552,-60.845612,,,,,,,Cogo,Mazzini,,,REFERENCE,,REFERENCE,
 Completar,Pergamino Res4,SPD,Corn - Parent Chr,ARPC Restoration,Late,AA,Buenos Aires,Nucleo,-33.79552,-60.845612,,,,,,,Cogo,Mazzini,,,REFERENCE,,REFERENCE,
 AACY04NAME1S,America,SPD,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Oeste,-35.628583,-63.06585,-35.62734,-63.0028,,,Alta,,Antunes,Peralta Martinez,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
-AACY04NCAS1S,Casilda,SPD,Corn - Stewarded,R3; GCA,Early,AA,Santa Fe,Nucleo,-33.542323,-60.15821,-33.592765,-60.135728,,,Estandar,,Romero Cuny,Mazzini,,En Ramallo,VERIFIED,09/18/2026,VERIFIED,09/18/2026
+AACY04NCAS1S,Casilda,SPD,Corn - Stewarded,R3; GCA,Early,AA,Santa Fe,Nucleo,-33.542323,-60.15821,-33.592765,-60.135728,09/23/2026,,Estandar,,Romero Cuny,Mazzini,,En Ramallo,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NGCHUS,Gualeguaychu,SPD,Corn - Stewarded,R3; GCA,Early,AA,Entre Ríos,Litoral,-33.133431,-58.739405,-33.0824103913893,-58.7938160475151,09/16/2026,,Estandar,,Vilchez,Bernardi,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NCARLS,La Carlota,SPD,Corn - Stewarded,R3; GCA,Early,AA,Córdoba,Oeste,-33.269807,-63.301441,-33.268687,-63.292758,,,Baja,,Perassi,Paz,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 ACCY04NMAL1S,Malena,SPD,Corn - Stewarded,R3; GCA,Early,AC,Córdoba,Oeste,-33.476548,-64.484046,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 AACY04NMBU1S,Monte Buey,SPD,Corn - Stewarded,R3; GCA,Early,AA,Córdoba,Nucleo,-33.00007,-62.45911,-32.904857,-62.532236,,,Estandar,,Perassi,Paz,,,REFERENCE,,VERIFIED,09/18/2026
 AACY04NFERRS,Ferre,Mixed,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Nucleo,-34.12044,-61.20371,,,09/16/2026,,Estandar,,Romero Cuny,Mazzini,,AG Idea Ferre.,REFERENCE,,REFERENCE,
-AACY04NROJAS,Rojas,SPD,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Nucleo,-34.1878,-60.7927,-34.210816,-60.765965,,,Estandar,,Romero Cuny,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
+AACY04NROJAS,Rojas,SPD,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Nucleo,-34.1878,-60.7927,-34.210816,-60.765965,09/22/2026,,Estandar,,Romero Cuny,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NSARAS,Sarah,SPD,Corn - Stewarded,R3; GCA,Early,AA,La Pampa,Oeste,-35.023608,-63.49315,-35.036503,-63.495392,,,Estandar,,Antunes,Peralta Martinez,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NZAVAS,Zavalla,SPD,Corn - Stewarded,R3; GCA,Early,AA,Santa Fe,Nucleo,-33.059316,-60.861879,-33.053846,-60.867941,,,Estandar,,Vilchez,Traggiay,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAME2S,America,SPD,Corn - Stewarded,R3; GCA,Late,AA,Buenos Aires,Oeste,-35.63047,-63.07252,,,,,Estandar,,Antunes,Peralta Martinez,,,REFERENCE,,REFERENCE,
