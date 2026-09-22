@@ -139,7 +139,7 @@ ACCY04NMAL2S,Malena,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Oeste,-33.4769
 ANCY04NMETAS,Metan,SPD,Corn - Stewarded,R3; GCA,Late,AN,Salta,NOA,-25.4318,-64.82504,,,,,Ultra baja,,Miranda,Aris,,,REFERENCE,,REFERENCE,
 AACY04NMBU2S,Monte Buey,SPD,Corn - Stewarded,R3; GCA,Late,AA,Córdoba,Nucleo,-33.00076,-62.45927,,,,,Alta,,Perassi,Paz,,,REFERENCE,,REFERENCE,
 ANCY04NOTUMS,Otumpa,SPD,Corn - Stewarded,R3; GCA,Late,AN,Santiago Del Estero,NEA,-27.2062,-62.03069,,,,,Ultra baja,,New FTS Jr - Quimili,Oggero,,,REFERENCE,,REFERENCE,
-ACCY04NPORTS,Porteña,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Centro,-31.0322,-61.9507,,,,,Estandar,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
+ACCY04NPORTS,Porteña,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Centro,-31.0322,-61.9507,-31.031668,-61.954554,,,Estandar,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
 ANCY04NQUIMS,Quimili,SPD,Corn - Stewarded,R3; GCA,Late,AN,Santiago Del Estero,NEA,-27.78477,-62.19608,,,,,Estandar,,New FTS Jr - Quimili,Oggero,,,REFERENCE,,REFERENCE,
 ANCY04NRAPES,Rapelli,SPD,Corn - Stewarded,R3; GCA,Late,AN,Santiago Del Estero,NOA,-26.43294,-64.51268,,,,,Estandar,,Guzman,Aris,,,REFERENCE,,REFERENCE,
 AAJY07NFERRS,Ferre,Contractor,Mustard - Stewarded,R0,Early,XL,Buenos Aires,Nucleo,-34.116516,-61.205039,,,06/17/2026,,60 kg MAP + 150 kg UREA + 100 kg Sulfato Amonio,,Romero Cuny,Mazzini,,,VERIFIED,09/16/2026,REFERENCE,
