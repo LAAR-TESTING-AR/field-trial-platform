@@ -74,7 +74,7 @@ ACCY04NCDLUT,Cañada de Luque,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AC,C�
 ACCY04NCDRET,Capilla de los Remedios,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Centro,-31.46498,-64.00674,,,,,Baja,,Attme,Capristo,,,REFERENCE,,REFERENCE,
 ACCY04NCHA2T,Chazon ,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Oeste,-33.04064,-63.59238,,,,,Baja,,Gomez,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCY04NCMART,Colonia Marina,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Centro,-31.24709,-62.39959,,,,,Ultra baja,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
-ACCY04NELT2T,El Trebol,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Santa Fe,Centro,-32.17171,-61.77264,,,,,Baja,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
+ACCY04NELT2T,El Trebol,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Santa Fe,Centro,-32.17171,-61.77264,-32.188237,-61.777426,,,Baja,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
 AACY04NFER2T,Ferre,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AA,Buenos Aires,Nucleo,-34.1632,-61.10482,,,,,Alta,,Romero Cuny,Mazzini,,Tiene el HYPER que estaba en Arrecifes Late 2025-2026,REFERENCE,,REFERENCE,
 ACCY04NGAL2T,Galvez,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Santa Fe,Centro,-32.0552,-61.24585,,,,,Estandar,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
 ANCY04NGCAPT,General Capdevilla,SPD,Corn,IMPACT 3R; IMPACT TROP,Late,AN,Chaco,NEA,-27.45281,-61.50464,,,,,Estandar,,Puntano,Oggero,,,REFERENCE,,REFERENCE,
