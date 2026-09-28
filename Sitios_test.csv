@@ -54,7 +54,7 @@ ACCB02FMRCST,Sampacho MRCV,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.36812,
 ACCY04NSBAST,San Basilio,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-33.51581,-64.20332,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCY04NSJENT,San Jeronimo Norte,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Santa Fe,Centro,-31.41631,-61.01263,-31.420834,-61.022042,09/16/2026,,Estandar,,Arias,Traggiay,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NTANDT-AACY04NTANHT,Tandil,Mixed,Corn,IMPACT 3R; R3; HYPER,Early,AA,Buenos Aires,Sudeste,-37.453083,-58.924611,-37.467128,-58.913186,,,Baja,,Cantero,Sarlangue,,Generar dos AOIs distintas,REFERENCE,,REFERENCE,
-AACY04NTR1HT,Tres Arroyos,Mixed,Corn,HYPER,Early,AA,Buenos Aires,Sudeste,,,,,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense,REFERENCE,,REFERENCE,
+AACY04NTR1HT,Tres Arroyos,Mixed,Corn,HYPER,Early,AA,Buenos Aires,Sudeste,,,-38.692788,-59.774181,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense,REFERENCE,,REFERENCE,
 AACY04NURANT,Uranga,SPD,Corn,IMPACT 3R,Early,AA,Santa Fe,Nucleo,-33.272707,-60.37579,-33.2676864415509,-60.3729076414246,09/15/2026,,Estandar,,Vilchez,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NVICTT,Victoria,Contractor,Corn,IMPACT 3R,Early,XL,Entre Ríos,Litoral,-32.8433572472268,-59.7904133037615,-32.8464963483987,-59.7933653237917,09/26/2026,,Baja,,Vilchez,Bernardi,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 ACCY04NMAK1T,Vicuña Mackenna,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-34.17601,-64.35822,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
@@ -104,7 +104,7 @@ ANCY04NSACHT,Sachayoj,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Sant
 ACCY04NSJDOT,San Jose de la Dormida,SPD,Corn,IMPACT 3R; HYPER,Late,AC,Córdoba,Centro,-30.29838,-63.91401,,,,,Ultra baja,,Attme,Capristo,,,REFERENCE,,REFERENCE,
 ACCY04NSUART,Suardi ,SPD,Corn,IMPACT 3R,Late,AC,Santa Fe,Centro,-30.49787,-61.91444,,,,,Baja,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
 ACCY04NSUCOT,Suco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Oeste,-33.42862,-64.78857,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
-AACY04NTR2HT,Tres Arroyos,Contractor,Corn,HYPER,Late,XL,Buenos Aires,Sudeste,,,,,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense,REFERENCE,,REFERENCE,
+AACY04NTR2HT,Tres Arroyos,Contractor,Corn,HYPER,Late,XL,Buenos Aires,Sudeste,,,-38.692788,-59.774181,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense,REFERENCE,,REFERENCE,
 ACCY04NMAK2T,Vicuña Mackenna,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AC,Córdoba,Oeste,-34.18846,-64.34118,,,,,Alta,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCY04NVMRST,Villa Maria del Rio Seco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-30.02585,-63.75195,,,,,Estandar,,Attme,Capristo,,,REFERENCE,,REFERENCE,
 ACCY04NVVALT,Villa Valeria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-34.34024,-64.52098,,,,,Baja,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
