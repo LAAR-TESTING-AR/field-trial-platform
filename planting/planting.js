@@ -1298,7 +1298,37 @@ selectorRegionesTimeline.addEventListener(
 
   }
 );
+const selectorCultivosTimeline =
+  document.getElementById(
+    "selectorCultivosTimeline"
+  );
 
+const selectorSeasonsTimeline =
+  document.getElementById(
+    "selectorSeasonsTimeline"
+  );
+
+selectorCultivosTimeline.addEventListener(
+  "change",
+  () => {
+
+    if (chartTimeline) {
+      btnTimeline.click();
+    }
+
+  }
+);
+
+selectorSeasonsTimeline.addEventListener(
+  "change",
+  () => {
+
+    if (chartTimeline) {
+      btnTimeline.click();
+    }
+
+  }
+);
 
 let chartTimeline = null;
 
