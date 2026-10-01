@@ -377,6 +377,47 @@ function actualizarMapa() {
       cantidadAccess += 1;
     }
   });
+
+const trialsVerificados =
+  sitiosFiltrados.filter(
+    sitio =>
+      String(
+        sitio["Trial Coordinate Status"] || ""
+      )
+        .trim()
+        .toUpperCase() ===
+      "VERIFIED"
+  ).length;
+
+const accessVerificados =
+  sitiosFiltrados.filter(
+    sitio =>
+      String(
+        sitio["Access Coordinate Status"] || ""
+      )
+        .trim()
+        .toUpperCase() ===
+      "VERIFIED"
+  ).length;
+
+const porcentajeTrials =
+  cantidadTrials > 0
+    ? Math.round(
+        (trialsVerificados /
+          cantidadTrials) *
+          100
+      )
+    : 0;
+
+const porcentajeAccess =
+  cantidadAccess > 0
+    ? Math.round(
+        (accessVerificados /
+          cantidadAccess) *
+          100
+      )
+    : 0;
+  
 const cantidadDrop =
   sitiosFiltrados.filter(
     sitio =>
@@ -411,6 +452,23 @@ const cantidadDrop =
     <span class="kpi-valor">${cantidadDrop}</span>
     <span class="kpi-label">Drop</span>
   </div>
+  <div class="kpi-item">
+  <span class="kpi-valor">
+    ${porcentajeTrials}%
+  </span>
+  <span class="kpi-label">
+    Trial Coord
+  </span>
+</div>
+
+<div class="kpi-item">
+  <span class="kpi-valor">
+    ${porcentajeAccess}%
+  </span>
+  <span class="kpi-label">
+    Access Coord
+  </span>
+</div>
 `;
 
   if (coordenadas.length) mapa.fitBounds(coordenadas, { padding: [30, 30], maxZoom: 10 });
