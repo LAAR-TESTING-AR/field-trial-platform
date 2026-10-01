@@ -1477,32 +1477,30 @@ const datasets = [];
 const coloresCultivos = {
 
   // CORN
-  "Corn": "#c2410c",
-  "Corn - Parent Chr": "#f97316",
-  "Corn - Regulated": "#15803d",
-  "Corn - Stewarded": "#7c3aed",
+  "Corn": "#c2410c",                 // naranja oscuro
+  "Corn - Parent Chr": "#f97316",    // naranja claro
+  "Corn - Regulated": "#166534",     // verde bosque
+  "Corn - Stewarded": "#5b21b6",     // violeta oscuro
 
   // SOYBEAN
-  "Soybean": "#7c4a1d",
-  "Soybean - Regulated": "#16a34a",
-  "Soybean - Stewarded": "#9333ea",
+  "Soybean": "#7c4a1d",              // marrón
+  "Soybean - Regulated": "#22c55e",  // verde brillante
+  "Soybean - Stewarded": "#9333ea",  // violeta brillante
 
   // SUNFLOWER
-  "Sunflower": "#d4a017",
-  "Sunflower - Regulated": "#22c55e",
-  "Sunflower - Stewarded": "#a855f7",
+  "Sunflower": "#d4a017",            // amarillo opaco
+  "Sunflower - Regulated": "#65a30d",// verde oliva
+  "Sunflower - Stewarded": "#c026d3",// magenta violeta
 
   // CANOLA
-  "Canola": "#2563eb",
-  "Canola - Parent Chr": "#60a5fa",
-  "Canola - Regulated": "#15803d",
-  "Canola - Stewarded": "#8b5cf6",
+  "Canola": "#2563eb",               // azul
+  "Canola - Parent Chr": "#60a5fa",  // azul claro
+  "Canola - Regulated": "#0f766e",   // verde petróleo
+  "Canola - Stewarded": "#8b5cf6",   // lavanda
 
   // MUSTARD
-  "Mustard - Stewarded": "#6d28d9"
-
+  "Mustard - Stewarded": "#312e81"   // índigo
 };
-
 /*
  * Calendario continuo por semanas.
  * Usa únicamente las regiones seleccionadas.
