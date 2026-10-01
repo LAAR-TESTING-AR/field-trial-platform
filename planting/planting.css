@@ -514,8 +514,8 @@ font-size: 28px;
 }
 
 .timeline-sidebar {
-  width: 280px;
-  min-width: 280px;
+  width: 220px;
+  min-width: 220px;
   flex-shrink: 0;
 }
 
@@ -788,3 +788,16 @@ font-size: 28px;
   word-break: break-word;
 }
 ``
+@media (orientation: landscape) {
+
+  .modal-timeline-contenido {
+    width: 99vw;
+    height: 95vh;
+  }
+
+  .timeline-sidebar {
+    width: 220px;
+    min-width: 220px;
+  }
+
+}
