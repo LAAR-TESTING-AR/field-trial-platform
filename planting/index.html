@@ -209,29 +209,113 @@
     </div>
 <div class="timeline-layout">
 
-  <div class="timeline-sidebar">
+<div class="timeline-sidebar">
 
-    <div class="timeline-filtro-region">
+  <div class="timeline-filtros-titulo">
+    Filtros del gráfico
+  </div>
 
-      <label for="selectorRegionesTimeline">
-        Regiones
-      </label>
-<div id="listaRegionesTimeline">
-</div>
-      <select
-        id="selectorRegionesTimeline"
-        multiple
-        aria-label="Seleccionar una o más regiones">
-      </select>
+  <details
+    class="timeline-filtro-desplegable"
+    open
+  >
+    <summary>
+      Cultivos
+      <span id="resumenCultivosTimeline">
+        Todos
+      </span>
+    </summary>
 
-    
-     <small>
-Sin selección = Toda la campaña
-</small>
-
+    <div
+      id="listaCultivosTimeline"
+      class="timeline-lista-opciones"
+    >
     </div>
+  </details>
+
+  <details
+    class="timeline-filtro-desplegable"
+  >
+    <summary>
+      Regiones
+      <span id="resumenRegionesTimeline">
+        Todas
+      </span>
+    </summary>
+
+    <div
+      id="listaRegionesTimeline"
+      class="timeline-lista-opciones"
+    >
+    </div>
+  </details>
+
+  <details
+    class="timeline-filtro-desplegable"
+  >
+    <summary>
+      Season
+      <span id="resumenSeasonsTimeline">
+        Todas
+      </span>
+    </summary>
+
+    <div
+      id="listaSeasonsTimeline"
+      class="timeline-lista-opciones"
+    >
+    </div>
+  </details>
+
+  <div class="timeline-filtros-acciones">
+
+    <button
+      id="seleccionarTodosTimeline"
+      type="button"
+    >
+      Seleccionar todo
+    </button>
+
+    <button
+      id="limpiarFiltrosTimeline"
+      type="button"
+    >
+      Limpiar
+    </button>
 
   </div>
+
+  <!-- Selectores internos utilizados por planting.js -->
+
+  <select
+    id="selectorCultivosTimeline"
+    multiple
+    hidden
+    aria-label="Cultivos seleccionados"
+  >
+  </select>
+
+  <select
+    id="selectorRegionesTimeline"
+    multiple
+    hidden
+    aria-label="Regiones seleccionadas"
+  >
+  </select>
+
+  <select
+    id="selectorSeasonsTimeline"
+    multiple
+    hidden
+    aria-label="Seasons seleccionadas"
+  >
+  </select>
+
+  <small class="timeline-filtros-ayuda">
+    Sin selección se muestra toda la campaña.
+  </small>
+
+</div>
 
   <div class="timeline-grafico">
 
