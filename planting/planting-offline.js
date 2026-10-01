@@ -34,48 +34,43 @@ function guardarSiembrasPendientes(
   actualizarIndicadorOffline();
 }
 
-function agreg*rSiembraPendiente(
+function agregarSiembraPendiente(
   aoiId,
-  fech*,
+  fecha,
   planter
 ) {
-  const pendientes*=
-    obtenerSiembrasPendientes();*
-  /*
-   * Si el mismo AOI ya esta*a pendiente,
-   * reemplazamos el *egistro para evitar
-   * enviar da*os diferentes.
-   */
-  const sinDu*licado =
+  const pendientes =
+    obtenerSiembrasPendientes();
+
+  const sinDuplicado =
     pendientes.filter(
-  *   registro =>
-        registro.ao*Id !== aoiId
+      registro =>
+        registro.aoiId !== aoiId
     );
 
-  sinDuplicad*.push({
+  sinDuplicado.push({
     aoiId: aoiId,
-    plan*ingDate: fecha,
-    planter: plant*r,
+    plantingDate: fecha,
+    planter: planter,
     registeredAt:
-      new Dat*().toISOString(),
+      new Date().toISOString(),
     source:
-    * "Field Trial Platform Planting Of*line"
+      "Field Trial Platform Planting Offline"
   });
 
-  guardarSiembrasPend*entes(
+  guardarSiembrasPendientes(
     sinDuplicado
   );
 
-  co*sole.log(
-    "Planting guardado l*calmente:",
+  console.log(
+    "Planting guardado localmente:",
     {
-      aoiId: aoi*d,
+      aoiId: aoiId,
       plantingDate: fecha,
-    * planter: planter
+      planter: planter
     }
   );
 }
-```*
 
 function actualizarIndicadorOffline() {
   const indicador =
