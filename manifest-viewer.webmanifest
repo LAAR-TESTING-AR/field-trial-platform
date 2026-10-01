@@ -6,7 +6,7 @@
   "start_url": "/field-trial-map/viewer.html",
   "scope": "/field-trial-map/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#0b6b3a",
   "icons": [
