@@ -148,16 +148,22 @@ async function sincronizarSiembrasPendientes() {
                 "Content-Type":
                   "application/json"
               },
-              body: JSON.stringify({
-                aoiId:
-                  siembra.aoiId,
-                plantingDate:
-                  siembra.plantingDate,
-                registeredAt:
-                  siembra.registeredAt,
-                source:
-                  "Field Trial Map Offline Sync"
-              })
+            body: JSON.stringify({
+  aoiId:
+    siembra.aoiId,
+
+  plantingDate:
+    siembra.plantingDate,
+
+  planter:
+    siembra.planter,
+
+  registeredAt:
+    siembra.registeredAt,
+
+  source:
+    "Field Trial Platform Offline Sync"
+})
             }
           );
 
