@@ -497,7 +497,8 @@ font-size: 28px;
 }
 
 .timeline-sidebar {
-  width: 180px;
+  width: 280px;
+  min-width: 280px;
   flex-shrink: 0;
 }
 
