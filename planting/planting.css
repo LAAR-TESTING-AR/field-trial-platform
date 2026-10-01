@@ -751,3 +751,23 @@ font-size: 28px;
   font-size: 11px;
   line-he*ght: 1.35;
 }
+.timeline-lista-opciones {
+  max-height: 220px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.timeline-opcion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0;
+  box-sizing: border-box;
+}
+
+.timeline-opcion-item span {
+  flex: 1;
+  word-break: break-word;
+}
+``
