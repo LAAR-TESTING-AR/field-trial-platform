@@ -212,13 +212,16 @@ bottom: 85px !important;
 
 .field-coordinate-pending-data {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px 16px;
+  grid-template-columns: 1fr;
+  gap: 8px;
   margin: 0 0 14px;
 }
 
 .field-coordinate-pending-data div {
   min-width: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .field-coordinate-pending-data dt {
