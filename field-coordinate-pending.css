@@ -286,11 +286,14 @@ body.field-coordinate-modal-open {
 }
 
 @media (max-width: 480px) {
-.field-coordinate-pending-button {
+
+  .field-coordinate-pending-button {
     right: 14px !important;
     top: auto !important;
     bottom: 85px !important;
   }
+
+}
 
 }
 
