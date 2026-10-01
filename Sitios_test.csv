@@ -25,7 +25,7 @@ AACY04NARR1T,Arrecifes,SPD,Corn,IMPACT 3R,Early,AA,Buenos Aires,Nucleo,-33.86872
 ACCY04NCARNT,Carnerillo,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-32.92824,-63.91633,,,,,Estandar,,Gomez,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCB02FMRC1T,Chajan MRCV 1,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.536781,-64.937555,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCB02FMRC2T,Chajan MRCV 2,SPD,Corn,OGCA+ Obs,Early,AC,Córdoba,Oeste,-33.538531,-64.936605,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
-ACCY04NCHA1T,Chazon ,SPD,Corn,IMPACT 3R,Early,AC,Córdoba,Oeste,-33.07967,-63.27564,,,09/24/2026,,Baja,,Gomez,Open Rio IV,,,REFERENCE,,REFERENCE,
+ACCY04NCHA1T,Chazon ,SPD,Corn,IMPACT 3R,Early,AC,Córdoba,Oeste,-33.07967,-63.27564,,,09/24/2026,,Baja,,Gomez,Espelet,,,REFERENCE,,REFERENCE,
 AACY04NCHIVT,Chivilcoy,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Nucleo,-34.9128,-60.1478,-34.920109,-60.109096,09/18/2026,,Ultra Baja,,Romero Cuny,Mazzini,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NCURUT,Concepcion del Uruguay,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Entre Ríos,Litoral,-32.380169,-58.649839,-32.4403047396002,-58.6186554940971,,,Estandar,,Vilchez,Bernardi,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 ACCY04NCMOLT,Coronel Moldes,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba,Oeste,-33.60069,-64.62746,,,,,Estandar,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
@@ -61,7 +61,7 @@ ACCY04NMAK1T,Vicuña Mackenna,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AC,Córdoba
 AACY04NELOIT,Villa Eloisa,SPD,Corn,IMPACT 3R,Early,AA,Santa Fe,Nucleo,-33.0049561072021,-61.4968697477989,-32.9958458356195,-61.4490555723008,,,Alta,,Vilchez,Traggiay,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NVGU1T,Villaguay,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Early,AA,Entre Ríos,Litoral,-32.09039,-58.97408,-32.089503,-58.979445,09/17/2026,,Estandar,,Vilchez,Bernardi,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NZAVAT,Zavalla,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Santa Fe,Nucleo,-33.024821,-60.899241,-33.031879,-60.902192,,,Estandar,,Vilchez,Traggiay,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
-ACCY04NADEMT,Adelia Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-33.65534,-64.47788,,,,,Ultra baja,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
+ACCY04NADEMT,Adelia Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-33.65534,-64.47788,,,,,Ultra baja,,Milani,Espelet,,,REFERENCE,,REFERENCE,
 ACCY04NALCHT,Altos de Chipion,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-31.02742,-62.3462,,,,,Alta,,Arias,Traggiay,,,REFERENCE,,REFERENCE,
 AACY04NTRENT,Trenque Lauquen,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Oeste,-35.88023,-62.42794,-35.878036,-62.435056,09/25/2026,,Estandar,,Focke,Peralta Martinez,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAMG2T,Ameghino,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Oeste,-34.98381,-62.83995,,,,,Estandar,,Antunes,Peralta Martinez,,,REFERENCE,,REFERENCE,
@@ -82,7 +82,7 @@ AACY04NGPICT,General Pico,SPD,Corn,IMPACT 3R,Late,AA,La Pampa,Oeste,-35.72576,-6
 AACY04NGVLLT,General Villegas,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Buenos Aires,Oeste,-35.15554,-63.01091,,,,,Estandar,,Antunes,Peralta Martinez,,,REFERENCE,,REFERENCE,
 AACY04NGCH2T,Gualeguaychu,SPD,Corn,IMPACT 3R,Late,AA,Entre Ríos,Litoral,-32.96958,-58.47771,,,,,Estandar,,Vilchez,Bernardi,,,REFERENCE,,REFERENCE,
 ACCY04NHER2T,Hernando,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-32.27251,-63.88597,,,,,Estandar,,Gomez,Open Rio IV,,,REFERENCE,,REFERENCE,
-ACCY04NHRENT,Huinca Renancó,Contractor,Corn,IMPACT 3R,Late,XL,Córdoba,Oeste,-34.81137,-64.29639,,,,,Ultra baja,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
+ACCY04NHRENT,Huinca Renancó,Contractor,Corn,IMPACT 3R,Late,XL,Córdoba,Oeste,-34.81137,-64.29639,,,,,Ultra baja,,Milani,Espelet,,,REFERENCE,,REFERENCE,
 ACCY04NJMART,Jesus Maria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Centro,-30.1734,-64.16247,,,,,Ultra baja,,Attme,Capristo,,,REFERENCE,,REFERENCE,
 ANCY04NLCOCT,La Cocha,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-28.08803,-65.39169,,,,,Baja,,Guzman,Aris,,,REFERENCE,,REFERENCE,
 ANCY04NLCEJT,Las Cejas,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Tucuman,NOA,-26.999046474913,-64.6884688795291,-26.990476828333,-64.679262682447,,,Ultra baja,,Guzman,Aris,,,REFERENCE,,REFERENCE,
@@ -107,7 +107,7 @@ ACCY04NSUCOT,Suco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Oeste,-33.42
 AACY04NTR2HT,Tres Arroyos,Contractor,Corn,HYPER,Late,XL,Buenos Aires,Sudeste,-38.694861,-59.771189,-38.692788,-59.774181,,,Estandar,,Cantero,Sarlangue,,Se siembra en Orense,REFERENCE,,REFERENCE,
 ACCY04NMAK2T,Vicuña Mackenna,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AC,Córdoba,Oeste,-34.18846,-64.34118,,,,,Alta,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
 ACCY04NVMRST,Villa Maria del Rio Seco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-30.02585,-63.75195,,,,,Estandar,,Attme,Capristo,,,REFERENCE,,REFERENCE,
-ACCY04NVVALT,Villa Valeria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-34.34024,-64.52098,,,,,Baja,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
+ACCY04NVVALT,Villa Valeria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-34.34024,-64.52098,,,,,Baja,,Milani,Espelet,,,REFERENCE,,REFERENCE,
 AACY04NVGU2T,Villaguay,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Entre Ríos,Litoral,-32.08565,-59.00467,,,,,Baja,,Vilchez,Bernardi,,,REFERENCE,,REFERENCE,
 Completar,Cordoba PC1,SPD,Corn - Parent Chr,ARPC,Early,AC,Córdoba,Centro,-31.491074,-64.020521,,,,,,,Cano,Capristo,,,REFERENCE,,REFERENCE,
 Completar,Cordoba PC2,SPD,Corn - Parent Chr,ARPC,Early,AC,Córdoba,Centro,-31.491074,-64.020521,,,,,,,Cano,Capristo,,,REFERENCE,,REFERENCE,
@@ -242,7 +242,7 @@ ANFY04NROMAN-ANFY04NROMDN,Romang,Mixed,Sunflower,ONE GCA; R1; R2; R3; IMPACT 3R;
 ANFY04NSBERN,San Bernardo,SPD,Sunflower,ONE GCA; R1; R2; R3; IMPACT 3R,Early,AN,Chaco,NEA,-27.283147,-60.854293,-27.272682,-60.846365,08/06/2026,,30 kg Microstar CMB + 60 kg UREA,,Puntano,Oggero,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 XLFY04NMSINN,San Julian,Contractor,Sunflower,R3 Bolivia,Early,XL,Bolivia,Bolivia,-16.889722,-62.661944,,,04/27/2026,,Sin Fertilizacion,,Miranda,NA,,,VERIFIED,09/18/2026,REFERENCE,
 ACFY04NSJUSN,San Justo,Mixed,Sunflower,IMPACT 3R,Early,AC,Santa Fe,NEA,-30.73755,-60.52409,-30.731187,-60.534858,09/06/2026,,30 kg Microstar CMB + 60 kg UREA,,Arias,Oggero,,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
-ACFY04NSERRN,Serrano,Contractor,Sunflower,IMPACT 3R,Early,AC,Córdoba,Oeste,-33.902675,-64.34973,,,,,30 kg/Ha Microstar CMB + 100 Kg/Ha UREA,,Milani,Open Rio IV,,,REFERENCE,,REFERENCE,
+ACFY04NSERRN,Serrano,Contractor,Sunflower,IMPACT 3R,Early,AC,Córdoba,Oeste,-33.902675,-64.34973,,,,,30 kg/Ha Microstar CMB + 100 Kg/Ha UREA,,Milani,Espelet,,,REFERENCE,,REFERENCE,
 AAFY04NTANIN / AAFY04NTANDN / AAFY04NTADDN,Tandil,SPD,Sunflower,ONE GCA; R1; R2; R3; IMPACT 3R; Dens,Early,AA,Buenos Aires,Sudeste,-37.461919,-58.911961,-37.467128,-58.913186,,,30 kg/Ha Microstar CMB + 100 Kg/Ha UREA,,Cantero,Sarlangue,,,REFERENCE,,REFERENCE,
 AAFY04NTREIN / AAFY04NTRELN / AAFY04NTREDN,Trenque Lauquen,Mixed,Sunflower,ONE GCA; R1; R2; R3; IMPACT 3R; Dens,Early,AA,Buenos Aires,Oeste,-35.92648,-62.79512,,,,,30 kg/Ha Microstar CMB + 100 Kg/Ha UREA,,Focke,Peralta Martinez,,,REFERENCE,,REFERENCE,
 AAFY04N3ARIN/AAFY04N3ARRN,Tres Arroyos,SPD,Sunflower,ONE GCA; R1; R2; R3; IMPACT 3R,Early,AA,Buenos Aires,Sudeste,-38.132842,-60.206958,-38.13908,-60.206513,,,30 kg/Ha Microstar CMB + 100 Kg/Ha UREA,,Cantero,Sarlangue,,Raleo a Densidad 40000 pl/ha,REFERENCE,,REFERENCE,
