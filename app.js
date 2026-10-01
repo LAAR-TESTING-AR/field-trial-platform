@@ -431,6 +431,16 @@ const cantidadDrop =
   Trials: cantidadTrials,
   Access: cantidadAccess
 });
+
+  console.log(
+  "Trial Status ejemplo:",
+  sitiosFiltrados[0]?.["Trial Coordinate Status"]
+);
+
+console.log(
+  "Access Status ejemplo:",
+  sitiosFiltrados[0]?.["Access Coordinate Status"]
+);
   const total = sitiosFiltrados.length;
   contadorSitios.innerHTML = `
   <div class="kpi-item">
