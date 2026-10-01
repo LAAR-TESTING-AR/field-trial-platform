@@ -1254,6 +1254,8 @@ console.log(
       .toISOString()
       .split("T")[0];
 
+  modalPlanter.value = "";
+  
   modalSiembra.classList.add(
     "visible"
   );
