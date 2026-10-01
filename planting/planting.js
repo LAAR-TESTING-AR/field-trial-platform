@@ -553,94 +553,129 @@ function generarDatosTimeline(
   return cultivos;
 }
 
-function cargarRegionesTimeline() {
-
+function cargarFiltroTimeline({
+  campo,
+  selectorId,
+  listaId,
+  resumenId,
+  textoTodos
+}) {
   const selector =
-    document.getElementById(
-      "selectorRegionesTimeline"
-    );
+    document.getElementById(selectorId);
 
   const lista =
-    document.getElementById(
-      "listaRegionesTimeline"
-    );
+    document.getElementById(listaId);
 
-  const regiones = [
-    ...new Set(
-      sitios
-        .map(s => s.Region)
-        .filter(Boolean)
+  const resumen =
+    document.getElementById(resumenId);
+
+  if (
+    !selector ||
+    !lista ||
+    !resumen
+  ) {
+    return;
+  }
+
+  const valores = ordenarValores(
+    sitios.map(
+      sitio => sitio[campo]
     )
-  ].sort();
+  );
 
   selector.innerHTML = "";
   lista.innerHTML = "";
-  
-  regiones.forEach(region => {
 
-    /*
-     * option oculta
-     */
+  valores.forEach(valor => {
     const opcion =
       document.createElement("option");
 
-    opcion.value = region;
-    opcion.textContent = region;
+    opcion.value = valor;
+    opcion.textContent = valor;
 
     selector.appendChild(opcion);
 
-    /*
-     * checkbox visible
-     */
     const fila =
-      document.createElement("div");
+      document.createElement("label");
 
     fila.className =
-      "region-item";
+      "timeline-opcion-item";
 
     const checkbox =
       document.createElement("input");
 
-    checkbox.type =
-      "checkbox";
+    checkbox.type = "checkbox";
+    checkbox.value = valor;
 
-    checkbox.dataset.region =
-      region;
+    const textoOpcion =
+      document.createElement("span");
 
-    const label =
-      document.createElement("label");
+    textoOpcion.textContent = valor;
 
-    label.textContent =
-      region;
+    checkbox.addEventListener(
+      "change",
+      () => {
+        opcion.selected =
+          checkbox.checked;
 
-checkbox.addEventListener(
-  "change",
-  () => {
+        const cantidadSeleccionada =
+          Array.from(
+            selector.selectedOptions
+          ).length;
 
-    opcion.selected =
-      checkbox.checked;
+        resumen.textContent =
+          cantidadSeleccionada === 0
+            ? textoTodos
+            : `${cantidadSeleccionada} seleccionados`;
 
-    selector.dispatchEvent(
-      new Event("change")
+        selector.dispatchEvent(
+          new Event("change")
+        );
+      }
     );
 
-  }
-);
-
-    fila.appendChild(
-      checkbox
-    );
-
-    fila.appendChild(
-      label
-    );
-
-    lista.appendChild(
-      fila
-    );
-
+    fila.appendChild(checkbox);
+    fila.appendChild(textoOpcion);
+    lista.appendChild(fila);
   });
 
+  resumen.textContent = textoTodos;
+}
+
+
+function cargarFiltrosTimeline() {
+  cargarFiltroTimeline({
+    campo: "Crop",
+    selectorId:
+      "selectorCultivosTimeline",
+    listaId:
+      "listaCultivosTimeline",
+    resumenId:
+      "resumenCultivosTimeline",
+    textoTodos: "Todos"
+  });
+
+  cargarFiltroTimeline({
+    campo: "Region",
+    selectorId:
+      "selectorRegionesTimeline",
+    listaId:
+      "listaRegionesTimeline",
+    resumenId:
+      "resumenRegionesTimeline",
+    textoTodos: "Todas"
+  });
+
+  cargarFiltroTimeline({
+    campo: "Season",
+    selectorId:
+      "selectorSeasonsTimeline",
+    listaId:
+      "listaSeasonsTimeline",
+    resumenId:
+      "resumenSeasonsTimeline",
+    textoTodos: "Todas"
+  });
 }
 
 function convertirFechaPlanting(fechaTexto) {
@@ -1142,7 +1177,7 @@ Papa.parse(
     console.log(
       `Sitios cargados: ${sitios.length}`
     );
-cargarRegionesTimeline();
+cargarFiltrosTimeline();
     actualizarVista();
 console.log(
 "Pendientes guardados:",
