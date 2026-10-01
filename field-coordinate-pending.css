@@ -109,7 +109,7 @@ bottom: 85px !important;
 
 .field-coordinate-pending-modal {
   position: relative;
-  width: min(100%, 700px);
+  width: min(100%, 500px);
   max-height: calc(100dvh - 32px);
   margin: auto;
   padding: 24px 20px 20px;
