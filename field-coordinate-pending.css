@@ -219,9 +219,6 @@ bottom: 85px !important;
 
 .field-coordinate-pending-data div {
   min-width: 0;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 .field-coordinate-pending-data dt {
@@ -236,7 +233,14 @@ bottom: 85px !important;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
+.field-coordinate-pending-data dt,
+.field-coordinate-pending-data dd {
+  display: inline-block;
+}
 
+.field-coordinate-pending-data dd {
+  margin-left: 8px;
+}
 .field-coordinate-pending-error {
   padding: 10px;
   border-radius: 8px;
