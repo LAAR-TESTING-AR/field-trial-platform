@@ -59,19 +59,30 @@ modalPlanter =
 btnGuardarSiembra.onclick =
   () => {
 
-    const fecha =
-      modalFechaSiembra.value;
+const fecha =
+  modalFechaSiembra.value;
 
-    const aoiId =
-      aoiPendienteSiembra;
+const planter =
+  modalPlanter.value;
 
-    if (!fecha || !aoiId) {
-      alert(
-        "Seleccione una fecha de siembra"
-      );
+const aoiId =
+  aoiPendienteSiembra;
 
-      return;
-    }
+if (!fecha || !aoiId) {
+  alert(
+    "Seleccione una fecha de siembra"
+  );
+
+  return;
+}
+
+if (!planter) {
+  alert(
+    "Seleccione una sembradora"
+  );
+
+  return;
+}
 
     btnGuardarSiembra.disabled =
       true;
@@ -84,10 +95,11 @@ btnGuardarSiembra.onclick =
      * El registro ya es seguro aunque
      * desaparezca la conexión.
      */
-    agregarSiembraPendiente(
-      aoiId,
-      fecha
-    );
+ agregarSiembraPendiente(
+  aoiId,
+  fecha,
+  planter
+);
 
     /*
      * Actualización visual inmediata.
@@ -100,11 +112,16 @@ btnGuardarSiembra.onclick =
           ) === aoiId
       );
 
-    if (sitioLocal) {
-      sitioLocal[
-        "Planting Date (MM/DD/YYYY)"
-      ] = fecha;
-    }
+if (sitioLocal) {
+  sitioLocal[
+    "Planting Date (MM/DD/YYYY)"
+  ] = fecha;
+
+  sitioLocal[
+    "Planter"
+  ] = planter;
+}
+``
 
     actualizarVista();
 
