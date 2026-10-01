@@ -1927,17 +1927,17 @@ ctx.fillText(
 
 plugins: {
 
-  legend: {
+ legend: {
 
-    display: true,
+  display: true,
 
-    onClick: () => {},
+  onClick: null,
 
-    labels: {
-      padding: 10
-    }
+  labels: {
+    padding: 10
+  }
 
-  },
+},
   tooltip: {
 
     callbacks: {
