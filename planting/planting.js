@@ -1474,14 +1474,34 @@ const esMobile =
   
 const datasets = [];
 
-const colores = [
-  "#f28c28",
-  "#3b82f6",
-  "#22c55e",
-  "#e11d48",
-  "#a855f7",
-  "#f59e0b"
-];
+const coloresCultivos = {
+
+  // CORN
+  "Corn": "#c2410c",
+  "Corn - Parent Chr": "#f97316",
+  "Corn - Regulated": "#15803d",
+  "Corn - Stewarded": "#7c3aed",
+
+  // SOYBEAN
+  "Soybean": "#7c4a1d",
+  "Soybean - Regulated": "#16a34a",
+  "Soybean - Stewarded": "#9333ea",
+
+  // SUNFLOWER
+  "Sunflower": "#d4a017",
+  "Sunflower - Regulated": "#22c55e",
+  "Sunflower - Stewarded": "#a855f7",
+
+  // CANOLA
+  "Canola": "#2563eb",
+  "Canola - Parent Chr": "#60a5fa",
+  "Canola - Regulated": "#15803d",
+  "Canola - Stewarded": "#8b5cf6",
+
+  // MUSTARD
+  "Mustard - Stewarded": "#6d28d9"
+
+};
 
 /*
  * Calendario continuo por semanas.
@@ -1689,17 +1709,13 @@ const ultimaSemanaCultivo =
 
         },
 
-      borderColor:
-        colores[
-          indiceColor %
-          colores.length
-        ],
+borderColor:
+  coloresCultivos[cultivo] ||
+  "#64748b",
 
-      backgroundColor:
-        colores[
-          indiceColor %
-          colores.length
-        ],
+backgroundColor:
+  coloresCultivos[cultivo] ||
+  "#64748b",
 
       borderWidth:
         2,
