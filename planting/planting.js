@@ -1321,44 +1321,63 @@ console.table(datosTimeline);
     chartTimeline.destroy();
   }
 
-const selectorRegiones =
-  document.getElementById(
-    "selectorRegionesTimeline"
+const cultivosSeleccionados =
+  Array.from(
+    document.getElementById(
+      "selectorCultivosTimeline"
+    ).selectedOptions
+  )
+  .map(
+    opcion => opcion.value
   );
 
 const regionesSeleccionadas =
   Array.from(
-    selectorRegiones.selectedOptions
+    document.getElementById(
+      "selectorRegionesTimeline"
+    ).selectedOptions
   )
   .map(
     opcion => opcion.value
-  )
-  .filter(
-    valor => valor !== ""
   );
 
-console.log(
-  "REGIONES:",
-  regionesSeleccionadas
-);
+const seasonsSeleccionadas =
+  Array.from(
+    document.getElementById(
+      "selectorSeasonsTimeline"
+    ).selectedOptions
+  )
+  .map(
+    opcion => opcion.value
+  );
 
 const sitiosFiltradosRegion =
-  regionesSeleccionadas.length === 0
-    ? sitios
-    : sitios.filter(
-        sitio =>
-          regionesSeleccionadas.includes(
-            sitio.Region
-          )
+  sitios.filter(sitio => {
+
+    const cumpleCultivo =
+      cultivosSeleccionados.length === 0 ||
+      cultivosSeleccionados.includes(
+        sitio.Crop
       );
-  console.log(
-  "AOI FILTRADOS REGION:",
-  sitiosFiltradosRegion.length
-);
-console.log(
-  "AOI REGION:",
-  sitiosFiltradosRegion.length
-);
+
+    const cumpleRegion =
+      regionesSeleccionadas.length === 0 ||
+      regionesSeleccionadas.includes(
+        sitio.Region
+      );
+
+    const cumpleSeason =
+      seasonsSeleccionadas.length === 0 ||
+      seasonsSeleccionadas.includes(
+        sitio.Season
+      );
+
+    return (
+      cumpleCultivo &&
+      cumpleRegion &&
+      cumpleSeason
+    );
+  });
 const cultivos =
   generarDatosTimeline(
     sitiosFiltradosRegion
