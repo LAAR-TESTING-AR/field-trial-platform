@@ -296,13 +296,30 @@ header {
 
 #modalFechaSiembra {
   width: 100%;
+  min-height: 52px;
+
   box-sizing: border-box;
+
   padding: 12px;
+
   margin-top: 6px;
   margin-bottom: 16px;
-  font-size: 16px;
-}
 
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  font-size: 16px;
+  text-align: center;
+
+  appearance: none;
+  -webkit-appearance: none;
+}
+#modalFechaSiembra::-webkit-date-and-time-value {
+  text-align: center;
+}
+``
 .modal-botones {
   display: flex;
   gap: 10px;
