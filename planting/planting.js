@@ -1931,6 +1931,8 @@ plugins: {
 
     display: true,
 
+    onClick: () => {},
+
     labels: {
       padding: 10
     }
