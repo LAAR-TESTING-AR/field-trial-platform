@@ -1403,7 +1403,28 @@ const colores = [
  */
 const calendarioSemanal =
   generarCalendarioSemanal(
-    sitiosFiltradosRegion
+    sitiosFiltradosRegion.filter(
+      sitio => {
+
+        const cumpleCultivo =
+          cultivosSeleccionados.length === 0 ||
+          cultivosSeleccionados.includes(
+            sitio.Crop
+          );
+
+        const cumpleSeason =
+          seasonsSeleccionadas.length === 0 ||
+          seasonsSeleccionadas.includes(
+            sitio.Season
+          );
+
+        return (
+          cumpleCultivo &&
+          cumpleSeason
+        );
+
+      }
+    )
   );
 
 const labelsGlobales =
