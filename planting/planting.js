@@ -1947,17 +1947,19 @@ plugins: {
         const punto =
           context.raw;
 
-        return [
+      return [
 
-          `Avance: ${punto.y.toFixed(1)}%`,
+  `Avance: ${punto.y.toFixed(1)}%`,
 
-          `AOI sembrados: ${punto.aoiDia}`,
+  `AOI sembrados: ${punto.aoiDia}`,
 
-          `AOI: ${punto.aoiIds.join(", ")}`,
+  "Localidades:",
 
-          `Localidades: ${punto.localidades.join(", ")}`
+  ...punto.localidades.map(
+    loc => `• ${loc}`
+  )
 
-        ];
+];
 
       }
 
