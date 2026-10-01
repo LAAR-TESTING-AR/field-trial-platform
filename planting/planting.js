@@ -1332,6 +1332,62 @@ selectorSeasonsTimeline.addEventListener(
 
 let chartTimeline = null;
 
+const btnLimpiarFiltrosTimeline =
+  document.getElementById(
+    "limpiarFiltrosTimeline"
+  );
+
+if (btnLimpiarFiltrosTimeline) {
+
+  btnLimpiarFiltrosTimeline.addEventListener(
+    "click",
+    () => {
+
+      document
+        .querySelectorAll(
+          "#listaCultivosTimeline input[type='checkbox'], " +
+          "#listaRegionesTimeline input[type='checkbox'], " +
+          "#listaSeasonsTimeline input[type='checkbox']"
+        )
+        .forEach(
+          checkbox => {
+            checkbox.checked = false;
+          }
+        );
+
+      document
+        .querySelectorAll(
+          "#selectorCultivosTimeline option, " +
+          "#selectorRegionesTimeline option, " +
+          "#selectorSeasonsTimeline option"
+        )
+        .forEach(
+          option => {
+            option.selected = false;
+          }
+        );
+
+      document.getElementById(
+        "resumenCultivosTimeline"
+      ).textContent = "Todos";
+
+      document.getElementById(
+        "resumenRegionesTimeline"
+      ).textContent = "Todas";
+
+      document.getElementById(
+        "resumenSeasonsTimeline"
+      ).textContent = "Todas";
+
+      if (chartTimeline) {
+        btnTimeline.click();
+      }
+
+    }
+  );
+
+}
+
 btnTimeline.addEventListener("click", () => {
 
   modalTimeline.classList.add("visible");
