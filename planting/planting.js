@@ -18,6 +18,7 @@ const URL_FLOW_SIEMBRA =
 
 let modalSiembra;
 let modalFechaSiembra;
+let modalPlanter;
 let btnCancelarSiembra;
 let btnGuardarSiembra;
 
@@ -34,7 +35,10 @@ document.addEventListener(
       document.getElementById(
         "modalFechaSiembra"
       );
-
+modalPlanter =
+  document.getElementById(
+    "modalPlanter"
+  );
     btnCancelarSiembra =
       document.getElementById(
         "btnCancelarSiembra"
