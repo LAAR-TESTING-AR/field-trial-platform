@@ -218,15 +218,15 @@ contadorSitios.innerHTML = `
     <span class="kpi-valor">${cantidadDrop}</span>
     <span class="kpi-label">Drop</span>
   </div>
-
 <div class="kpi-item">
-<span class="kpi-valor">
-  ${trialsVerificados}
-</span>
+  <span class="kpi-valor">
+    ${trialsVerificados}
+  </span>
 
-<span class="kpi-subvalor">
-  (${porcentajeTrials}%)
-</span>
+  <span class="kpi-subvalor">
+    (${porcentajeTrials}%)
+  </span>
+
   <span class="kpi-label">
     Trial Coord
   </span>
@@ -234,17 +234,18 @@ contadorSitios.innerHTML = `
 
 <div class="kpi-item">
   <span class="kpi-valor">
-  ${trialsVerificados}
-</span>
+    ${accessVerificados}
+  </span>
 
-<span class="kpi-subvalor">
-  (${porcentajeTrials}%)
-</span>
+  <span class="kpi-subvalor">
+    (${porcentajeAccess}%)
+  </span>
+
   <span class="kpi-label">
     Access Coord
   </span>
 </div>
-  
+
 `;
     
     window.actualizarLeyenda(sitiosFiltrados);
