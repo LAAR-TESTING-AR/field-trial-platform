@@ -220,9 +220,13 @@ contadorSitios.innerHTML = `
   </div>
 
 <div class="kpi-item">
-  <span class="kpi-valor">
-    ${trialsVerificados} (${porcentajeTrials}%)
-  </span>
+<span class="kpi-valor">
+  ${trialsVerificados}
+</span>
+
+<span class="kpi-subvalor">
+  (${porcentajeTrials}%)
+</span>
   <span class="kpi-label">
     Trial Coord
   </span>
@@ -230,8 +234,12 @@ contadorSitios.innerHTML = `
 
 <div class="kpi-item">
   <span class="kpi-valor">
-    ${accessVerificados} (${porcentajeAccess}%)
-  </span>
+  ${trialsVerificados}
+</span>
+
+<span class="kpi-subvalor">
+  (${porcentajeTrials}%)
+</span>
   <span class="kpi-label">
     Access Coord
   </span>
