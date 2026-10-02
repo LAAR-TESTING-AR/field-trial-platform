@@ -193,6 +193,11 @@ const porcentajeAccess =
         (accessVerificados / cantidadAccess) * 100
       )
     : 0;
+
+    console.log(
+  "Primer sitio:",
+  sitiosFiltrados[0]
+);
 contadorSitios.innerHTML = `
   <div class="kpi-item">
     <span class="kpi-valor">${sitiosFiltrados.length}</span>
