@@ -103,6 +103,8 @@
     let cantidadTrials = 0;
     let cantidadAccess = 0;
     let cantidadDrop = 0;
+    let trialsVerificados = 0;
+let accessVerificados = 0;
 
     sitiosFiltrados.forEach(sitio => {
       const esDrop = esTrialDrop(sitio);
@@ -130,6 +132,17 @@
 
         coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
         cantidadTrials += 1;
+
+        if (
+  String(
+    sitio["Trial Coordinate Status"] || ""
+  )
+    .trim()
+    .toUpperCase() === "VERIFIED"
+) {
+  trialsVerificados += 1;
+}
+        
         if (esDrop) cantidadDrop += 1;
       }
 
@@ -154,9 +167,32 @@
 
         coordenadas.push([sitio.latitudeAccess, sitio.longitudeAccess]);
         cantidadAccess += 1;
+
+        if (
+  String(
+    sitio["Access Coordinate Status"] || ""
+  )
+    .trim()
+    .toUpperCase() === "VERIFIED"
+) {
+  accessVerificados += 1;
+}
+        
       }
     });
+const porcentajeTrials =
+  cantidadTrials > 0
+    ? Math.round(
+        (trialsVerificados / cantidadTrials) * 100
+      )
+    : 0;
 
+const porcentajeAccess =
+  cantidadAccess > 0
+    ? Math.round(
+        (accessVerificados / cantidadAccess) * 100
+      )
+    : 0;
 contadorSitios.innerHTML = `
   <div class="kpi-item">
     <span class="kpi-valor">${sitiosFiltrados.length}</span>
@@ -177,6 +213,25 @@ contadorSitios.innerHTML = `
     <span class="kpi-valor">${cantidadDrop}</span>
     <span class="kpi-label">Drop</span>
   </div>
+
+<div class="kpi-item">
+  <span class="kpi-valor">
+    ${trialsVerificados} (${porcentajeTrials}%)
+  </span>
+  <span class="kpi-label">
+    Trial Coord
+  </span>
+</div>
+
+<div class="kpi-item">
+  <span class="kpi-valor">
+    ${accessVerificados} (${porcentajeAccess}%)
+  </span>
+  <span class="kpi-label">
+    Access Coord
+  </span>
+</div>
+  
 `;
     
     window.actualizarLeyenda(sitiosFiltrados);
