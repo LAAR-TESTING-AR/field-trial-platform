@@ -188,9 +188,9 @@ const porcentajeTrials =
     : 0;
 
 const porcentajeAccess =
-  cantidadAccess > 0
+  cantidadTrials > 0
     ? Math.round(
-        (accessVerificados / cantidadAccess) * 100
+        (accessVerificados / cantidadTrials) * 100
       )
     : 0;
 
