@@ -133,9 +133,9 @@ let accessVerificados = 0;
         coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
         cantidadTrials += 1;
 
-        if (
+if (
   String(
-    sitio["Trial Coordinate Status"] || ""
+    sitio.trialCoordinateStatus || ""
   )
     .trim()
     .toUpperCase() === "VERIFIED"
@@ -168,9 +168,9 @@ let accessVerificados = 0;
         coordenadas.push([sitio.latitudeAccess, sitio.longitudeAccess]);
         cantidadAccess += 1;
 
-        if (
+if (
   String(
-    sitio["Access Coordinate Status"] || ""
+    sitio.accessCoordinateStatus || ""
   )
     .trim()
     .toUpperCase() === "VERIFIED"
