@@ -170,8 +170,7 @@ Completar,Ferré,SPD,Soybean,R4 4E - R4 4L -  / Var M0-1  - R2 4H -  - R3 4E - R
 ACBY08NGALVT-ACBY04NGALVT,Galvez,SPD,Soybean,R4 4E - R4 4L - R4 5E /  -  - R2 5E -  - R3 4L - R3 5H,Early,AC,Santa Fe,II - 4,-32.07568,-61.21907,,,,,320000,30 Kg Microstar CMB,0,Arias,Traggiay,,REFERENCE,,REFERENCE,
 Completar,General Villegas,SPD,Soybean,R4 4E -  -  / Var M0-1 - R2 4H -  - R3 4E - R3 4L - ,Early,AA,Buenos Aires,II - 5,-35.15012,-62.84029,,,,,320000,30 Kg Microstar CMB,0,Antunes,Peralta Martinez,,REFERENCE,,REFERENCE,
 Completar,Gualeguaychu,SPD,Soybean,R4 4L - R4 5E /  -  - R2 5E -  -  - R3 5H,Early,AA,Entre Ríos,II - 8,-33.09274,-58.7842,,,,,320000,30 Kg Microstar CMB,0,Vilchez,Bernardi,,REFERENCE,,REFERENCE,
-"ACBY08NHERNT/ ACBY04NHERNT
-",Hernando,SPD,Soybean, - R4 4L - R4 5E /  -  - R2 5E -  - R3 4L - R3 5H,Early,AC,Cordoba,II - 3,-32.35665,-63.72345,,,,,320000,30 Kg Microstar CMB,0,Gomez,Open Rio IV,,REFERENCE,,REFERENCE,
+ACBY08NHERNT-ACBY04NHERNT,Hernando,SPD,Soybean, - R4 4L - R4 5E /  -  - R2 5E -  - R3 4L - R3 5H,Early,AC,Cordoba,II - 3,-32.35665,-63.72345,,,,,320000,30 Kg Microstar CMB,0,Gomez,Open Rio IV,,REFERENCE,,REFERENCE,
 ACBY08NJMART-ACBY04NJMART,Jesus Maria,SPD,Soybean, - R4 4L - R4 5E /  -  - R2 5E -  -  - R3 5H,Early,AC,Cordoba,II - 1,-31.18639,-64.04678,,,,,320000,30 Kg Microstar CMB,0,Attme,Capristo,,REFERENCE,,REFERENCE,
 Completar,Junin,SPD,Soybean,R4 4E - R4 4L -  / Var M0-1 - R2 4H -  - R3 4E - R3 4L - ,Early,AA,Buenos Aires,II - 6,-34.51443,-61.08774,,,,,320000,30 Kg Microstar CMB,0,Romero Cuny,Mazzini,,REFERENCE,,REFERENCE,
 Completar,La Carlota,SPD,Soybean,R4 4E - R4 4L - R4 5E /  -  - R2 5E -  -  - R3 5H,Early,AA,Córdoba,II - 3,-33.43616,-63.35543,,,,,320000,30 Kg Microstar CMB,0,Perassi,Paz,,REFERENCE,,REFERENCE,
