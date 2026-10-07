@@ -272,7 +272,7 @@ function crearPopupTrial(sitio) {
       ${linea("FTS", sitio.fts)}
       ${linea("SPA", sitio.spa)}
       ${linea("Fecha de siembra", sitio.plantingDate)}
-      ${linea("Densidad de plantas", sitio.plantDensity, sitio.plantDensity ? " plantas/ha" : "")}
+      ${linea("Densidad de plantas", sitio.plantDensity ? sitio.plantDensity + " plantas/ha" : "", "")}
       ${linea("Fertilización", sitio.fertilization)}
       ${linea("Área", sitio.area, sitio.area ? " ha" : "")}
       ${linea("Latitud", lat)}
