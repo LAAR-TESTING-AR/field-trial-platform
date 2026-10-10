@@ -1313,6 +1313,21 @@ const modalTimeline =
 
 const cerrarTimeline =
   document.getElementById("cerrarTimeline");
+const btnPlanterStats =
+  document.getElementById(
+    "btnPlanterStats"
+  );
+
+const modalPlanterStats =
+  document.getElementById(
+    "modalPlanterStats"
+  );
+
+const cerrarPlanterStats =
+  document.getElementById(
+    "cerrarPlanterStats"
+  );
+
 const selectorRegionesTimeline =
   document.getElementById(
     "selectorRegionesTimeline"
