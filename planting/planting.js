@@ -2190,7 +2190,7 @@ ranking.innerHTML = `
 
   </table>
 
-;
+`;
     .join("");
     const labels =
       datos.map(
