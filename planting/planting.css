@@ -418,24 +418,18 @@ text-align: center;
   gap: 12px;
 }
 
-#btnTimeline {
+#btnTimeline,
+#btnPlanterStats {
   width: 100%;
-
   margin-top: 12px;
-
   padding: 14px;
-
   border: none;
   border-radius: 10px;
-
   background: #e6efe8;
   color: #0b6b3a;
-
   font-size: 20px;
   font-weight: 700;
-
   cursor: pointer;
-
   display: flex;
   align-items: center;
   justify-content: center;
