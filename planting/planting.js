@@ -2187,7 +2187,7 @@ ranking.innerHTML = `
 
     <tbody>
 
-      ${datos.map(item => `
+${datos.map((item, index) => `
 
         <tr>
 
