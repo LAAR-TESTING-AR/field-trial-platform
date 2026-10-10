@@ -487,9 +487,18 @@ function actualizarDashboard(sitiosFiltrados) {
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
 
-document.getElementById("barraAvance").style.width =
-  `${avance}%`;
+const anguloAvance =
+  -90 + (
+    Math.max(
+      0,
+      Math.min(100, avance)
+    ) * 1.8
+  );
 
+document.getElementById(
+  "agujaAvance"
+).style.transform =
+  `rotate(${anguloAvance}deg)`;
 }
 function generarDatosPlanter(
   sitiosBase = sitios
