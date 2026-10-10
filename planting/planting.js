@@ -2121,19 +2121,82 @@ btnPlanterStats.addEventListener(
   "click",
   () => {
 
-    console.log(
-      "CLICK PLANTER"
-    );
-console.table(
-  generarDatosPlanter()
-);
+    const datos =
+      generarDatosPlanter();
+
+    console.table(datos);
+
+    const labels =
+      datos.map(
+        d => d.planter
+      );
+
+    const hectareas =
+      datos.map(
+        d => d.hectareas
+      );
+
+    const canvas =
+      document.getElementById(
+        "graficoPlanter"
+      );
+
+    if (
+      window.chartPlanter
+    ) {
+      window.chartPlanter.destroy();
+    }
+
+    window.chartPlanter =
+      new Chart(
+        canvas,
+        {
+
+          type: "doughnut",
+
+          data: {
+
+            labels: labels,
+
+            datasets: [
+
+              {
+
+                data: hectareas
+
+              }
+
+            ]
+
+          },
+
+          options: {
+
+            responsive: true,
+
+            maintainAspectRatio: false,
+
+            plugins: {
+
+              legend: {
+
+                position: "bottom"
+
+              }
+
+            }
+
+          }
+
+        }
+      );
+
     modalPlanterStats.classList.add(
       "visible"
     );
 
   }
 );
-
 cerrarPlanterStats.addEventListener(
   "click",
   () => {
