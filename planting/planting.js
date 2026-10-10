@@ -2206,11 +2206,9 @@ ranking.innerHTML =
 
             plugins: {
 
-              legend: {
-
-                position: "bottom"
-
-              }
+             legend: {
+  display: false
+}
 
             }
 
