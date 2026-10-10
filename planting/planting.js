@@ -2060,9 +2060,15 @@ cerrarTimeline.addEventListener("click", () => {
 btnPlanterStats.addEventListener(
   "click",
   () => {
+
+    console.log(
+      "CLICK PLANTER"
+    );
+
     modalPlanterStats.classList.add(
       "visible"
     );
+
   }
 );
 
