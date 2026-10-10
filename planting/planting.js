@@ -2201,7 +2201,10 @@ ranking.innerHTML = `
       datos.map(
         d => d.hectareas
       );
-
+const aoi =
+  datos.map(
+    d => d.aoi
+  );
     const canvas =
       document.getElementById(
         "graficoPlanter"
@@ -2224,15 +2227,25 @@ ranking.innerHTML = `
 
             labels: labels,
 
-            datasets: [
+     datasets: [
 
-              {
+  {
+    label: "AOI",
 
-                data: hectareas
+    data: aoi,
 
-              }
+    weight: 1
+  },
 
-            ]
+  {
+    label: "Ha",
+
+    data: hectareas,
+
+    weight: 2
+  }
+
+]
 
           },
 
