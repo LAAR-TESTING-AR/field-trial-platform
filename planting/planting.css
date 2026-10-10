@@ -464,7 +464,8 @@ text-align: center;
 .icono-timeline {
 font-size: 28px;
 }
-#btnTimeline:hover {
+#btnTimeline:hover,
+#btnPlanterStats:hover {
   background: #d9e8dd;
 }
 .modal-timeline {
