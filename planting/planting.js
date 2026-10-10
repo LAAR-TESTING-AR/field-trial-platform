@@ -2228,6 +2228,18 @@ const aoi =
   datos.map(
     d => d.aoi
   );
+    const coloresPlanter = [
+
+  "#3B82F6", // BE19186
+  "#F85D7F", // PP23191
+  "#F59E3A", // BE19182
+  "#F2C84C", // BE19187
+  "#4EB5B7", // BE19185
+  "#8B5CF6", // BE19184
+  "#BFC3C7", // Contractor
+  "#38BDF8"  // BE19183
+
+];
     const canvas =
       document.getElementById(
         "graficoPlanter"
@@ -2250,12 +2262,14 @@ const aoi =
 
             labels: labels,
 
-     datasets: [
+datasets: [
 
   {
     label: "AOI",
 
     data: aoi,
+
+    backgroundColor: coloresPlanter,
 
     weight: 1
   },
@@ -2264,6 +2278,8 @@ const aoi =
     label: "Ha",
 
     data: hectareas,
+
+    backgroundColor: coloresPlanter,
 
     weight: 2
   }
