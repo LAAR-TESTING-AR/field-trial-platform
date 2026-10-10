@@ -2146,29 +2146,6 @@ document.getElementById(
   "totalHaPlanter"
 ).textContent =
   `${totalHa.toFixed(1)} ha`;
-    const totalAOI =
-  datos.reduce(
-    (suma, item) =>
-      suma + item.aoi,
-    0
-  );
-
-const totalHa =
-  datos.reduce(
-    (suma, item) =>
-      suma + item.hectareas,
-    0
-  );
-
-document.getElementById(
-  "totalAOIPlanter"
-).textContent =
-  `${totalAOI} AOI`;
-
-document.getElementById(
-  "totalHaPlanter"
-).textContent =
-  `${totalHa.toFixed(1)} ha`;
     
     console.table(datos);
 const ranking =
