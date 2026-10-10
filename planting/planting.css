@@ -411,6 +411,13 @@ text-align: center;
 #botonLeyenda:active {
   transform: scale(0.96);
 }
+
+.dashboard-botones {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 #btnTimeline {
   width: 100%;
 
