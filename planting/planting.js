@@ -510,7 +510,10 @@ function generarDatosPlanter(
       limpiarTexto(
         sitio["Planter"]
       );
-
+console.log(
+  "PLANTER:",
+  sitio["Planter"]
+);
     if (!planter) {
       return;
     }
