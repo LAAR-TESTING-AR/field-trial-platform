@@ -230,7 +230,7 @@ header {
   transform-origin: 50% 100%;
   transform: rotate(-90deg);
   transition: transform 0.5s ease;
-  z-index: 3;
+  z-index: 2;
 }
 
 .gauge-centro {
@@ -255,7 +255,7 @@ header {
   line-height: 1;
   color: #0b6b3a;
   text-align: center;
-  z-index: 5;
+  z-index: 20;
 }
 #avanceGrande {
   min-width: 44px;
