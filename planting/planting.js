@@ -2125,7 +2125,35 @@ btnPlanterStats.addEventListener(
       generarDatosPlanter();
 
     console.table(datos);
+const ranking =
+  document.getElementById(
+    "planterRanking"
+  );
 
+ranking.innerHTML =
+  datos
+    .map(
+      (item, index) => `
+
+        <div style="
+          padding:8px 0;
+          border-bottom:1px solid #eeeeee;
+        ">
+
+          <strong>
+            ${index + 1}. ${item.planter}
+          </strong>
+
+          <br>
+
+          ${item.aoi} AOI |
+          ${item.hectareas.toFixed(1)} ha
+
+        </div>
+
+      `
+    )
+    .join("");
     const labels =
       datos.map(
         d => d.planter
