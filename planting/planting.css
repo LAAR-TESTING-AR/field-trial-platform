@@ -880,3 +880,51 @@ font-size: 28px;
 
   overflow-y: auto;
 }
+#planterChartContainer {
+  position: relative;
+}
+
+#planterCentro {
+
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+#totalAOIPlanter {
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  color: #193b2a;
+}
+
+#totalHaPlanter {
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #555;
+
+  margin-top: 4px;
+}
+
+#planterLeyendaAnillos {
+
+  margin-top: 8px;
+
+  font-size: 11px;
+
+  color: #777;
+
+  line-height: 1.3;
+}
