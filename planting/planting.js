@@ -2191,7 +2191,7 @@ ranking.innerHTML = `
   </table>
 
 `;
-    .join("");
+ 
     const labels =
       datos.map(
         d => d.planter
