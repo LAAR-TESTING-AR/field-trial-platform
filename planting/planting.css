@@ -850,3 +850,33 @@ font-size: 28px;
   }
 
 }
+#planterStatsContenido {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#planterChartContainer {
+  flex: 1;
+  min-height: 350px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#graficoPlanter {
+  max-width: 500px;
+  max-height: 500px;
+}
+
+#planterRanking {
+
+  border-top: 1px solid #e0e0e0;
+
+  padding: 16px;
+
+  min-height: 120px;
+
+  overflow-y: auto;
+}
