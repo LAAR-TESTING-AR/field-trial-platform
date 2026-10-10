@@ -2057,3 +2057,20 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
+btnPlanterStats.addEventListener(
+  "click",
+  () => {
+    modalPlanterStats.classList.add(
+      "visible"
+    );
+  }
+);
+
+cerrarPlanterStats.addEventListener(
+  "click",
+  () => {
+    modalPlanterStats.classList.remove(
+      "visible"
+    );
+  }
+);
