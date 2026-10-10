@@ -247,7 +247,7 @@ header {
 .gauge-siembra #avanceGrande {
   position: absolute;
   left: 50%;
-  bottom: 3px;
+  bottom: 18px;
   transform: translateX(-50%);
   min-width: auto;
   font-size: 24px;
