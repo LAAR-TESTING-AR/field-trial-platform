@@ -789,20 +789,39 @@ function formatearSemanaTimeline(claveSemana) {
       .split("-")
       .map(Number);
 
-  const fecha =
+  const inicio =
     new Date(
       partes[0],
       partes[1] - 1,
       partes[2]
     );
 
-  return fecha.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit"
-    }
+  const fin =
+    new Date(inicio);
+
+  fin.setDate(
+    fin.getDate() + 6
   );
+
+  const inicioTxt =
+    inicio.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  const finTxt =
+    fin.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  return `${inicioTxt}-${finTxt}`;
 }
 
 function generarCalendarioSemanal(sitiosBase) {
