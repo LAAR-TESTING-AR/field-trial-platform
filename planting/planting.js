@@ -486,7 +486,29 @@ function actualizarDashboard(sitiosFiltrados) {
 
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
+let colorAvance;
 
+if (avance <= 25) {
+
+  colorAvance = "#d32f2f";
+
+} else if (avance <= 50) {
+
+  colorAvance = "#f57c00";
+
+} else if (avance <= 75) {
+
+  colorAvance = "#fbc02d";
+
+} else {
+
+  colorAvance = "#2e7d32";
+
+}
+
+document.getElementById(
+  "avanceGrande"
+).style.color = colorAvance;
 const anguloAvance =
   -90 + (
     Math.max(
