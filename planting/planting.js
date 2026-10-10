@@ -491,7 +491,64 @@ document.getElementById("barraAvance").style.width =
   `${avance}%`;
 
 }
+function generarDatosPlanter(
+  sitiosBase = sitios
+) {
 
+  const resultado = {};
+
+  sitiosBase.forEach(sitio => {
+
+    if (
+      esDrop(sitio) ||
+      !estaSembrado(sitio)
+    ) {
+      return;
+    }
+
+    const planter =
+      limpiarTexto(
+        sitio["Planter"]
+      );
+
+    if (!planter) {
+      return;
+    }
+
+    const area =
+      Number(
+        String(
+          sitio["Area ( Ha)"] || "0"
+        ).replace(",", ".")
+      ) || 0;
+
+    if (!resultado[planter]) {
+
+      resultado[planter] = {
+
+        planter: planter,
+
+        aoi: 0,
+
+        hectareas: 0
+
+      };
+
+    }
+
+    resultado[planter].aoi += 1;
+
+    resultado[planter].hectareas += area;
+
+  });
+
+  return Object.values(resultado)
+    .sort(
+      (a, b) =>
+        b.hectareas - a.hectareas
+    );
+
+}
 function generarDatosTimeline(
   sitiosBase = sitios
 ) {
@@ -2064,7 +2121,9 @@ btnPlanterStats.addEventListener(
     console.log(
       "CLICK PLANTER"
     );
-
+console.table(
+  generarDatosPlanter()
+);
     modalPlanterStats.classList.add(
       "visible"
     );
