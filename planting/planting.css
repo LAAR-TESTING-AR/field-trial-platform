@@ -418,6 +418,32 @@ text-align: center;
   gap: 12px;
 }
 
+@media (max-width: 900px) {
+
+  .dashboard-botones {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  #btnTimeline,
+  #btnPlanterStats {
+
+    flex: 1;
+
+    margin-top: 0;
+
+    padding: 10px;
+
+    font-size: 16px;
+
+  }
+
+  .icono-timeline {
+    font-size: 20px;
+  }
+
+}
+
 #btnTimeline,
 #btnPlanterStats {
   width: 100%;
