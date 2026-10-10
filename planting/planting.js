@@ -2130,29 +2130,67 @@ const ranking =
     "planterRanking"
   );
 
-ranking.innerHTML =
-  datos
-    .map(
-      (item, index) => `
+ranking.innerHTML = `
 
-        <div style="
-          padding:8px 0;
-          border-bottom:1px solid #eeeeee;
-        ">
+  <table style="
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+  ">
+  
+    <thead>
+      <tr>
+        <th style="text-align:left;padding:8px;">
+          Sembradora
+        </th>
 
-          <strong>
-            ${index + 1}. ${item.planter}
-          </strong>
+        <th style="text-align:center;padding:8px;">
+          AOI
+        </th>
 
-          <br>
+        <th style="text-align:center;padding:8px;">
+          Ha
+        </th>
+      </tr>
+    </thead>
 
-          ${item.aoi} AOI |
-          ${item.hectareas.toFixed(1)} ha
+    <tbody>
 
-        </div>
+      ${datos.map(item => `
 
-      `
-    )
+        <tr>
+
+          <td style="
+            padding:8px;
+            border-top:1px solid #eeeeee;
+            font-weight:600;
+          ">
+            ${item.planter}
+          </td>
+
+          <td style="
+            text-align:center;
+            border-top:1px solid #eeeeee;
+          ">
+            ${item.aoi}
+          </td>
+
+          <td style="
+            text-align:center;
+            border-top:1px solid #eeeeee;
+          ">
+            ${item.hectareas.toFixed(1)}
+          </td>
+
+        </tr>
+
+      `).join("")}
+
+    </tbody>
+
+  </table>
+
+;
     .join("");
     const labels =
       datos.map(
