@@ -200,11 +200,12 @@ header {
   border-radius: 50%;
   background: conic-gradient(
     from 270deg,
-    #d32f2f 0deg 45deg,
-    #f57c00 45deg 90deg,
-    #fbc02d 90deg 135deg,
-    #2e7d32 135deg 180deg,
-    transparent 180deg 360deg
+    #d32f2f 0deg,
+    #f57c00 60deg,
+    #fbc02d 120deg,
+    #2e7d32 180deg,
+    transparent 180deg,
+    transparent 360deg
   );
 }
 
