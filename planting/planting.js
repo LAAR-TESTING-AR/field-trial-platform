@@ -2167,13 +2167,21 @@ ranking.innerHTML = `
           Sembradora
         </th>
 
-        <th style="text-align:center;padding:8px;">
-          AOI
-        </th>
+<th style="text-align:center;padding:8px;">
+  AOI
+</th>
 
-        <th style="text-align:center;padding:8px;">
-          Ha
-        </th>
+<th style="text-align:center;padding:8px;">
+  %AOI
+</th>
+
+<th style="text-align:center;padding:8px;">
+  Ha
+</th>
+
+<th style="text-align:center;padding:8px;">
+  %Ha
+</th>
       </tr>
     </thead>
 
@@ -2191,19 +2199,33 @@ ranking.innerHTML = `
             ${item.planter}
           </td>
 
-          <td style="
-            text-align:center;
-            border-top:1px solid #eeeeee;
-          ">
-            ${item.aoi}
-          </td>
+<td style="
+  text-align:center;
+  border-top:1px solid #eeeeee;
+">
+  ${item.aoi}
+</td>
 
-          <td style="
-            text-align:center;
-            border-top:1px solid #eeeeee;
-          ">
-            ${item.hectareas.toFixed(1)}
-          </td>
+<td style="
+  text-align:center;
+  border-top:1px solid #eeeeee;
+">
+  ${((item.aoi / totalAOI) * 100).toFixed(1)}%
+</td>
+
+<td style="
+  text-align:center;
+  border-top:1px solid #eeeeee;
+">
+  ${item.hectareas.toFixed(1)}
+</td>
+
+<td style="
+  text-align:center;
+  border-top:1px solid #eeeeee;
+">
+  ${((item.hectareas / totalHa) * 100).toFixed(1)}%
+</td>
 
         </tr>
 
