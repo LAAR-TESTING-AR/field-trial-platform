@@ -2191,13 +2191,29 @@ ranking.innerHTML = `
 
         <tr>
 
-          <td style="
-            padding:8px;
-            border-top:1px solid #eeeeee;
-            font-weight:600;
-          ">
-            ${item.planter}
-          </td>
+        <td style="
+  padding:8px;
+  border-top:1px solid #eeeeee;
+  font-weight:600;
+">
+
+  <span
+    style="
+      display:inline-block;
+      width:12px;
+      height:12px;
+      border-radius:50%;
+      background:${
+        coloresPlanter[index]
+      };
+      margin-right:8px;
+      vertical-align:middle;
+    "
+  ></span>
+
+  ${item.planter}
+
+</td>
 
 <td style="
   text-align:center;
