@@ -228,7 +228,7 @@ contadorSitios.innerHTML = `
   </span>
 
   <span class="kpi-label">
-    Trial Coord
+    Trial Verified
   </span>
 </div>
 
@@ -242,7 +242,7 @@ contadorSitios.innerHTML = `
   </span>
 
   <span class="kpi-label">
-    Access Coord
+    Access Verified
   </span>
 </div>
 
