@@ -358,7 +358,59 @@ body { display: flex; flex-direction: column; }
 
   box-shadow: 0 2px 8px rgba(0,0,0,.08);
 }
+/* AOI */
+.kpi-item:nth-child(1) {
+  border-top-color: #f39c12;
+}
 
+.kpi-item:nth-child(1) .kpi-valor {
+  color: #f39c12;
+}
+
+/* Trials */
+.kpi-item:nth-child(2) {
+  border-top-color: #1976d2;
+}
+
+.kpi-item:nth-child(2) .kpi-valor {
+  color: #1976d2;
+}
+
+/* Access */
+.kpi-item:nth-child(3) {
+  border-top-color: #d32f2f;
+}
+
+.kpi-item:nth-child(3) .kpi-valor {
+  color: #d32f2f;
+}
+
+/* Drop */
+.kpi-item:nth-child(4) {
+  border-top-color: #212121;
+}
+
+.kpi-item:nth-child(4) .kpi-valor {
+  color: #212121;
+}
+
+/* Trial Verified */
+.kpi-item:nth-child(5) {
+  border-top-color: #176b3a;
+}
+
+.kpi-item:nth-child(5) .kpi-valor {
+  color: #176b3a;
+}
+
+/* Access Verified */
+.kpi-item:nth-child(6) {
+  border-top-color: #176b3a;
+}
+
+.kpi-item:nth-child(6) .kpi-valor {
+  color: #176b3a;
+}
 .kpi-item:last-child {
   margin-bottom: 0;
 }
