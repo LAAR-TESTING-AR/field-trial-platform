@@ -224,16 +224,16 @@ header {
   position: absolute;
 
   left: 84px;
-  bottom: 0;
+
+  bottom: 58px;
 
   width: 2px;
 
-  height: 28px;
+  height: 22px;
 
   background: #1d1d1d;
 
   transform-origin: 50% 100%;
-  transform: rotate(-90deg);
 
   transition: transform 0.5s ease;
 
@@ -245,14 +245,8 @@ header {
   border-bottom: 7px solid #1d1d1d;
 }
 .gauge-centro {
-  position: absolute;
-  left: 77px;
-  bottom: -5px;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
-  background: #1d1d1d;
-  z-index: 4;
 }
 
 .gauge-siembra #avanceGrande {
