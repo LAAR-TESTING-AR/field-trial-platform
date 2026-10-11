@@ -222,18 +222,37 @@ header {
 
 .gauge-aguja {
   position: absolute;
-  left: 82px;
-  bottom: 0;
-  width: 3px;
-  height: 64px;
+
+  left: 84px;
+  bottom: 49px;
+
+  width: 2px;
+  height: 36px;
+
   background: #1d1d1d;
-  border-radius: 3px;
+
   transform-origin: 50% 100%;
   transform: rotate(-90deg);
+
   transition: transform 0.5s ease;
+
   z-index: 2;
 }
+.gauge-aguja::before {
+  content: "";
 
+  position: absolute;
+
+  top: -6px;
+  left: -4px;
+
+  width: 0;
+  height: 0;
+
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #1d1d1d;
+}
 .gauge-centro {
   position: absolute;
   left: 77px;
