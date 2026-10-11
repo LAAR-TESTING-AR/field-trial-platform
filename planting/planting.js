@@ -168,7 +168,15 @@ const filtroSeason =
 
 const filtroLaar =
   document.getElementById("filtroLaar");
+const filtroLaarModo =
+  document.getElementById(
+    "filtroLaarModo"
+  );
 
+const filtroLaarTexto =
+  document.getElementById(
+    "filtroLaarTexto"
+  );
 const filtroOperation =
   document.getElementById("filtroOperation");
 const busqueda =
@@ -188,11 +196,7 @@ const configuracionFiltros = [
     campo: "Season",
     textoInicial: "Todas las seasons"
   },
-  {
-    elemento: filtroLaar,
-    campo: "LAAR Status 2026-2027",
-    textoInicial: "Todos los LAAR Status"
-  },
+
   {
     elemento: filtroOperation,
     campo: "Operations",
@@ -362,20 +366,52 @@ function coincideConFiltros(
   sitio,
   campoIgnorado = null
 ) {
-  return configuracionFiltros.every(
-    ({ elemento, campo }) => {
-      if (campo === campoIgnorado) {
-        return true;
+
+  const cumpleFiltrosExactos =
+    configuracionFiltros.every(
+      ({ elemento, campo }) => {
+
+        if (campo === campoIgnorado) {
+          return true;
+        }
+
+        const valorSeleccionado =
+          limpiarTexto(
+            elemento.value
+          );
+
+        return (
+          !valorSeleccionado ||
+          limpiarTexto(
+            sitio[campo]
+          ) === valorSeleccionado
+        );
+
       }
+    );
 
-      const valorSeleccionado =
-        limpiarTexto(elemento.value);
+  if (!cumpleFiltrosExactos) {
+    return false;
+  }
 
-      return (
-        !valorSeleccionado ||
-        limpiarTexto(sitio[campo]) === valorSeleccionado
-      );
-    }
+  const textoLaar =
+    normalizarTexto(
+      filtroLaarTexto?.value
+    );
+
+  if (!textoLaar) {
+    return true;
+  }
+
+  const valorLaar =
+    normalizarTexto(
+      sitio[
+        "LAAR Status 2026-2027"
+      ]
+    );
+
+  return valorLaar.includes(
+    textoLaar
   );
 }
 
@@ -1268,12 +1304,26 @@ busqueda.addEventListener(
   "input",
   actualizarVista
 );
+if (filtroLaarTexto) {
 
+  filtroLaarTexto.addEventListener(
+    "input",
+    actualizarVista
+  );
+
+}
 limpiarFiltros.addEventListener(
   "click",
   () => {
     busqueda.value = "";
+if (filtroLaarTexto) {
+  filtroLaarTexto.value = "";
+}
 
+if (filtroLaarModo) {
+  filtroLaarModo.value =
+    "contains";
+}
     configuracionFiltros.forEach(
       ({ elemento }) => {
         elemento.value = "";
