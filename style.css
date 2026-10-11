@@ -466,9 +466,9 @@ body { display: flex; flex-direction: column; }
 
   display: grid;
 
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 
-  gap: 6px;
+  gap: 4px;
 }
 
 .kpi-item {
@@ -483,7 +483,7 @@ body { display: flex; flex-direction: column; }
 
   margin-bottom: 0;
 
-  padding: 8px 4px;
+  padding: 5px 2px;
 
   background: #ffffff;
 
@@ -497,7 +497,7 @@ body { display: flex; flex-direction: column; }
 }
 
   .kpi-valor {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .kpi-subvalor {
@@ -505,7 +505,7 @@ body { display: flex; flex-direction: column; }
   }
 
   .kpi-label {
-    font-size: 11px;
+    font-size: 10px;
   }
 
 }
