@@ -93,9 +93,71 @@
         <option value="">Todas las seasons</option>
     </select>
 
-    <select id="filtroLaar">
-        <option value="">Todos los LAAR Status</option>
-    </select>
+   <div
+  id="contenedorFiltroLaar"
+  class="filtro-laar"
+>
+
+  <select
+    id="filtroLaarModo"
+    aria-label="Modo de filtro LAAR Status"
+  >
+    <option value="contains">
+      Contiene
+    </option>
+
+    <option value="exact">
+      Coincidencia exacta
+    </option>
+  </select>
+
+  <input
+    type="search"
+    id="filtroLaarTexto"
+    list="sugerenciasLaar"
+    placeholder="Buscar en LAAR Status..."
+    aria-label="Buscar en LAAR Status"
+    autocomplete="off"
+  >
+
+  <datalist id="sugerenciasLaar">
+  </datalist>
+
+  <details
+    id="filtroLaarExacto"
+    class="filtro-laar-exacto"
+    hidden
+  >
+
+    <summary>
+      Seleccionar combinaciones exactas
+      <span id="resumenLaarExacto">
+        Ninguna
+      </span>
+    </summary>
+
+    <div
+      id="listaLaarExacto"
+      class="lista-laar-exacto"
+    >
+    </div>
+
+  </details>
+
+  <!--
+    Selector interno conservado temporalmente.
+    planting.js todavía lo utiliza para mantener
+    el módulo funcionando durante la migración.
+  -->
+  <select
+    id="filtroLaar"
+    multiple
+    hidden
+    aria-label="Filtro interno LAAR Status"
+  >
+  </select>
+
+</div>
 
     <select id="filtroOperation">
         <option value="">Todas las operaciones</option>
