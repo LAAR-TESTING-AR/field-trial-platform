@@ -1029,12 +1029,12 @@ font-size: 28px;
 
 .gauge-e0 {
   left: -12px;
-  top: 84px;
+  top: 76px;
 }
 
 .gauge-e25 {
   left: 6px;
-  top: 6px;
+  top: 12px;
 }
 
 .gauge-e50 {
@@ -1044,10 +1044,10 @@ font-size: 28px;
 
 .gauge-e75 {
   right: 6px;
-  top: 6px;
+  top: 12px;
 }
 
 .gauge-e100 {
   right: -18px;
-  top: 84px;
+  top: 76px;
 }
