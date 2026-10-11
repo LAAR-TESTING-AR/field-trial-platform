@@ -469,6 +469,10 @@ body { display: flex; flex-direction: column; }
   grid-template-columns: repeat(6, 1fr);
 
   gap: 4px;
+
+  max-width: 98%;
+
+  margin: 0 auto;
 }
 
 .kpi-item {
