@@ -364,20 +364,21 @@ body { display: flex; flex-direction: column; }
 }
 
 .kpi-valor {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 800;
   color: #176b3a;
   line-height: 1;
 }
 
 .kpi-label {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   color: #4f5a53;
   text-align: center;
+  line-height: 1.1;
 }
 .kpi-subvalor {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   color: #6c7570;
 }
