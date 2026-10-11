@@ -228,7 +228,7 @@ header {
 
   width: 2px;
 
-  height: 52px;
+  height: 28px;
 
   background: #1d1d1d;
 
@@ -240,20 +240,9 @@ header {
   z-index: 2;
 }
 .gauge-aguja::before {
-  content: "";
-
-  position: absolute;
-
-  top: -7px;
-  left: -4px;
-
-  width: 0;
-  height: 0;
-
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-
-  border-bottom: 8px solid #1d1d1d;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 7px solid #1d1d1d;
 }
 .gauge-centro {
   position: absolute;
