@@ -407,7 +407,15 @@ body { display: flex; flex-direction: column; }
 .kpi-item:nth-child(6) {
   border-top-color: #176b3a;
 }
+/* Trial Verified */
+.kpi-item:nth-child(5) .kpi-subvalor {
+  color: #176b3a;
+}
 
+/* Access Verified */
+.kpi-item:nth-child(6) .kpi-subvalor {
+  color: #176b3a;
+}
 .kpi-item:nth-child(6) .kpi-valor {
   color: #176b3a;
 }
@@ -430,9 +438,8 @@ body { display: flex; flex-direction: column; }
   line-height: 1.1;
 }
 .kpi-subvalor {
-  font-size: 13px;
-  font-weight: 700;
-  color: #6c7570;
+  font-size: 15px;
+  font-weight: 800;
 }
 ``
   #mapa {
