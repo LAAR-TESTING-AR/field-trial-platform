@@ -455,20 +455,49 @@ body { display: flex; flex-direction: column; }
     width: auto;
     right: 8px;
     left: 8px;
+
+    padding: 8px;
   }
 
   #contadorSitios {
-    display: flex;
-    justify-content: space-around;
-    gap: 6px;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 8px;
   }
 
   .kpi-item {
+
+    display: flex;
+
     flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    min-width: unset;
+
     margin-bottom: 0;
-    min-width: 55px;
+
+    padding: 8px 4px;
   }
 
+  .kpi-valor {
+    font-size: 18px;
+  }
+
+  .kpi-subvalor {
+    font-size: 11px;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+  }
+
+}
 }
 .coordenada-reference {
   filter: grayscale(100%);
