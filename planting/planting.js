@@ -1138,18 +1138,17 @@ if (
       estado = "SEMBRADO";
     }
 
-    const marcador = L.circleMarker(
-      [lat, lon],
-      {
-        radius: 8,
-        fillColor: color,
-        color: "#ffffff",
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.95
-      }
-    );
-
+  const marcador = L.circleMarker(
+  [lat, lon],
+  {
+    radius: 10,
+    fillColor: color,
+    color: "#ffffff",
+    weight: 2,
+    opacity: 1,
+    fillOpacity: 0.95
+  }
+);
 marcador.bindPopup(
   crearPopup(sitio, estado)
 );
