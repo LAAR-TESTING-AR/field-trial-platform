@@ -67,16 +67,26 @@ header {
   width: 100%;
   padding: 10px;
   margin-top: 10px;
-  border: none;
+
+  border: 1px solid #e6bcbc;
+
   border-radius: 8px;
-  background: #d8dfd9;
-  color: #193b2a;
-  font-weight: 600;
+
+  background: #fae8e8;
+
+  color: #a12b2b;
+
+  font-weight: 700;
+
   cursor: pointer;
+
+  transition: all 0.2s ease;
 }
 
 #limpiarFiltros:hover {
-  background: #c7d1c9;
+  background: #f5dada;
+
+  border-color: #d99e9e;
 }
 #busqueda {
   box-sizing: border-box;
