@@ -1028,26 +1028,26 @@ font-size: 28px;
 }
 
 .gauge-e0 {
-  left: -18px;
-  top: 72px;
+  left: -12px;
+  top: 84px;
 }
 
 .gauge-e25 {
-  left: 10px;
-  top: 25px;
+  left: 6px;
+  top: 6px;
 }
 
 .gauge-e50 {
   left: 76px;
-  top: 12px;
+  top: -12px;
 }
 
 .gauge-e75 {
-  right: 10px;
-  top: 25px;
+  right: 6px;
+  top: 6px;
 }
 
 .gauge-e100 {
-  right: -25px;
-  top: 72px;
+  right: -18px;
+  top: 84px;
 }
