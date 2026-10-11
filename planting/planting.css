@@ -224,35 +224,39 @@ header {
   position: absolute;
 
   left: 84px;
-
   bottom: 0;
 
   width: 2px;
+  height: 80px;
 
-  height: 42px;
-
-  background: #1d1d1d;
+  background: transparent;
 
   transform-origin: 50% 100%;
+  transform: rotate(-90deg);
 
   transition: transform 0.5s ease;
 
-  z-index: 2;
+  z-index: 6;
 }
 .gauge-aguja::before {
   content: "";
 
   position: absolute;
 
-  top: -6px;
+  top: 0;
   left: -3px;
 
-  width: 0;
-  height: 0;
+  width: 8px;
+  height: 23px;
 
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-bottom: 8px solid #1d1d1d;
+  background: #1d1d1d;
+
+  clip-path: polygon(
+    50% 0%,
+    100% 100%,
+    50% 82%,
+    0% 100%
+  );
 }
 .gauge-centro {
   width: 10px;
