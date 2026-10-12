@@ -926,7 +926,7 @@ font-size: 28px;
   flex: 1;
   word-break: break-word;
 }
-``
+
 @media (orientation: landscape) {
 
   .modal-timeline-contenido {
@@ -1068,26 +1068,16 @@ font-size: 28px;
   min-width: 0;
 }
 
-.filtro-laar input {
-
+.filtro-laar input[type="search"] {
   width: 100%;
-
-  min-width: 180px;
-
+  min-width: 0;
   padding: 7px 9px;
-
   border: 1px solid #bfc7c1;
-
   border-radius: 6px;
-
   background: #ffffff;
-
   color: #1f2d25;
-
   font-family: inherit;
-
   box-sizing: border-box;
-
 }
 
 .filtro-laar-exacto {
@@ -1132,53 +1122,49 @@ font-size: 28px;
 }
 
 .opcion-laar-exacta {
-
-  display: flex;
-
-  align-items: flex-start;
-
-  justify-content: flex-start;
-
-  gap: 8px;
-
-  padding: 6px 8px;
-
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 8px;
   width: 100%;
-
-  cursor: pointer;
-
+  margin: 0;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  color: #293b31;
+  font-size: 12px;
+  line-height: 1.3;
   text-align: left;
-
+  cursor: pointer;
 }
-`
 
 .opcion-laar-exacta:hover {
   background: #edf5f0;
 }
 
-.opcion-laar-exacta input {
-
-  margin-top: 2px;
-
-  flex: 0 0 auto;
-
+.opcion-laar-exacta input[type="checkbox"] {
+  display: block;
+  width: 15px !important;
+  min-width: 15px !important;
+  max-width: 15px !important;
+  height: 15px !important;
+  min-height: 15px !important;
+  margin: 1px 0 0;
+  padding: 0;
+  box-sizing: border-box;
+  accent-color: #0b6b3a;
+  cursor: pointer;
 }
-``
 
 .opcion-laar-exacta span {
-
-  flex: 1;
-
-  text-align: left;
-
+  display: block;
+  width: auto;
+  min-width: 0;
   margin: 0;
-
   padding: 0;
-
-  word-break: break-word;
-
-}
-.etiqueta-laar {
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}.etiqueta-laar {
 
   font-size: 11px;
 
@@ -1193,43 +1179,6 @@ font-size: 28px;
   margin-bottom: -2px;
 
   padding-left: 2px;
-
-}
-.fila-laar {
-
-  display: grid;
-
-  grid-template-columns: 170px minmax(0, 1fr);
-
-  gap: 8px;
-
-  align-items: stretch;
-
-  width: 100%;
-}
-.fila-laar input,
-.fila-laar select {
-
-  width: 100%;
-
-  min-width: 0;
-
-}
-.fila-laar {
-
-  display: grid;
-
-  grid-template-columns: 170px 1fr;
-
-  gap: 8px;
-
-  width: 100%;
-
-}
-
-.fila-laar > * {
-
-  width: 100%;
 
 }
 .filtro-laar {
