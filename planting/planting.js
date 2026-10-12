@@ -121,7 +121,6 @@ if (sitioLocal) {
     "Planter"
   ] = planter;
 }
-``
 
     actualizarVista();
 
@@ -695,7 +694,6 @@ function actualizarOpcionesLaar() {
 
   actualizarResumenLaarExacto();
 }
-``
 
 function actualizarFiltrosDependientes() {
 
@@ -1551,7 +1549,6 @@ if (filtroLaarTexto) {
   );
 
 }
-
 if (filtroLaarModo) {
 
   filtroLaarModo.addEventListener(
@@ -1584,11 +1581,8 @@ if (filtroLaarModo) {
   );
 
 }
-`
+
 limpiarFiltros.addEventListener(
-  "click",
-  () => {
-    limpiarFiltros.addEventListener(
   "click",
   () => {
 
@@ -1597,9 +1591,7 @@ limpiarFiltros.addEventListener(
     if (filtroLaarTexto) {
 
       filtroLaarTexto.value = "";
-
-      filtroLaarTexto.hidden =
-        false;
+      filtroLaarTexto.hidden = false;
 
     }
 
@@ -1610,16 +1602,12 @@ limpiarFiltros.addEventListener(
 
     }
 
-    valoresLaarExactosSeleccionados
-      .clear();
+    valoresLaarExactosSeleccionados.clear();
 
     if (filtroLaarExacto) {
 
-      filtroLaarExacto.hidden =
-        true;
-
-      filtroLaarExacto.open =
-        false;
+      filtroLaarExacto.hidden = true;
+      filtroLaarExacto.open = false;
 
     }
 
@@ -1638,6 +1626,8 @@ limpiarFiltros.addEventListener(
   }
 );
 
+Papa.parse(
+  `../Sitios_test.csv?v=${Date.now()}`,
 Papa.parse(
   `../Sitios_test.csv?v=${Date.now()}`,
   {
