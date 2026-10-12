@@ -1135,13 +1135,19 @@ font-size: 28px;
 
   display: flex;
 
-  align-items: center;
+  align-items: flex-start;
+
+  justify-content: flex-start;
 
   gap: 8px;
 
   padding: 6px 8px;
 
+  width: 100%;
+
   cursor: pointer;
+
+  text-align: left;
 
 }
 `
