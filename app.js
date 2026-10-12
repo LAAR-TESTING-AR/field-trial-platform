@@ -9,7 +9,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 const capaMarcadores = L.layerGroup().addTo(mapa);
 const busqueda = document.getElementById("busqueda");
 const filtroCultivo = document.getElementById("filtroCultivo");
-const filtroRegion = document.getElementById("filtroRegion");
+const filtroStation = document.getElementById("filtroStation");
 const filtroLocalidad = document.getElementById("filtroLocalidad");
 const filtroFTS = document.getElementById("filtroFTS");
 const limpiarFiltros = document.getElementById("limpiarFiltros");
