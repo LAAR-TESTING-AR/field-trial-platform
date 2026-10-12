@@ -1628,8 +1628,6 @@ limpiarFiltros.addEventListener(
 
 Papa.parse(
   `../Sitios_test.csv?v=${Date.now()}`,
-Papa.parse(
-  `../Sitios_test.csv?v=${Date.now()}`,
   {
   download: true,
   header: true,
