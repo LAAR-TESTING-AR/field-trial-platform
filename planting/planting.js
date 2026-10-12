@@ -1636,9 +1636,7 @@ limpiarFiltros.addEventListener(
     actualizarVista();
 
   }
-);  }
 );
-
 
 Papa.parse(
   `../Sitios_test.csv?v=${Date.now()}`,
