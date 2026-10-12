@@ -1217,3 +1217,10 @@ font-size: 28px;
   width: 100%;
 
 }
+.filtro-laar {
+
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+}
