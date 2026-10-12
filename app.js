@@ -118,10 +118,25 @@ function completarFiltro(elemento, valores) {
 }
 
 function completarFiltros() {
-  completarFiltro(filtroCultivo, valoresUnicos("crop"));
-  completarFiltro(filtroRegion, valoresUnicos("region"));
-  completarFiltro(filtroLocalidad, valoresUnicos("location"));
-  completarFiltro(filtroFTS, valoresUnicos("fts"));
+  completarFiltro(
+    filtroCultivo,
+    valoresUnicos("crop")
+  );
+
+  completarFiltro(
+    filtroStation,
+    valoresUnicos("station")
+  );
+
+  completarFiltro(
+    filtroLocalidad,
+    valoresUnicos("location")
+  );
+
+  completarFiltro(
+    filtroFTS,
+    valoresUnicos("fts")
+  );
 }
 
 function coincideConFiltros(sitio) {
@@ -150,7 +165,7 @@ function coincideConFiltros(sitio) {
   return (
     coincideBusqueda &&
     (!filtroCultivo.value || sitio.crop === filtroCultivo.value) &&
-    (!filtroRegion.value || sitio.region === filtroRegion.value) &&
+    (!filtroStation.value || sitio.station === filtroStation.value) &&
     (!filtroLocalidad.value || sitio.location === filtroLocalidad.value) &&
     (!filtroFTS.value || sitio.fts === filtroFTS.value)
   );
@@ -552,18 +567,35 @@ setTimeout(() => {
   });
 }
 
-[filtroCultivo, filtroRegion, filtroLocalidad, filtroFTS].forEach(control => {
-  control.addEventListener("change", actualizarMapa);
+[
+  filtroCultivo,
+  filtroStation,
+  filtroLocalidad,
+  filtroFTS
+].forEach(control => {
+
+  control.addEventListener(
+    "change",
+    actualizarMapa
+  );
+
 });
 busqueda.addEventListener("input", actualizarMapa);
-limpiarFiltros.addEventListener("click", () => {
-  busqueda.value = "";
-  filtroCultivo.value = "";
-  filtroRegion.value = "";
-  filtroLocalidad.value = "";
-  filtroFTS.value = "";
-  actualizarMapa();
-});
+limpiarFiltros.addEventListener(
+  "click",
+  () => {
+
+    busqueda.value = "";
+
+    filtroCultivo.value = "";
+    filtroStation.value = "";
+    filtroLocalidad.value = "";
+    filtroFTS.value = "";
+
+    actualizarMapa();
+
+  }
+);
 
 mapa.on("popupopen", ocultarLeyenda);
 mapa.on("click", ocultarLeyenda);
