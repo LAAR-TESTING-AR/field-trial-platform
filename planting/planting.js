@@ -177,6 +177,29 @@ const filtroLaarTexto =
   document.getElementById(
     "filtroLaarTexto"
   );
+
+const filtroLaarExacto =
+  document.getElementById(
+    "filtroLaarExacto"
+  );
+
+const listaLaarExacto =
+  document.getElementById(
+    "listaLaarExacto"
+  );
+
+const resumenLaarExacto =
+  document.getElementById(
+    "resumenLaarExacto"
+  );
+
+const sugerenciasLaar =
+  document.getElementById(
+    "sugerenciasLaar"
+  );
+
+let valoresLaarExactosSeleccionados =
+  new Set();
 const filtroOperation =
   document.getElementById("filtroOperation");
 const busqueda =
@@ -394,25 +417,59 @@ function coincideConFiltros(
     return false;
   }
 
-  const textoLaar =
-    normalizarTexto(
-      filtroLaarTexto?.value
-    );
+ const modoLaar =
+  filtroLaarModo?.value ||
+  "contains";
 
-  if (!textoLaar) {
+const valorLaarOriginal =
+  limpiarTexto(
+    sitio[
+      "LAAR Status 2026-2027"
+    ]
+  );
+
+const valorLaarNormalizado =
+  normalizarTexto(
+    valorLaarOriginal
+  );
+
+/*
+ * Coincidencia exacta:
+ * permite una o varias combinaciones.
+ */
+if (modoLaar === "exact") {
+
+  if (
+    valoresLaarExactosSeleccionados
+      .size === 0
+  ) {
     return true;
   }
 
-  const valorLaar =
-    normalizarTexto(
-      sitio[
-        "LAAR Status 2026-2027"
-      ]
-    );
-
-  return valorLaar.includes(
-    textoLaar
+  return [
+    ...valoresLaarExactosSeleccionados
+  ].some(
+    valorSeleccionado =>
+      normalizarTexto(
+        valorSeleccionado
+      ) === valorLaarNormalizado
   );
+}
+
+/*
+ * Modo Contiene.
+ */
+const textoLaar =
+  normalizarTexto(
+    filtroLaarTexto?.value
+  );
+
+return (
+  !textoLaar ||
+  valorLaarNormalizado.includes(
+    textoLaar
+  )
+);
 }
 
 function obtenerSitiosFiltrados() {
@@ -468,17 +525,199 @@ function reconstruirFiltro(
     elemento.value = "";
   }
 }
+function coincideConFiltrosBase(
+  sitio
+) {
 
-function actualizarFiltrosDependientes() {
-  configuracionFiltros.forEach(
-    ({ elemento, campo, textoInicial }) => {
-      reconstruirFiltro(
-        elemento,
-        obtenerValoresDisponibles(campo),
-        textoInicial
+  return configuracionFiltros.every(
+    ({ elemento, campo }) => {
+
+      const valorSeleccionado =
+        limpiarTexto(
+          elemento.value
+        );
+
+      return (
+        !valorSeleccionado ||
+        limpiarTexto(
+          sitio[campo]
+        ) === valorSeleccionado
       );
+
     }
   );
+}
+
+function obtenerOpcionesLaarExactas() {
+
+  return ordenarValores(
+    sitios
+      .filter(
+        sitio =>
+          coincideConBusqueda(sitio) &&
+          coincideConFiltrosBase(sitio)
+      )
+      .map(
+        sitio =>
+          limpiarTexto(
+            sitio[
+              "LAAR Status 2026-2027"
+            ]
+          )
+      )
+      .filter(Boolean)
+  );
+}
+function actualizarResumenLaarExacto() {
+
+  if (!resumenLaarExacto) {
+    return;
+  }
+
+  const cantidad =
+    valoresLaarExactosSeleccionados
+      .size;
+
+  resumenLaarExacto.textContent =
+    cantidad === 0
+      ? "Ninguna"
+      : cantidad === 1
+      ? "1 seleccionada"
+      : `${cantidad} seleccionadas`;
+}
+
+function actualizarOpcionesLaar() {
+
+  if (
+    !listaLaarExacto ||
+    !sugerenciasLaar
+  ) {
+    return;
+  }
+
+  const opciones =
+    obtenerOpcionesLaarExactas();
+
+  /*
+   * Descarta selecciones que dejaron
+   * de estar disponibles por cambios
+   * en Crop, Season u Operations.
+   */
+  valoresLaarExactosSeleccionados =
+    new Set(
+      [
+        ...valoresLaarExactosSeleccionados
+      ].filter(
+        valor =>
+          opciones.includes(valor)
+      )
+    );
+
+  listaLaarExacto.innerHTML = "";
+  sugerenciasLaar.innerHTML = "";
+
+  opciones.forEach(valor => {
+
+    /*
+     * Sugerencias para el modo Contiene.
+     */
+    const sugerencia =
+      document.createElement(
+        "option"
+      );
+
+    sugerencia.value = valor;
+
+    sugerenciasLaar.appendChild(
+      sugerencia
+    );
+
+    /*
+     * Selecciones para el modo exacto.
+     */
+    const fila =
+      document.createElement(
+        "label"
+      );
+
+    fila.className =
+      "opcion-laar-exacta";
+
+    const checkbox =
+      document.createElement(
+        "input"
+      );
+
+    checkbox.type = "checkbox";
+    checkbox.value = valor;
+
+    checkbox.checked =
+      valoresLaarExactosSeleccionados
+        .has(valor);
+
+    const texto =
+      document.createElement(
+        "span"
+      );
+
+    texto.textContent = valor;
+
+    checkbox.addEventListener(
+      "change",
+      () => {
+
+        if (checkbox.checked) {
+
+          valoresLaarExactosSeleccionados
+            .add(valor);
+
+        } else {
+
+          valoresLaarExactosSeleccionados
+            .delete(valor);
+
+        }
+
+        actualizarResumenLaarExacto();
+        actualizarVista();
+
+      }
+    );
+
+    fila.appendChild(checkbox);
+    fila.appendChild(texto);
+
+    listaLaarExacto.appendChild(
+      fila
+    );
+
+  });
+
+  actualizarResumenLaarExacto();
+}
+``
+
+function actualizarFiltrosDependientes() {
+
+  configuracionFiltros.forEach(
+    ({
+      elemento,
+      campo,
+      textoInicial
+    }) => {
+
+      reconstruirFiltro(
+        elemento,
+        obtenerValoresDisponibles(
+          campo
+        ),
+        textoInicial
+      );
+
+    }
+  );
+
+  actualizarOpcionesLaar();
 }
 
 function actualizarDashboard(sitiosFiltrados) {
@@ -1312,26 +1551,92 @@ if (filtroLaarTexto) {
   );
 
 }
+
+if (filtroLaarModo) {
+
+  filtroLaarModo.addEventListener(
+    "change",
+    () => {
+
+      const esModoExacto =
+        filtroLaarModo.value ===
+        "exact";
+
+      if (filtroLaarTexto) {
+        filtroLaarTexto.hidden =
+          esModoExacto;
+      }
+
+      if (filtroLaarExacto) {
+
+        filtroLaarExacto.hidden =
+          !esModoExacto;
+
+        filtroLaarExacto.open =
+          esModoExacto;
+
+      }
+
+      actualizarOpcionesLaar();
+      actualizarVista();
+
+    }
+  );
+
+}
+`
 limpiarFiltros.addEventListener(
   "click",
   () => {
-    busqueda.value = "";
-if (filtroLaarTexto) {
-  filtroLaarTexto.value = "";
-}
+    limpiarFiltros.addEventListener(
+  "click",
+  () => {
 
-if (filtroLaarModo) {
-  filtroLaarModo.value =
-    "contains";
-}
+    busqueda.value = "";
+
+    if (filtroLaarTexto) {
+
+      filtroLaarTexto.value = "";
+
+      filtroLaarTexto.hidden =
+        false;
+
+    }
+
+    if (filtroLaarModo) {
+
+      filtroLaarModo.value =
+        "contains";
+
+    }
+
+    valoresLaarExactosSeleccionados
+      .clear();
+
+    if (filtroLaarExacto) {
+
+      filtroLaarExacto.hidden =
+        true;
+
+      filtroLaarExacto.open =
+        false;
+
+    }
+
+    actualizarResumenLaarExacto();
+
     configuracionFiltros.forEach(
       ({ elemento }) => {
+
         elemento.value = "";
+
       }
     );
 
     actualizarVista();
+
   }
+);  }
 );
 
 
