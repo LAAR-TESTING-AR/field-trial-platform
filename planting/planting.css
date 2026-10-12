@@ -1157,18 +1157,26 @@ font-size: 28px;
 }
 
 .opcion-laar-exacta input {
-  width: 15px;
-  height: 15px;
-  min-height: 15px;
-  margin: 0;
-  padding: 0;
-  accent-color: #0b6b3a;
-  cursor: pointer;
+
+  margin-top: 2px;
+
+  flex: 0 0 auto;
+
 }
+``
 
 .opcion-laar-exacta span {
-  min-width: 0;
-  overflow-wrap: anywhere;
+
+  flex: 1;
+
+  text-align: left;
+
+  margin: 0;
+
+  padding: 0;
+
+  word-break: break-word;
+
 }
 .etiqueta-laar {
 
