@@ -1069,13 +1069,25 @@ font-size: 28px;
 }
 
 .filtro-laar input {
+
   width: 100%;
+
+  min-width: 180px;
+
   padding: 7px 9px;
+
   border: 1px solid #bfc7c1;
+
   border-radius: 6px;
+
   background: #ffffff;
+
   color: #1f2d25;
+
   font-family: inherit;
+
+  box-sizing: border-box;
+
 }
 
 .filtro-laar-exacto {
@@ -1186,5 +1198,22 @@ font-size: 28px;
   width: 100%;
 
   min-width: 0;
+
+}
+.fila-laar {
+
+  display: grid;
+
+  grid-template-columns: 170px 1fr;
+
+  gap: 8px;
+
+  width: 100%;
+
+}
+
+.fila-laar > * {
+
+  width: 100%;
 
 }
