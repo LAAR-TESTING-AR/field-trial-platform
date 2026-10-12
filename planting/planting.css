@@ -1061,3 +1061,93 @@ font-size: 28px;
   right: -18px;
   top: 76px;
 }
+.filtro-laar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.filtro-laar input {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #bfc7c1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1f2d25;
+  font-family: inherit;
+}
+
+.filtro-laar-exacto {
+  position: relative;
+  width: 100%;
+  border: 1px solid #bfc7c1;
+  border-radius: 7px;
+  background: #ffffff;
+}
+
+.filtro-laar-exacto[hidden],
+.filtro-laar input[hidden] {
+  display: none !important;
+}
+
+.filtro-laar-exacto summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px;
+  color: #293b31;
+  background: #eef4f0;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#resumenLaarExacto {
+  color: #607268;
+  font-size: 11px;
+  text-align: right;
+}
+
+.lista-laar-exacto {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 220px;
+  padding: 7px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.opcion-laar-exacta {
+  display: grid;
+  grid-template-columns:
+    18px minmax(0, 1fr);
+  align-items: start;
+  gap: 7px;
+  padding: 6px;
+  border-radius: 6px;
+  color: #293b31;
+  font-size: 12px;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.opcion-laar-exacta:hover {
+  background: #edf5f0;
+}
+
+.opcion-laar-exacta input {
+  width: 15px;
+  height: 15px;
+  min-height: 15px;
+  margin: 0;
+  padding: 0;
+  accent-color: #0b6b3a;
+  cursor: pointer;
+}
+
+.opcion-laar-exacta span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
