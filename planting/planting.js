@@ -201,6 +201,8 @@ let valoresLaarExactosSeleccionados =
   new Set();
 const filtroOperation =
   document.getElementById("filtroOperation");
+const filtroStation =
+  document.getElementById("filtroStation");
 const busqueda =
   document.getElementById("busqueda");
 
@@ -223,7 +225,12 @@ const configuracionFiltros = [
     elemento: filtroOperation,
     campo: "Operations",
     textoInicial: "Todas las operaciones"
-  }
+  },
+  {
+  elemento: filtroStation,
+  campo: "Station",
+  textoInicial: "Todas las estaciones"
+}
 ];
 
 function limpiarTexto(valor) {
