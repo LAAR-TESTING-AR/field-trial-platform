@@ -171,25 +171,71 @@ if (cropExcluido) {
     return ftsSeleccionados.size === 0 || ftsSeleccionados.has(limpiar(sitio.fts));
   }
 
-  function reemplazarFiltroPrincipal() {
-    window.coincideConFiltros = function (sitio) {
-      return esVisible(sitio)
-        && coincideBusqueda(sitio)
-        && (!filtroCultivo.value || sitio.crop === filtroCultivo.value)
-        && (!filtroRegion.value || sitio.region === filtroRegion.value)
-        && (!filtroLocalidad.value || sitio.location === filtroLocalidad.value)
-        && coincideSeleccionFTS(sitio);
-    };
+function reemplazarFiltroPrincipal() {
+  window.coincideConFiltros = function (sitio) {
+    return esVisible(sitio)
+      && coincideBusqueda(sitio)
+      && (
+        !filtroCultivo.value ||
+        sitio.crop === filtroCultivo.value
+      )
+      && (
+        !filtroStation.value ||
+        sitio.station === filtroStation.value
+      )
+      && (
+        !filtroLocalidad.value ||
+        sitio.location === filtroLocalidad.value
+      )
+      && coincideSeleccionFTS(sitio);
+  };
+}
+
+function coincideExcepto(
+  sitio,
+  campoExcluido
+) {
+
+  if (
+    !esVisible(sitio) ||
+    !coincideBusqueda(sitio)
+  ) {
+    return false;
   }
 
-  function coincideExcepto(sitio, campoExcluido) {
-    if (!esVisible(sitio) || !coincideBusqueda(sitio)) return false;
-    if (campoExcluido !== "crop" && filtroCultivo.value && sitio.crop !== filtroCultivo.value) return false;
-    if (campoExcluido !== "region" && filtroRegion.value && sitio.region !== filtroRegion.value) return false;
-    if (campoExcluido !== "location" && filtroLocalidad.value && sitio.location !== filtroLocalidad.value) return false;
-    if (campoExcluido !== "fts" && !coincideSeleccionFTS(sitio)) return false;
-    return true;
+  if (
+    campoExcluido !== "crop" &&
+    filtroCultivo.value &&
+    sitio.crop !== filtroCultivo.value
+  ) {
+    return false;
   }
+
+  if (
+    campoExcluido !== "station" &&
+    filtroStation.value &&
+    sitio.station !== filtroStation.value
+  ) {
+    return false;
+  }
+
+  if (
+    campoExcluido !== "location" &&
+    filtroLocalidad.value &&
+    sitio.location !== filtroLocalidad.value
+  ) {
+    return false;
+  }
+
+  if (
+    campoExcluido !== "fts" &&
+    !coincideSeleccionFTS(sitio)
+  ) {
+    return false;
+  }
+
+  return true;
+}
 
   function valoresDisponibles(campo) {
     return [...new Set(
@@ -372,22 +418,54 @@ if (cropExcluido) {
     filtroFTS.insertAdjacentElement("afterend", contenedorMultiFTS);
   }
 
-  function actualizarFiltrosDependientes() {
-    reconstruirSelect(filtroCultivo, "crop", "Todos los cultivos");
-    reconstruirSelect(filtroRegion, "region", "Todas las regiones");
-    reconstruirSelect(filtroLocalidad, "location", "Todas las localidades");
+function actualizarFiltrosDependientes() {
 
-    if (depurarFTSSeleccionados()) {
-      reconstruirSelect(filtroCultivo, "crop", "Todos los cultivos");
-      reconstruirSelect(filtroRegion, "region", "Todas las regiones");
-      reconstruirSelect(filtroLocalidad, "location", "Todas las localidades");
-    }
+  reconstruirSelect(
+    filtroCultivo,
+    "crop",
+    "Todos los cultivos"
+  );
 
-    filtroFTS.value = "";
-    reconstruirOpcionesFTS();
-    actualizarTextoBoton();
-    actualizarMapa();
+  reconstruirSelect(
+    filtroStation,
+    "station",
+    "Todas las estaciones"
+  );
+
+  reconstruirSelect(
+    filtroLocalidad,
+    "location",
+    "Todas las localidades"
+  );
+
+  if (depurarFTSSeleccionados()) {
+
+    reconstruirSelect(
+      filtroCultivo,
+      "crop",
+      "Todos los cultivos"
+    );
+
+    reconstruirSelect(
+      filtroStation,
+      "station",
+      "Todas las estaciones"
+    );
+
+    reconstruirSelect(
+      filtroLocalidad,
+      "location",
+      "Todas las localidades"
+    );
+
   }
+
+  filtroFTS.value = "";
+
+  reconstruirOpcionesFTS();
+  actualizarTextoBoton();
+  actualizarMapa();
+}
 
   function iniciar() {
     if (iniciado || !Array.isArray(sitios) || !sitios.length) return false;
@@ -396,9 +474,18 @@ if (cropExcluido) {
     reemplazarFiltroPrincipal();
     construirMultiSelectorFTS();
 
-    [filtroCultivo, filtroRegion, filtroLocalidad].forEach(control => {
-      control.addEventListener("change", actualizarFiltrosDependientes);
-    });
+ [
+  filtroCultivo,
+  filtroStation,
+  filtroLocalidad
+].forEach(control => {
+
+  control.addEventListener(
+    "change",
+    actualizarFiltrosDependientes
+  );
+
+});
 
     busqueda.addEventListener("input", actualizarFiltrosDependientes);
 
