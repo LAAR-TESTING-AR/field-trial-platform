@@ -247,7 +247,20 @@ contadorSitios.innerHTML = `
 </div>
 
 `;
-    
+    console.log(
+  "CONTADOR WIDTH:",
+  contadorSitios.offsetWidth
+);
+
+console.log(
+  "DISPLAY:",
+  getComputedStyle(contadorSitios).display
+);
+
+console.log(
+  "GRID:",
+  getComputedStyle(contadorSitios).gridTemplateColumns
+);
     window.actualizarLeyenda(sitiosFiltrados);
 
     if (coordenadas.length) {
