@@ -547,13 +547,14 @@ body { display: flex; flex-direction: column; }
 .coordenada-reference {
   filter: grayscale(100%);
 }
-@media (max-width: 900px),
-       (max-height: 500px) {
+@media (max-width: 900px) {
 
   #contadorSitios {
-    display: grid !important;
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 4px !important;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    max-width: 98%;
+    margin: 0 auto;
   }
 
 }
