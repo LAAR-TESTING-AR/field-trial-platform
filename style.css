@@ -547,3 +547,8 @@ body { display: flex; flex-direction: column; }
 .coordenada-reference {
   filter: grayscale(100%);
 }
+#contadorSitios {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr) !important;
+  gap: 4px !important;
+}
