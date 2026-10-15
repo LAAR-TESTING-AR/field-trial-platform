@@ -186,9 +186,9 @@ const access =
       )
   ).length;
 
-const masterRegions =
+const masterTrials =
   document.getElementById(
-    "masterRegions"
+    "masterTrials"
   );
 
 const masterAccess =
@@ -196,8 +196,8 @@ const masterAccess =
     "masterAccess"
   );
 
-if (masterRegions) {
-  masterRegions.textContent =
+if (masterTrials) {
+  masterTrials.textContent =
     `${trials} Trials`;
 }
 if (masterAccess) {
