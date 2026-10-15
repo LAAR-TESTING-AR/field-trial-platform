@@ -14,10 +14,16 @@ const capaSatelital = L.tileLayer(
     attribution: "Esri World Imagery"
   }
 );
+const capaInicial = localStorage.getItem("masterListMapLayer") || "map";
+
 const mapa = L.map("mapa", {
   center: [-34.5, -63.0],
   zoom: 5,
-  layers: [capaMapaActual]
+  layers: [
+    capaInicial === "satellite"
+      ? capaSatelital
+      : capaMapaActual
+  ]
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
@@ -31,6 +37,25 @@ L.control.layers(
     position: "topleft"
   }
 ).addTo(mapa);
+mapa.on("baselayerchange", function (evento) {
+
+  if (evento.name === "Satellite") {
+
+    localStorage.setItem(
+      "masterListMapLayer",
+      "satellite"
+    );
+
+  } else {
+
+    localStorage.setItem(
+      "masterListMapLayer",
+      "map"
+    );
+
+  }
+
+});
 const busqueda = document.getElementById("busqueda");
 const filtroCultivo = document.getElementById("filtroCultivo");
 const filtroStation = document.getElementById("filtroStation");
