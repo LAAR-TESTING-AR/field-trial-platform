@@ -16,10 +16,17 @@ const capaSatelital = L.tileLayer(
   }
 );
 
+const capaInicial =
+  localStorage.getItem("plantingMapLayer") || "map";
+
 const mapa = L.map("mapa", {
   center: [-34.5, -63.0],
   zoom: 5,
-  layers: [capaMapaActual]
+  layers: [
+    capaInicial === "satellite"
+      ? capaSatelital
+      : capaMapaActual
+  ]
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
@@ -33,7 +40,25 @@ L.control.layers(
     position: "topleft"
   }
 ).addTo(mapa);
+mapa.on("baselayerchange", function (evento) {
 
+  if (evento.name === "Satellite") {
+
+    localStorage.setItem(
+      "plantingMapLayer",
+      "satellite"
+    );
+
+  } else {
+
+    localStorage.setItem(
+      "plantingMapLayer",
+      "map"
+    );
+
+  }
+
+});
 let sitios = [];
 const URL_FLOW_SIEMBRA =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/d1ccb1bbfc2d42b1971a8e732db9aba7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a8tOXFBAyVBQZYwChwZCWsyvLfc33_lmeIcMHcH74Qs";
