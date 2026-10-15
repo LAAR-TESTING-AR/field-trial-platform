@@ -1,10 +1,18 @@
 console.log("app.js v10 - modelo unificado Trial + Access");
 
-const mapa = L.map("mapa").setView([-34.5, -63.0], 5);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: "&copy; OpenStreetMap contributors"
-}).addTo(mapa);
+const capaMapaActual = L.tileLayer(
+  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }
+);
+
+const mapa = L.map("mapa", {
+  center: [-34.5, -63.0],
+  zoom: 5,
+  layers: [capaMapaActual]
+});
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
 const busqueda = document.getElementById("busqueda");
