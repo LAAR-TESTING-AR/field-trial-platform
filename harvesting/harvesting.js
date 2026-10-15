@@ -864,10 +864,10 @@ function generarDatosPlanter(
       return;
     }
 
-    const planter =
-      limpiarTexto(
-        sitio["Planter"]
-      );
+const planter =
+  limpiarTexto(
+    sitio["Combine"]
+  );
 console.log(
   "PLANTER:",
   sitio["Planter"]
