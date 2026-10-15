@@ -206,3 +206,43 @@
 
   opacity:.95;
 }
+.btn-module-switch {
+
+  position: absolute;
+
+  top: 14px;
+  right: 70px;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.12);
+
+  border: 1px solid rgba(255,255,255,.18);
+
+  backdrop-filter: blur(6px);
+
+  text-decoration: none;
+
+  font-size: 20px;
+
+  transition:
+    transform .2s ease,
+    background .2s ease,
+    border-color .2s ease;
+}
+
+.btn-module-switch:hover {
+
+  background: rgba(255,255,255,.20);
+
+  border-color: rgba(255,255,255,.30);
+
+  transform: translateY(-1px);
+}
