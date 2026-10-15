@@ -105,7 +105,6 @@ if (
 }
 
     actualizarEstadoConexion();
-    actualizarBotonInstalacion();
     actualizarFotosPendientes();
   }
 
