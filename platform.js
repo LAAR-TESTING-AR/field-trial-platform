@@ -168,8 +168,12 @@ const regiones =
 const trials =
   sitiosValidos.filter(
     sitio =>
-      limpiarTexto(sitio.Location)
-        .toLowerCase() === "trial"
+      limpiarTexto(
+        sitio["Latitude Trial"]
+      ) &&
+      limpiarTexto(
+        sitio["Longitude Trial"]
+      )
   ).length;
 const access =
   sitiosValidos.filter(
