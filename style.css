@@ -423,7 +423,7 @@ body { display: flex; flex-direction: column; }
 }
 
 
-@media (min-width: 2000px) {
+@media (min-width: 1400px) {
 
 .panel {
     position: fixed;
