@@ -165,7 +165,12 @@ const regiones =
       .map(s => limpiarTexto(s.Region))
       .filter(Boolean)
   ).size;
-
+const trials =
+  sitiosValidos.filter(
+    sitio =>
+      limpiarTexto(sitio.Location)
+        .toLowerCase() === "trial"
+  ).length;
 const access =
   sitiosValidos.filter(
     sitio =>
@@ -189,9 +194,8 @@ const masterAccess =
 
 if (masterRegions) {
   masterRegions.textContent =
-    `${regiones} Regions`;
+    `${trials} Trial`;
 }
-
 if (masterAccess) {
   masterAccess.textContent =
     `${access} Access`;
