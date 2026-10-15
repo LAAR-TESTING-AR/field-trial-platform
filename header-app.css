@@ -70,10 +70,11 @@
 }
 
 .encabezado-funciones {
-  margin: 5px 0 0;
-  color: rgba(255, 255, 255, 0.84);
-  font-size: 12px;
-  line-height: 1.2;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  margin-top: 2px;
 }
 
 @media (max-width: 700px) {
