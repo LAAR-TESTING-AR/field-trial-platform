@@ -1,16 +1,38 @@
 console.log("Planting Tracker v2 - filtros dependientes");
 
-const mapa = L.map("mapa").setView([-34.5, -63.0], 5);
-
-L.tileLayer(
+const capaMapaActual = L.tileLayer(
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap contributors"
   }
-).addTo(mapa);
+);
+
+const capaSatelital = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom: 19,
+    attribution: "Esri World Imagery"
+  }
+);
+
+const mapa = L.map("mapa", {
+  center: [-34.5, -63.0],
+  zoom: 5,
+  layers: [capaMapaActual]
+});
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
+L.control.layers(
+  {
+    "Map": capaMapaActual,
+    "Satellite": capaSatelital
+  },
+  {},
+  {
+    position: "topleft"
+  }
+).addTo(mapa);
 
 let sitios = [];
 const URL_FLOW_SIEMBRA =
