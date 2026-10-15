@@ -64,15 +64,6 @@ aria-label="Actualizar datos">
           pendientes
         </button>
 
-        <button
-          id="pwaBotonInstalar"
-          class="pwa-boton-instalar"
-          type="button"
-          hidden
-        >
-          <span aria-hidden="true">📱</span>
-          Instalar App
-        </button>
       </div>
     `;
 
