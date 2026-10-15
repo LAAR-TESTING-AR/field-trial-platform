@@ -430,10 +430,10 @@ function esDrop(sitio) {
     .includes("drop");
 }
 
-function estaSembrado(sitio) {
+function estaCosechado(sitio) {
   return Boolean(
     limpiarTexto(
-      sitio["Planting Date (MM/DD/YYYY)"]
+      sitio["Harvest Date (MM/DD/YYYY)"]
     )
   );
 }
@@ -780,13 +780,13 @@ function actualizarDashboard(sitiosFiltrados) {
   const sembradas = sitiosFiltrados.filter(
     sitio =>
       !esDrop(sitio) &&
-      estaSembrado(sitio)
+      estaCosechado(sitio)
   ).length;
 
   const pendientes = sitiosFiltrados.filter(
     sitio =>
       !esDrop(sitio) &&
-      !estaSembrado(sitio)
+      !estaCosechado(sitio)
   ).length;
 
   const totalOperativo =
@@ -859,7 +859,7 @@ function generarDatosPlanter(
 
     if (
       esDrop(sitio) ||
-      !estaSembrado(sitio)
+      !estaCosechado(sitio)
     ) {
       return;
     }
@@ -918,7 +918,7 @@ function generarDatosTimeline(
     sitiosBase.filter(
       sitio =>
         !esDrop(sitio) &&
-        estaSembrado(sitio)
+        estaCosechado(sitio)
     );
 
   const cultivos = {};
@@ -1249,7 +1249,7 @@ function generarCalendarioSemanal(sitiosBase) {
       .filter(
         sitio =>
           !esDrop(sitio) &&
-          estaSembrado(sitio)
+          estaCosechado(sitio)
       )
       .map(
         sitio =>
@@ -1452,7 +1452,7 @@ if (
 }
 
     const drop = esDrop(sitio);
-    const sembrado = estaSembrado(sitio);
+    const sembrado = estaCosechado(sitio);
 
     let color = "#d32f2f";
     let estado = "PENDIENTE";
@@ -2305,7 +2305,7 @@ const puntosGenerales =
           sitio => {
 
             if (
-              !estaSembrado(sitio)
+              !estaCosechado(sitio)
             ) {
               return false;
             }
