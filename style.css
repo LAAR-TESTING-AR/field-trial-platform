@@ -547,3 +547,12 @@ body { display: flex; flex-direction: column; }
 .coordenada-reference {
   filter: grayscale(100%);
 }
+@media (orientation: landscape) and (max-width: 1000px) {
+
+  #contadorSitios {
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 4px;
+  }
+
+}
