@@ -75,10 +75,6 @@ aria-label="Actualizar datos">
       document.body.insertAdjacentElement("afterbegin", barra);
     }
 
-    document
-      .getElementById("pwaBotonInstalar")
-      .addEventListener("click", instalarAplicacion);
-
     const syncBtn =
   document.getElementById(
     "syncMasterList"
