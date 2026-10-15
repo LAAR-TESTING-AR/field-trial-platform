@@ -198,7 +198,7 @@ const masterAccess =
 
 if (masterRegions) {
   masterRegions.textContent =
-    `${trials} Trial`;
+    `${trials} Trials`;
 }
 if (masterAccess) {
   masterAccess.textContent =
