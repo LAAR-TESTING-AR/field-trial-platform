@@ -7,7 +7,13 @@ const capaMapaActual = L.tileLayer(
     attribution: "&copy; OpenStreetMap contributors"
   }
 );
-
+const capaSatelital = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom: 19,
+    attribution: "Esri World Imagery"
+  }
+);
 const mapa = L.map("mapa", {
   center: [-34.5, -63.0],
   zoom: 5,
@@ -15,6 +21,16 @@ const mapa = L.map("mapa", {
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
+L.control.layers(
+  {
+    "Map": capaMapaActual,
+    "Satellite": capaSatelital
+  },
+  {},
+  {
+    position: "topleft"
+  }
+).addTo(mapa);
 const busqueda = document.getElementById("busqueda");
 const filtroCultivo = document.getElementById("filtroCultivo");
 const filtroStation = document.getElementById("filtroStation");
