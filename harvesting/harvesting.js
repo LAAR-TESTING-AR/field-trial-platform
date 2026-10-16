@@ -1311,10 +1311,10 @@ function crearPopup(sitio, estado) {
       sitio["AOI ID"]
     );
 
-  const plantingDate =
-    limpiarTexto(
-      sitio["Planting Date (MM/DD/YYYY)"]
-    );
+const harvestDate =
+  limpiarTexto(
+    sitio["Harvest Date (MM/DD/YYYY)"]
+  );
 
   let bloqueAccion = "";
 
