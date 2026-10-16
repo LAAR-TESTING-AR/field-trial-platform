@@ -446,11 +446,11 @@ text-align: center;
   font-weight: 600;
 }
 
-#btnCancelarSiembra {
+#btnCancelarCosecha {
   background: #e5e5e5;
 }
 
-#btnGuardarSiembra {
+#btnGuardarCosecha {
   background: #0b6b3a;
   color: white;
 }
