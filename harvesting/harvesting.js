@@ -1808,9 +1808,9 @@ const modalCombineStats =
     "modalCombineStats"
   );
 
-const cerrarPlanterStats =
+const cerrarCombineStats =
   document.getElementById(
-    "cerrarPlanterStats"
+    "cerrarCombineStats"
   );
 
 const selectorRegionesTimeline =
@@ -2785,7 +2785,7 @@ modalCombineStats.classList.add(
 
   }
 );
-cerrarPlanterStats.addEventListener(
+cerrarCombineStats.addEventListener(
   "click",
   () => {
 modalCombineStats.classList.remove(
