@@ -1798,9 +1798,9 @@ const modalTimeline =
 
 const cerrarTimeline =
   document.getElementById("cerrarTimeline");
-const btnPlanterStats =
+const btnCombineStats =
   document.getElementById(
-    "btnPlanterStats"
+    "btnCombineStats"
   );
 
 const modalPlanterStats =
@@ -2542,7 +2542,7 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
-btnPlanterStats.addEventListener(
+btnCombineStats.addEventListener(
   "click",
   () => {
 
