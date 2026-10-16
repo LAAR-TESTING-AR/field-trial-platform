@@ -897,9 +897,9 @@ resultado[combine] = {
 
     }
 
-    resultado[planter].aoi += 1;
+resultado[combine].aoi += 1;
 
-    resultado[planter].hectareas += area;
+resultado[combine].hectareas += area;
 
   });
 
