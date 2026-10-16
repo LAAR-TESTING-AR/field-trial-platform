@@ -2712,10 +2712,10 @@ const aoi =
     d => d.aoi
   );
    
-    const canvas =
-      document.getElementById(
-        "graficoPlanter"
-      );
+const canvas =
+  document.getElementById(
+    "graficoCombine"
+  );
 
     if (
       window.chartPlanter
