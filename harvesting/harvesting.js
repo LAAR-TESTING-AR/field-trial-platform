@@ -1342,27 +1342,27 @@ if (estado === "PENDIENTE") {
   }
 
 }
-  else if (estado === "SEMBRADO") {
+else if (estado === "COSECHADO") {
 
-    bloqueAccion = `
+  bloqueAccion = `
 
-      <hr>
+    <hr>
 
-      <div class="popup-fecha-registrada">
+    <div class="popup-fecha-registrada">
 
-        <strong>
-          Fecha de siembra
-        </strong>
+      <strong>
+        Fecha de cosecha
+      </strong>
 
-        <br>
+      <br>
 
-        ${plantingDate}
+      ${harvestDate}
 
-      </div>
+    </div>
 
-    `;
+  `;
 
-  }
+}
 
   return `
 
