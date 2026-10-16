@@ -1787,9 +1787,9 @@ window.addEventListener(
   "online",
   async () => {
 
-    console.log(
-      "Sincronizando siembras pendientes..."
-    );
+console.log(
+  "Sincronizando cosechas pendientes..."
+);
 
     await sincronizarSiembrasPendientes();
 
