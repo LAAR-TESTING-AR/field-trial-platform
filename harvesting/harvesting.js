@@ -2595,7 +2595,7 @@ document.getElementById(
     console.table(datos);
 const ranking =
   document.getElementById(
-    "planterRanking"
+    "combineRanking"
   );
 
 ranking.innerHTML = `
