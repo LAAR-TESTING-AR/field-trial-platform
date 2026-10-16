@@ -1334,7 +1334,7 @@ if (estado === "PENDIENTE") {
         type="button"
         class="btn-registrar-siembra"
         data-aoi="${aoiId}">
-        Registrar Siembra
+        Registrar Cosecha
       </button>
 
     `;
