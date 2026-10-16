@@ -2650,7 +2650,7 @@ ${datos.map((item, index) => `
     "
   ></span>
 
-  ${item.planter}
+  ${item.combine}
 
 </td>
 
@@ -2694,7 +2694,7 @@ ${datos.map((item, index) => `
  
     const labels =
       datos.map(
-        d => d.planter
+        d => d.combine
       );
 
     const hectareas =
