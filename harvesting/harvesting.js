@@ -109,7 +109,7 @@ btnGuardarSiembra.onclick =
 const fecha =
   modalFechaSiembra.value;
 
-const planter =
+const combine =
   modalPlanter.value;
 
 const aoiId =
@@ -123,9 +123,9 @@ if (!fecha || !aoiId) {
   return;
 }
 
-if (!planter) {
+if (!combine) {
   alert(
-    "Seleccione una sembradora"
+    "Seleccione una cosechadora"
   );
 
   return;
