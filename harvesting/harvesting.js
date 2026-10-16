@@ -183,7 +183,7 @@ if (sitioLocal) {
      * El usuario puede seguir trabajando
      * mientras se intenta sincronizar.
      */
-    sincronizarSiembrasPendientes();
+    sincronizarCosechasPendientes();
   };
 
     }
@@ -1712,7 +1712,7 @@ reconciliarPendientesConSitios(
   sitios
 );
 
-sincronizarSiembrasPendientes();
+sincronizarCosechasPendientes();
 
 if (resultado.errors.length) {
       console.warn(
@@ -1786,7 +1786,7 @@ console.log(
   "Sincronizando cosechas pendientes..."
 );
 
-    await sincronizarSiembrasPendientes();
+    await sincronizarCosechasPendientes();
 
   }
 );
