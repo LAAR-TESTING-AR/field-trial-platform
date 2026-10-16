@@ -2549,16 +2549,22 @@ btnPlanterStats.addEventListener(
     const datos =
       generarDatosCombine();
 
-     const coloresPlanter = [
+   const coloresCombine = [
 
-  "#3B82F6", // BE19186
-  "#F85D7F", // PP23191
-  "#F59E3A", // BE19182
-  "#F2C84C", // BE19187
-  "#4EB5B7", // BE19185
-  "#8B5CF6", // BE19184
-  "#BFC3C7", // Contractor
-  "#38BDF8"  // BE19183
+  "#3B82F6", // Contractor
+  "#F85D7F", // CR5.85AA
+  "#F59E3A", // CR5.85AC
+  "#F2C84C", // CR6080
+  "#4EB5B7", // Hege
+  "#8B5CF6", // JD1470
+  "#BFC3C7", // JD1550_1
+  "#38BDF8", // JD1550_2
+  "#22C55E", // JD1550_3
+  "#EF4444", // SPSC40
+  "#A855F7", // TR87
+  "#14B8A6", // TR88
+  "#F97316", // TR89
+  "#64748B"  // Wintersteiger
 
 ];
     
@@ -2643,7 +2649,7 @@ ${datos.map((item, index) => `
       height:12px;
       border-radius:50%;
       background:${
-        coloresPlanter[index]
+        coloresCombine[index]
       };
       margin-right:8px;
       vertical-align:middle;
@@ -2735,7 +2741,7 @@ datasets: [
 
     data: aoi,
 
-    backgroundColor: coloresPlanter,
+    backgroundColor: coloresCombine,
 
     weight: 1
   },
@@ -2745,7 +2751,7 @@ datasets: [
 
     data: hectareas,
 
-    backgroundColor: coloresPlanter,
+    backgroundColor: coloresCombine,
 
     weight: 2
   }
