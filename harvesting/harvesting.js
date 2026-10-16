@@ -161,12 +161,12 @@ agregarSiembraPendiente(
 
 if (sitioLocal) {
   sitioLocal[
-    "Planting Date (MM/DD/YYYY)"
+    "Harvest Date (MM/DD/YYYY)"
   ] = fecha;
 
   sitioLocal[
-    "Planter"
-  ] = planter;
+    "Combine"
+  ] = combine;
 }
 
     actualizarVista();
