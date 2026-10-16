@@ -848,7 +848,7 @@ document.getElementById(
 ).style.transform =
   `rotate(${anguloAvance}deg)`;
 }
-function generarDatosPlanter(
+function generarDatosCombine(
   sitiosBase = sitios
 ) {
 
@@ -863,7 +863,7 @@ function generarDatosPlanter(
       return;
     }
 
-const planter =
+const combine =
   limpiarTexto(
     sitio["Combine"]
   );
@@ -876,7 +876,7 @@ console.log(
   sitio["Harvest Date (MM/DD/YYYY)"]
 );
     
-    if (!planter) {
+    if (!combine) {
       return;
     }
 
@@ -887,17 +887,13 @@ console.log(
         ).replace(",", ".")
       ) || 0;
 
-    if (!resultado[planter]) {
+    if (!resultado[combine]) {
 
-      resultado[planter] = {
-
-        planter: planter,
-
-        aoi: 0,
-
-        hectareas: 0
-
-      };
+resultado[combine] = {
+  combine: combine,
+  aoi: 0,
+  hectareas: 0
+};
 
     }
 
@@ -2551,7 +2547,7 @@ btnPlanterStats.addEventListener(
   () => {
 
     const datos =
-      generarDatosPlanter();
+      generarDatosCombine();
 
      const coloresPlanter = [
 
