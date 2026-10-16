@@ -1803,9 +1803,9 @@ const btnCombineStats =
     "btnCombineStats"
   );
 
-const modalPlanterStats =
+const modalCombineStats =
   document.getElementById(
-    "modalPlanterStats"
+    "modalCombineStats"
   );
 
 const cerrarPlanterStats =
@@ -2779,18 +2779,19 @@ datasets: [
         }
       );
 
-    modalPlanterStats.classList.add(
-      "visible"
-    );
+modalCombineStats.classList.add(
+  "visible"
+);
 
   }
 );
 cerrarPlanterStats.addEventListener(
   "click",
   () => {
-    modalPlanterStats.classList.remove(
-      "visible"
-    );
+modalCombineStats.classList.remove(
+  "visible"
+);
+
   }
 );
 
