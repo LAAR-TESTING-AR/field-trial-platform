@@ -933,12 +933,12 @@ function generarDatosTimeline(
     const cultivo =
       limpiarTexto(sitio.Crop);
 
-    const fechaPlanting =
-      convertirFechaPlanting(
-        sitio[
-          "Planting Date (MM/DD/YYYY)"
-        ]
-      );
+const fechaPlanting =
+  convertirFechaPlanting(
+    sitio[
+      "Harvest Date (MM/DD/YYYY)"
+    ]
+  );
 
     if (
       !cultivo ||
