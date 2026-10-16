@@ -1553,7 +1553,7 @@ if (
           boton.disabled = false;
 
           boton.textContent =
-            "Registrar Siembra";
+            "Registrar Cosecha";
 
         }
 
