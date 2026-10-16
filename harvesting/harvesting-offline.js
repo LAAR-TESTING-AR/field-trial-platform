@@ -1,5 +1,5 @@
 const CLAVE_SIEMBRAS_PENDIENTES =
-  "plantingPendingSync";
+  "harvestingPendingSync";
 
 let sincronizacionSiembraEnCurso = false;
 
@@ -37,7 +37,7 @@ function guardarSiembrasPendientes(
 function agregarSiembraPendiente(
   aoiId,
   fecha,
-  planter
+  combine
 ) {
   const pendientes =
     obtenerSiembrasPendientes();
@@ -50,12 +50,12 @@ function agregarSiembraPendiente(
 
   sinDuplicado.push({
     aoiId: aoiId,
-    plantingDate: fecha,
-    planter: planter,
+    harvestDate: fecha,
+    combine: combine,
     registeredAt:
       new Date().toISOString(),
     source:
-      "Field Trial Platform Planting Offline"
+      "Field Trial Platform Harvesting Offline"
   });
 
   guardarSiembrasPendientes(
@@ -63,11 +63,11 @@ function agregarSiembraPendiente(
   );
 
   console.log(
-    "Planting guardado localmente:",
+    "Harvesting guardado localmente:",
     {
       aoiId: aoiId,
-      plantingDate: fecha,
-      planter: planter
+      harvestDate: fecha,
+      combine: combine
     }
   );
 }
@@ -143,21 +143,21 @@ async function sincronizarSiembrasPendientes() {
                 "Content-Type":
                   "application/json"
               },
-            body: JSON.stringify({
+body: JSON.stringify({
   aoiId:
     siembra.aoiId,
 
-  plantingDate:
-    siembra.plantingDate,
+  harvestDate:
+    siembra.harvestDate,
 
-  planter:
-    siembra.planter,
+  combine:
+    siembra.combine,
 
   registeredAt:
     siembra.registeredAt,
 
   source:
-    "Field Trial Platform Offline Sync"
+    "Field Trial Platform Harvesting Offline Sync"
 })
             }
           );
