@@ -2526,7 +2526,7 @@ ticks: {
 },
           title: {
             display: true,
-            text: "% Avance Siembra"
+            text: "% Avance Cosecha"
           }
         },
 
