@@ -106,8 +106,8 @@ function actualizarIndicadorOffline() {
   indicador.style.color =
     "#c26800";
 
-  indicador.title =
-    "Siembras pendientes de sincronización";
+indicador.title =
+  "Cosechas pendientes de sincronización";
 }
 
 async function sincronizarSiembrasPendientes() {
