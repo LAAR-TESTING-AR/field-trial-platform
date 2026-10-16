@@ -933,7 +933,7 @@ function generarDatosTimeline(
       limpiarTexto(sitio.Crop);
 
 const fechaHarvest =
-  convertirFechaPlanting(
+  convertirFechaHarvest(
     sitio[
       "Harvest Date (MM/DD/YYYY)"
     ]
@@ -1121,7 +1121,7 @@ function cargarFiltrosTimeline() {
   });
 }
 
-function convertirFechaPlanting(fechaTexto) {
+function convertirFechaHarvest(fechaTexto) {
 
   const partes =
     limpiarTexto(fechaTexto)
@@ -1257,7 +1257,7 @@ function generarCalendarioSemanal(sitiosBase) {
       )
       .map(
         sitio =>
-       convertirFechaPlanting(
+       convertirFechaHarvest(
   sitio[
     "Harvest Date (MM/DD/YYYY)"
   ]
@@ -2315,7 +2315,7 @@ const puntosGenerales =
             }
 
             const fecha =
-              convertirFechaPlanting(
+             convertirFechaHarvest(
                 sitio[
                   "Planting Date (MM/DD/YYYY)"
                 ]
