@@ -175,16 +175,18 @@ body: JSON.stringify({
   siembra.aoiId
 );
 
-      } catch (error) {
-        console.log(
-  "La cosecha continúa pendiente:",
-  siembra.aoiId
-);
+      } 
+ catch (error) {
+  console.error(
+    "Error sincronizando cosecha:",
+    siembra.aoiId,
+    error
+  );
 
-        pendientesRestantes.push(
-          siembra
-        );
-      }
+  pendientesRestantes.push(
+    siembra
+  );
+}
     }
 
     guardarSiembrasPendientes(
