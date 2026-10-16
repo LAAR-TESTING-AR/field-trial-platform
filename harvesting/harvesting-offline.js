@@ -3,7 +3,7 @@ const CLAVE_SIEMBRAS_PENDIENTES =
 
 let sincronizacionSiembraEnCurso = false;
 
-function obtenerSiembrasPendientes() {
+function obtenerCosechasPendientes() {
   try {
     const contenido =
       localStorage.getItem(
@@ -40,7 +40,7 @@ function agregarSiembraPendiente(
   combine
 ) {
   const pendientes =
-    obtenerSiembrasPendientes();
+    obtenerCosechasPendientes();
 
   const sinDuplicado =
     pendientes.filter(
@@ -83,7 +83,7 @@ function actualizarIndicadorOffline() {
   }
 
   const cantidad =
-    obtenerSiembrasPendientes().length;
+    obtenerCosechasPendientes().length;
 
   if (cantidad === 0) {
     indicador.textContent =
@@ -116,7 +116,7 @@ async function sincronizarSiembrasPendientes() {
   }
 
   const pendientes =
-    obtenerSiembrasPendientes();
+    obtenerCosechasPendientes();
 
   if (pendientes.length === 0) {
     actualizarIndicadorOffline();
@@ -202,7 +202,7 @@ function reconciliarPendientesConSitios(
   sitiosActuales
 ) {
   const pendientes =
-    obtenerSiembrasPendientes();
+    obtenerCosechasPendientes();
 
   if (
     pendientes.length === 0 ||
