@@ -2718,12 +2718,12 @@ const canvas =
   );
 
     if (
-      window.chartPlanter
+      window.chartCombine
     ) {
-      window.chartPlanter.destroy();
+      window.chartCombine.destroy();
     }
 
-    window.chartPlanter =
+    window.chartCombine =
       new Chart(
         canvas,
         {
