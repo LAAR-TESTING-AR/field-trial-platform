@@ -801,7 +801,7 @@ function actualizarDashboard(sitiosFiltrados) {
   document.getElementById("totalAOI").textContent =
     sitiosFiltrados.length;
 
-  document.getElementById("cosechadas").textContent =
+  document.getElementById("sembradas").textContent =
     cosechadas;
 
   document.getElementById("pendientes").textContent =
