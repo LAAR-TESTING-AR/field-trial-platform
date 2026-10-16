@@ -23,7 +23,7 @@ function obtenerCosechasPendientes() {
   }
 }
 
-function guardarSiembrasPendientes(
+function guardarCosechasPendientes(
   pendientes
 ) {
   localStorage.setItem(
@@ -58,7 +58,7 @@ function agregarSiembraPendiente(
       "Field Trial Platform Harvesting Offline"
   });
 
-  guardarSiembrasPendientes(
+  guardarCosechasPendientes(
     sinDuplicado
   );
 
@@ -189,7 +189,7 @@ body: JSON.stringify({
 }
     }
 
-    guardarSiembrasPendientes(
+    guardarCosechasPendientes(
       pendientesRestantes
     );
 
@@ -244,7 +244,7 @@ const fechaEnBase =
        */
       return fechaEnBase === "";    });
 
-  guardarSiembrasPendientes(
+  guardarCosechasPendientes(
     pendientesReales
   );
 
