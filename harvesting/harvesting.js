@@ -64,7 +64,7 @@ const URL_FLOW_HARVESTING =
 
 let modalSiembra;
 let modalFechaSiembra;
-let modalPlanter;
+let modalCombine;
 let btnCancelarSiembra;
 let btnGuardarSiembra;
 
@@ -81,9 +81,9 @@ document.addEventListener(
       document.getElementById(
         "modalFechaSiembra"
       );
-modalPlanter =
+modalCombine =
   document.getElementById(
-    "modalPlanter"
+    "modalCombine"
   );
     btnCancelarSiembra =
       document.getElementById(
@@ -109,7 +109,7 @@ const fecha =
   modalFechaSiembra.value;
 
 const combine =
-  modalPlanter.value;
+  modalCombine.value;
 
 const aoiId =
   aoiPendienteSiembra;
@@ -1758,7 +1758,7 @@ console.log(
       .toISOString()
       .split("T")[0];
 
-  modalPlanter.value = "";
+  modalCombine.value = "";
   
   modalSiembra.classList.add(
     "visible"
