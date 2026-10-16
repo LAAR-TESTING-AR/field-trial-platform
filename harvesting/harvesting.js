@@ -918,7 +918,7 @@ function generarDatosTimeline(
   sitiosBase = sitios
 ) {
 
-  const sembrados =
+  const cosechados =
     sitiosBase.filter(
       sitio =>
         !esDrop(sitio) &&
@@ -927,12 +927,12 @@ function generarDatosTimeline(
 
   const cultivos = {};
 
-  sembrados.forEach(sitio => {
+  cosechados.forEach(sitio => {
 
     const cultivo =
       limpiarTexto(sitio.Crop);
 
-const fechaPlanting =
+const fechaHarvest =
   convertirFechaPlanting(
     sitio[
       "Harvest Date (MM/DD/YYYY)"
@@ -941,14 +941,14 @@ const fechaPlanting =
 
     if (
       !cultivo ||
-      !fechaPlanting
+      !fechaHarvest
     ) {
       return;
     }
 
     const semana =
       crearClaveSemana(
-        fechaPlanting
+        fechaHarvest
       );
 
     if (!cultivos[cultivo]) {
