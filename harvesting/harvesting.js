@@ -2583,12 +2583,14 @@ const totalHa =
   );
 
 document.getElementById(
-  "totalAOIPlanter"
+  "totalAOICombine"
+)
 ).textContent =
   `${totalAOI} AOI`;
 
 document.getElementById(
-  "totalHaPlanter"
+  "totalHaCombine"
+)
 ).textContent =
   `${totalHa.toFixed(1)} ha`;
     
