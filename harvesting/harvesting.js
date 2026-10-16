@@ -2534,7 +2534,7 @@ ticks: {
           type: "category",
           title: {
             display: true,
-            text: "Planting Week"
+            text: "Harvesting Week"
           }
           
         }
