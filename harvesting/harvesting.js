@@ -2603,7 +2603,7 @@ ranking.innerHTML = `
     <thead>
       <tr>
         <th style="text-align:left;padding:8px;">
-          Sembradora
+          Cosechadora
         </th>
 
 <th style="text-align:center;padding:8px;">
