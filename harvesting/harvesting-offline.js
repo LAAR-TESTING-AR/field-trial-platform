@@ -34,7 +34,7 @@ function guardarCosechasPendientes(
   actualizarIndicadorOffline();
 }
 
-function agregarSiembraPendiente(
+function agregarCosechaPendiente(
   aoiId,
   fecha,
   combine
