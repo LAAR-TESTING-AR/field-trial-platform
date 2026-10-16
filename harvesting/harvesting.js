@@ -65,8 +65,8 @@ const URL_FLOW_HARVESTING =
 let modalCosecha;
 let modalFechaCosecha;
 let modalCombine;
-let btnCancelarSiembra;
-let btnGuardarSiembra;
+let btnCancelarCosecha;
+let btnGuardarCosecha;
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -85,24 +85,24 @@ modalCombine =
   document.getElementById(
     "modalCombine"
   );
-    btnCancelarSiembra =
+    btnCancelarCosecha =
       document.getElementById(
-        "btnCancelarSiembra"
+        "btnCancelarCosecha"
       );
 
-    btnGuardarSiembra =
+    btnGuardarCosecha =
       document.getElementById(
-        "btnGuardarSiembra"
+        "btnGuardarCosecha"
       );
 
-    if (btnCancelarSiembra) {
-      btnCancelarSiembra.onclick =
+    if (btnCancelarCosecha) {
+      btnCancelarCosecha.onclick =
         cerrarModalCosecha;
     }
 
-    if (btnGuardarSiembra) {
+    if (btnGuardarCosecha) {
 
-btnGuardarSiembra.onclick =
+btnGuardarCosecha.onclick =
   () => {
 
 const fecha =
@@ -130,10 +130,10 @@ if (!combine) {
   return;
 }
 
-    btnGuardarSiembra.disabled =
+    btnGuardarCosecha.disabled =
       true;
 
-    btnGuardarSiembra.textContent =
+    btnGuardarCosecha.textContent =
       "Guardando...";
 
     /*
@@ -170,10 +170,10 @@ if (sitioLocal) {
 
     actualizarVista();
 
-    btnGuardarSiembra.disabled =
+    btnGuardarCosecha.disabled =
       false;
 
-    btnGuardarSiembra.textContent =
+    btnGuardarCosecha.textContent =
       "Guardar";
 
     cerrarModalCosecha();
