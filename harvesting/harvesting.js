@@ -142,10 +142,10 @@ if (!combine) {
      * El registro ya es seguro aunque
      * desaparezca la conexión.
      */
- agregarSiembraPendiente(
+agregarSiembraPendiente(
   aoiId,
   fecha,
-  planter
+  combine
 );
 
     /*
