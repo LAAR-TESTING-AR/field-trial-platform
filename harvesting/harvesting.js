@@ -63,7 +63,7 @@ const URL_FLOW_HARVESTING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
 
 let modalSiembra;
-let modalFechaSiembra;
+let modalFechaCosecha;
 let modalCombine;
 let btnCancelarSiembra;
 let btnGuardarSiembra;
@@ -77,9 +77,9 @@ document.addEventListener(
         "modalSiembra"
       );
 
-    modalFechaSiembra =
+   modalFechaCosecha =
       document.getElementById(
-        "modalFechaSiembra"
+        "modalFechaCosecha"
       );
 modalCombine =
   document.getElementById(
@@ -106,7 +106,7 @@ btnGuardarSiembra.onclick =
   () => {
 
 const fecha =
-  modalFechaSiembra.value;
+  modalFechaCosecha.value;
 
 const combine =
   modalCombine.value;
@@ -1753,7 +1753,7 @@ console.log(
   aoiPendienteSiembra =
     aoiId;
 
-  modalFechaSiembra.value =
+ modalFechaCosecha.value =
     new Date()
       .toISOString()
       .split("T")[0];
