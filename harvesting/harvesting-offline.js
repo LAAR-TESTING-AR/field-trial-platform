@@ -228,12 +228,12 @@ function reconciliarPendientesConSitios(
         return true;
       }
 
-      const fechaEnBase =
-        String(
-          sitioBase[
-            "Planting Date (MM/DD/YYYY)"
-          ] || ""
-        ).trim();
+const fechaEnBase =
+  String(
+    sitioBase[
+      "Harvest Date (MM/DD/YYYY)"
+    ] || ""
+  ).trim();
 
       /*
        * Si el CSV ya tiene fecha,
