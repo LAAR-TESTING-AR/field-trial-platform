@@ -385,7 +385,7 @@ header {
   margin-top: 0;
 }
 
-#modalFechaSiembra {
+#modalFechaCosecha {
   width: 100%;
   min-height: 52px;
 
@@ -407,11 +407,11 @@ header {
   appearance: none;
   -webkit-appearance: none;
 }
-#modalFechaSiembra::-webkit-date-and-time-value {
+#modalFechaCosecha::-webkit-date-and-time-value {
   text-align: center;
 }
 
-#modalPlanter {
+#modalCombine {
   width: 100%;
   min-height: 52px;
 
