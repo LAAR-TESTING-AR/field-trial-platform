@@ -869,9 +869,14 @@ const planter =
     sitio["Combine"]
   );
 console.log(
-  "PLANTER:",
-  sitio["Planter"]
+  "COMBINE:",
+  sitio["Combine"],
+  "AOI:",
+  sitio["AOI ID"],
+  "HARVEST DATE:",
+  sitio["Harvest Date (MM/DD/YYYY)"]
 );
+    
     if (!planter) {
       return;
     }
