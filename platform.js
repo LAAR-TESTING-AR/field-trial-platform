@@ -60,7 +60,35 @@ console.log(
           (sembrados / totalOperativo) * 100
         )
       : 0;
+const cosechados =
+  sitiosValidos.filter(
+    sitio =>
+      !esDrop(sitio) &&
+      Boolean(
+        limpiarTexto(
+          sitio["Harvest Date (MM/DD/YYYY)"]
+        )
+      )
+  ).length;
 
+const pendientesCosecha =
+  sitiosValidos.filter(
+    sitio =>
+      !esDrop(sitio) &&
+      !limpiarTexto(
+        sitio["Harvest Date (MM/DD/YYYY)"]
+      )
+  ).length;
+
+const totalOperativoCosecha =
+  cosechados + pendientesCosecha;
+
+const avanceCosecha =
+  totalOperativoCosecha > 0
+    ? Math.round(
+        (cosechados / totalOperativoCosecha) * 100
+      )
+    : 0;
   const tarjetasKpi =
     document.querySelectorAll(
       ".kpi-card"
