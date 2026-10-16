@@ -517,7 +517,7 @@ text-align: center;
   }
 
   #btnTimeline,
-  #btnPlanterStats {
+  #btnCombineStats {
 
     flex: 1;
 
@@ -536,7 +536,7 @@ text-align: center;
 }
 
 #btnTimeline,
-#btnPlanterStats {
+#btnCombineStats {
   width: 100%;
   margin-top: 12px;
   padding: 14px;
@@ -556,7 +556,7 @@ text-align: center;
 font-size: 28px;
 }
 #btnTimeline:hover,
-#btnPlanterStats:hover {
+#btnCombineStats:hover {
   background: #d9e8dd;
 }
 .modal-timeline {
