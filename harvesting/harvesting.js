@@ -1,5 +1,4 @@
-console.log("Planting Tracker v2 - filtros dependientes");
-
+console.log("Harvesting Tracker v2 - filtros dependientes");
 const capaMapaActual = L.tileLayer(
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
   {
@@ -17,7 +16,7 @@ const capaSatelital = L.tileLayer(
 );
 
 const capaInicial =
-  localStorage.getItem("plantingMapLayer") || "map";
+  localStorage.getItem("harvestingMapLayer") || "map";
 
 const mapa = L.map("mapa", {
   center: [-34.5, -63.0],
@@ -45,14 +44,14 @@ mapa.on("baselayerchange", function (evento) {
   if (evento.name === "Satellite") {
 
     localStorage.setItem(
-      "plantingMapLayer",
+      "harvestingMapLayer",
       "satellite"
     );
 
   } else {
 
     localStorage.setItem(
-      "plantingMapLayer",
+      "harvestingMapLayer",
       "map"
     );
 
@@ -777,7 +776,7 @@ function actualizarDashboard(sitiosFiltrados) {
     esDrop
   ).length;
 
-  const sembradas = sitiosFiltrados.filter(
+  const cosechadas = sitiosFiltrados.filter(
     sitio =>
       !esDrop(sitio) &&
       estaCosechado(sitio)
@@ -790,20 +789,20 @@ function actualizarDashboard(sitiosFiltrados) {
   ).length;
 
   const totalOperativo =
-    sembradas + pendientes;
+    cosechadas + pendientes;
 
   const avance =
     totalOperativo > 0
       ? Math.round(
-          (sembradas / totalOperativo) * 100
+          (cosechadas / totalOperativo) * 100
         )
       : 0;
 
   document.getElementById("totalAOI").textContent =
     sitiosFiltrados.length;
 
-  document.getElementById("sembradas").textContent =
-    sembradas;
+  document.getElementById("cosechadas").textContent =
+    cosechadas;
 
   document.getElementById("pendientes").textContent =
     pendientes;
