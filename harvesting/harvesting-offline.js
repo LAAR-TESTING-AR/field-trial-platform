@@ -1,7 +1,7 @@
 const CLAVE_SIEMBRAS_PENDIENTES =
   "harvestingPendingSync";
 
-let sincronizacionSiembraEnCurso = false;
+let sincronizacionCosechaEnCurso = false;
 
 function obtenerCosechasPendientes() {
   try {
@@ -111,7 +111,7 @@ indicador.title =
 }
 
 async function sincronizarCosechasPendientes() {
-  if (sincronizacionSiembraEnCurso) {
+  if (sincronizacionCosechaEnCurso) {
     return;
   }
 
@@ -123,7 +123,7 @@ async function sincronizarCosechasPendientes() {
     return;
   }
 
-  sincronizacionSiembraEnCurso = true;
+  sincronizacionCosechaEnCurso = true;
 
 console.log(
   `Intentando sincronizar ${pendientes.length} cosecha(s)`
@@ -194,7 +194,7 @@ body: JSON.stringify({
     );
 
   } finally {
-    sincronizacionSiembraEnCurso = false;
+    sincronizacionCosechaEnCurso = false;
     actualizarIndicadorOffline();
   }
 }
