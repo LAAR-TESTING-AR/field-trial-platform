@@ -62,7 +62,7 @@ let sitios = [];
 const URL_FLOW_HARVESTING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
 
-let modalSiembra;
+let modalCosecha;
 let modalFechaCosecha;
 let modalCombine;
 let btnCancelarSiembra;
@@ -72,9 +72,9 @@ document.addEventListener(
   "DOMContentLoaded",
   () => {
 
-    modalSiembra =
+    modalCosecha =
       document.getElementById(
-        "modalSiembra"
+        "modalCosecha"
       );
 
    modalFechaCosecha =
@@ -97,7 +97,7 @@ modalCombine =
 
     if (btnCancelarSiembra) {
       btnCancelarSiembra.onclick =
-        cerrarModalSiembra;
+        cerrarModalCosecha;
     }
 
     if (btnGuardarSiembra) {
@@ -176,7 +176,7 @@ if (sitioLocal) {
     btnGuardarSiembra.textContent =
       "Guardar";
 
-    cerrarModalSiembra();
+    cerrarModalCosecha();
 
     /*
      * No usamos await.
@@ -1510,7 +1510,7 @@ if (
     boton.onclick =
       async () => {
 
-  abrirModalSiembra(
+  abrirModalCosecha(
   aoiId
 );
 
@@ -1743,7 +1743,7 @@ botonLeyenda.addEventListener(
 );
 let aoiPendienteSiembra = null;
 
-function abrirModalSiembra(
+function abrirModalCosecha(
   aoiId
 ) {
 console.log(
@@ -1760,15 +1760,15 @@ console.log(
 
   modalCombine.value = "";
   
-  modalSiembra.classList.add(
+  modalCosecha.classList.add(
     "visible"
   );
 
 }
 
-function cerrarModalSiembra() {
+function cerrarModalCosecha() {
 
-  modalSiembra.classList.remove(
+  modalCosecha.classList.remove(
     "visible"
   );
 
