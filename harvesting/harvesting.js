@@ -112,7 +112,7 @@ const combine =
   modalCombine.value;
 
 const aoiId =
-  aoiPendienteSiembra;
+  aoiPendienteCosecha;
 
 if (!fecha || !aoiId) {
   alert(
@@ -1741,7 +1741,7 @@ botonLeyenda.addEventListener(
     panelLeyenda.classList.toggle("visible");
   }
 );
-let aoiPendienteSiembra = null;
+let aoiPendienteCosecha = null;
 
 function abrirModalCosecha(
   aoiId
@@ -1750,7 +1750,7 @@ console.log(
   "Abriendo modal",
   aoiId
 );
-  aoiPendienteSiembra =
+  aoiPendienteCosecha =
     aoiId;
 
  modalFechaCosecha.value =
@@ -1772,7 +1772,7 @@ function cerrarModalCosecha() {
     "visible"
   );
 
-  aoiPendienteSiembra =
+  aoiPendienteCosecha =
     null;
 
 }
