@@ -125,9 +125,9 @@ async function sincronizarSiembrasPendientes() {
 
   sincronizacionSiembraEnCurso = true;
 
-  console.log(
-    `Intentando sincronizar ${pendientes.length} siembra(s)`
-  );
+console.log(
+  `Intentando sincronizar ${pendientes.length} cosecha(s)`
+);
 
   const pendientesRestantes = [];
 
@@ -171,15 +171,15 @@ body: JSON.stringify({
         }
 
         console.log(
-          "Siembra sincronizada:",
-          siembra.aoiId
-        );
+  "Cosecha sincronizada:",
+  siembra.aoiId
+);
 
       } catch (error) {
         console.log(
-          "La siembra continúa pendiente:",
-          siembra.aoiId
-        );
+  "La cosecha continúa pendiente:",
+  siembra.aoiId
+);
 
         pendientesRestantes.push(
           siembra
