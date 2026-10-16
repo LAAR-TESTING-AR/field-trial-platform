@@ -141,7 +141,7 @@ if (!combine) {
      * El registro ya es seguro aunque
      * desaparezca la conexión.
      */
-agregarSiembraPendiente(
+agregarCosechaPendiente(
   aoiId,
   fecha,
   combine
