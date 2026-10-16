@@ -2498,7 +2498,7 @@ plugins: {
 
   `Avance: ${punto.y.toFixed(1)}%`,
 
-  `AOI sembrados: ${punto.aoiDia}`,
+  `AOI cosechados: ${punto.aoiDia}`,
 
   "Localidades:",
 
