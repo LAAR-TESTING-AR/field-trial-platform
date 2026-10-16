@@ -1258,11 +1258,11 @@ function generarCalendarioSemanal(sitiosBase) {
       )
       .map(
         sitio =>
-          convertirFechaPlanting(
-            sitio[
-              "Planting Date (MM/DD/YYYY)"
-            ]
-          )
+       convertirFechaPlanting(
+  sitio[
+    "Harvest Date (MM/DD/YYYY)"
+  ]
+)
       )
       .filter(Boolean)
       .sort(
