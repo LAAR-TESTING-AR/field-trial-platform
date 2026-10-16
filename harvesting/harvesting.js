@@ -2584,13 +2584,11 @@ const totalHa =
 
 document.getElementById(
   "totalAOICombine"
-)
 ).textContent =
   `${totalAOI} AOI`;
 
 document.getElementById(
   "totalHaCombine"
-)
 ).textContent =
   `${totalHa.toFixed(1)} ha`;
     
