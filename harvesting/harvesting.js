@@ -1457,18 +1457,18 @@ if (
 }
 
     const drop = esDrop(sitio);
-    const sembrado = estaCosechado(sitio);
+const cosechado = estaCosechado(sitio);
 
-    let color = "#d32f2f";
-    let estado = "PENDIENTE";
+let color = "#d32f2f";
+let estado = "PENDIENTE";
 
-    if (drop) {
-      color = "#000000";
-      estado = "DROP";
-    } else if (sembrado) {
-      color = "#2e7d32";
-      estado = "SEMBRADO";
-    }
+if (drop) {
+  color = "#000000";
+  estado = "DROP";
+} else if (cosechado) {
+  color = "#2e7d32";
+  estado = "COSECHADO";
+}
 
   const marcador = L.circleMarker(
   [lat, lon],
