@@ -110,7 +110,7 @@ indicador.title =
   "Cosechas pendientes de sincronización";
 }
 
-async function sincronizarSiembrasPendientes() {
+async function sincronizarCosechasPendientes() {
   if (sincronizacionSiembraEnCurso) {
     return;
   }
