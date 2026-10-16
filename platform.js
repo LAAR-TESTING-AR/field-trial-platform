@@ -175,6 +175,49 @@ if (sowingPending) {
     `${pendientes} Pending`;
 
 }
+
+/*
+ * KPI y barra dentro de Harvesting.
+ */
+const harvestingProgress =
+  document.getElementById(
+    "harvestingProgress"
+  );
+
+const harvestingProgressBar =
+  document.getElementById(
+    "harvestingProgressBar"
+  );
+
+const harvestingCompleted =
+  document.getElementById(
+    "harvestingCompleted"
+  );
+
+const harvestingPending =
+  document.getElementById(
+    "harvestingPending"
+  );
+
+if (harvestingProgress) {
+  harvestingProgress.textContent =
+    `${avanceCosecha}%`;
+}
+
+if (harvestingProgressBar) {
+  harvestingProgressBar.style.width =
+    `${avanceCosecha}%`;
+}
+
+if (harvestingCompleted) {
+  harvestingCompleted.textContent =
+    `${cosechados} Harvested`;
+}
+
+if (harvestingPending) {
+  harvestingPending.textContent =
+    `${pendientesCosecha} Pending`;
+}
   
 const masterAoi =
   document.getElementById(
