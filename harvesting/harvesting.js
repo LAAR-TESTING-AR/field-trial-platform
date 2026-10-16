@@ -1327,7 +1327,7 @@ if (estado === "PENDIENTE") {
 
       <button
         type="button"
-        class="btn-registrar-siembra"
+        class="btn-registrar-cosecha"
         data-aoi="${aoiId}">
         Registrar Cosecha
       </button>
@@ -1491,7 +1491,7 @@ marcador.on(
 
     const boton =
       document.querySelector(
-        `.btn-registrar-siembra[data-aoi="${aoiId}"]`
+        `.btn-registrar-cosecha[data-aoi="${aoiId}"]`
       );
 
     if (!boton) {
