@@ -117,7 +117,7 @@ const aoiId =
 
 if (!fecha || !aoiId) {
   alert(
-    "Seleccione una fecha de siembra"
+    "Seleccione una fecha de cosecha"
   );
 
   return;
