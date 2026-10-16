@@ -1706,7 +1706,7 @@ cargarFiltrosTimeline();
     actualizarVista();
 console.log(
 "Pendientes guardados:",
-obtenerSiembrasPendientes()
+obtenerCosechasPendientes()
 );
 reconciliarPendientesConSitios(
   sitios
