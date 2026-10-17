@@ -204,6 +204,16 @@ if (harvestingProgress) {
     `${avanceCosecha}%`;
 }
 
+const kpiHarvesting =
+  document.getElementById(
+    "kpiHarvesting"
+  );
+
+if (kpiHarvesting) {
+  kpiHarvesting.textContent =
+    `${avanceCosecha}%`;
+}
+  
 if (harvestingProgressBar) {
   harvestingProgressBar.style.width =
     `${avanceCosecha}%`;
