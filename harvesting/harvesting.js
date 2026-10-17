@@ -1514,44 +1514,6 @@ if (
   aoiId
 );
 
-return;
-
-if (
-  !fecha ||
-  fecha.trim() === ""
-) {
-  return;
-}
-      
-        boton.disabled = true;
-        boton.textContent =
-          "Registrando...";
-
-        const ok =
-          await registrarSiembra(
-            aoiId,
-            fecha
-          );
-
-        if (ok) {
-
-          alert(
-            "Siembra registrada correctamente"
-          );
-
-        } else {
-
-          alert(
-            "Error registrando siembra"
-          );
-
-          boton.disabled = false;
-
-          boton.textContent =
-            "Registrar Cosecha";
-
-        }
-
       };
 
   }
