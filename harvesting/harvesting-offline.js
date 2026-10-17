@@ -1,4 +1,4 @@
-const CLAVE_SIEMBRAS_PENDIENTES =
+const CLAVE_COSECHAS_PENDIENTES =
   "harvestingPendingSync";
 
 let sincronizacionCosechaEnCurso = false;
@@ -7,7 +7,7 @@ function obtenerCosechasPendientes() {
   try {
     const contenido =
       localStorage.getItem(
-        CLAVE_SIEMBRAS_PENDIENTES
+        CLAVE_COSECHAS_PENDIENTES
       );
 
     return contenido
@@ -27,7 +27,7 @@ function guardarCosechasPendientes(
   pendientes
 ) {
   localStorage.setItem(
-    CLAVE_SIEMBRAS_PENDIENTES,
+    CLAVE_COSECHAS_PENDIENTES,
     JSON.stringify(pendientes)
   );
 
