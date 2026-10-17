@@ -94,7 +94,7 @@ const avanceCosecha =
       ".kpi-card"
     );
 
- /*
+/*
  * KPI superiores:
  * 0 = AOI
  * 1 = Sown
@@ -103,24 +103,24 @@ const avanceCosecha =
  */
 if (tarjetasKpi.length >= 4) {
 
-* tarjetasKpi[0]
-    .querySelector*".kpi-valor")
+  tarjetasKpi[0]
+    .querySelector(".kpi-valor")
     .textContent =
- *    sitiosValidos.length;
+      sitiosValidos.length;
 
-  tarje*asKpi[1]
-    .querySelector(".kpi-*alor")
+  tarjetasKpi[1]
+    .querySelector(".kpi-valor")
     .textContent =
-      `$*avance}%`;
+      `${avance}%`;
 
   tarjetasKpi[2]
-    .*uerySelector(".kpi-valor")
-    .te*tContent =
-      `${avanceCosecha}*`;
+    .querySelector(".kpi-valor")
+    .textContent =
+      `${avanceCosecha}%`;
 
   tarjetasKpi[3]
-    .querySel*ctor(".kpi-valor")
-    .textConten* =
+    .querySelector(".kpi-valor")
+    .textContent =
       drops;
 }
 
