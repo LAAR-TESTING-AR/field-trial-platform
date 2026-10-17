@@ -15,7 +15,7 @@ function obtenerCosechasPendientes() {
       : [];
   } catch (error) {
     console.error(
-      "Error leyendo siembras pendientes:",
+      "Error leyendo cosechas pendientes:",
       error
     );
 
@@ -132,7 +132,7 @@ console.log(
   const pendientesRestantes = [];
 
   try {
-    for (const siembra of pendientes) {
+    for (const cosecha of pendientes) {
       try {
         const respuesta =
           await fetch(
@@ -145,16 +145,16 @@ console.log(
               },
 body: JSON.stringify({
   aoiId:
-    siembra.aoiId,
+    cosecha.aoiId,
 
   harvestDate:
-    siembra.harvestDate,
+    cosecha.harvestDate,
 
   combine:
-    siembra.combine,
+    cosecha.combine,
 
   registeredAt:
-    siembra.registeredAt,
+    cosecha.registeredAt,
 
   source:
     "Field Trial Platform Harvesting Offline Sync"
@@ -164,7 +164,7 @@ body: JSON.stringify({
 
         if (!respuesta.ok) {
           pendientesRestantes.push(
-            siembra
+            cosecha
           );
 
           continue;
@@ -172,19 +172,19 @@ body: JSON.stringify({
 
         console.log(
   "Cosecha sincronizada:",
-  siembra.aoiId
+  cosecha.aoiId
 );
 
       } 
  catch (error) {
   console.error(
     "Error sincronizando cosecha:",
-    siembra.aoiId,
+    cosecha.aoiId,
     error
   );
 
   pendientesRestantes.push(
-    siembra
+    cosecha
   );
 }
     }
