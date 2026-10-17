@@ -94,35 +94,35 @@ const avanceCosecha =
       ".kpi-card"
     );
 
-  /*
-   * KPI superiores:
-   * 0 = AOI
-   * 1 = Sown
-   * 2 = Pending
-   * 3 = Drop
-   */
-  if (tarjetasKpi.length >= 4) {
+ /*
+ * KPI superiores:
+ * 0 = AOI
+ * 1 = Sown
+ * 2 = Harvested
+ * 3 = Drop
+ */
+if (tarjetasKpi.length >= 4) {
 
-    tarjetasKpi[0]
-      .querySelector(".kpi-valor")
-      .textContent =
-        sitiosValidos.length;
+* tarjetasKpi[0]
+    .querySelector*".kpi-valor")
+    .textContent =
+ *    sitiosValidos.length;
 
-    tarjetasKpi[1]
-      .querySelector(".kpi-valor")
-      .textContent =
-        `${avance}%`;
+  tarje*asKpi[1]
+    .querySelector(".kpi-*alor")
+    .textContent =
+      `$*avance}%`;
 
-    tarjetasKpi[2]
-      .querySelector(".kpi-valor")
-      .textContent =
-        pendientes;
+  tarjetasKpi[2]
+    .*uerySelector(".kpi-valor")
+    .te*tContent =
+      `${avanceCosecha}*`;
 
-    tarjetasKpi[3]
-      .querySelector(".kpi-valor")
-      .textContent =
-        drops;
-  }
+  tarjetasKpi[3]
+    .querySel*ctor(".kpi-valor")
+    .textConten* =
+      drops;
+}
 
   /*
    * KPI y barra dentro de Sowing.
