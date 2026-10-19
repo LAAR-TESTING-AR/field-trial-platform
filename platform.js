@@ -165,7 +165,7 @@ const sowingPending =
 if (sowingCompleted) {
 
   sowingCompleted.textContent =
-    `${sembrados} Sown`;
+    `${sembrados} Planting`;
 
 }
 
@@ -221,7 +221,7 @@ if (harvestingProgressBar) {
 
 if (harvestingCompleted) {
   harvestingCompleted.textContent =
-    `${cosechados} Harvested`;
+    `${cosechados} Harvesting`;
 }
 
 if (harvestingPending) {
