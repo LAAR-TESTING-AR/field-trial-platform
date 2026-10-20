@@ -2565,147 +2565,58 @@ btnPlanning.addEventListener(
       "visible"
     );
 
-    document.getElementById(
+document.getElementById(
   "planningGrid"
 ).innerHTML = `
 
-  <table
-    style="
-      width:100%;
-      border-collapse:collapse;
-    "
-  >
-
-    <tr>
-
-<th
+<div
   style="
-    text-align:left;
-    padding:12px;
-    width:220px;
+    padding:20px;
   "
 >
-  Planning Week
-</th>
-
-      <th>BE19182</th>
-
-      <th>BE19183</th>
-
-      <th>BE19184</th>
-
-      <th>BE19185</th>
-
-      <th>BE19186</th>
-
-      <th>BE19187</th>
-
-      <th>BE19188</th>
-
-      <th>PP23191</th>
-
-    </tr>
-
-   <tr>
-
-<td
-  style="
-    padding:12px;
-    font-weight:600;
-    vertical-align:top;
-    width:220px;
-  "
->
-
-  19/10 - 25/10
 
   <div
     style="
-      font-size:12px;
+      font-size:20px;
+      font-weight:700;
+      color:#0b6b3a;
+      margin-bottom:4px;
+    "
+  >
+    19/10 - 25/10
+  </div>
+
+  <div
+    style="
+      font-size:13px;
       color:#666;
-      font-weight:400;
-      margin-top:4px;
+      margin-bottom:20px;
     "
   >
     Current Week
   </div>
 
-</td>
-
-  <td
+  <div
     style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
+      display:grid;
+      grid-template-columns:
+        repeat(8, minmax(180px,1fr));
+      gap:12px;
     "
-  ></td>
+  >
 
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
+    <div>BE19182</div>
+    <div>BE19183</div>
+    <div>BE19184</div>
+    <div>BE19185</div>
+    <div>BE19186</div>
+    <div>BE19187</div>
+    <div>BE19188</div>
+    <div>PP23191</div>
 
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
+  </div>
 
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
-
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
-
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
-
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
-
-  <td
-    style="
-      min-height:140px;
-      height:140px;
-      border:1px dashed #d5d5d5;
-      vertical-align:top;
-    "
-  ></td>
-
-</tr>
-  </table>
+</div>
 
 `;
   }
