@@ -2556,6 +2556,29 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
+
+btnPlanning.addEventListener(
+  "click",
+  () => {
+
+    modalPlanning.classList.add(
+      "visible"
+    );
+
+  }
+);
+
+cerrarPlanning.addEventListener(
+  "click",
+  () => {
+
+    modalPlanning.classList.remove(
+      "visible"
+    );
+
+  }
+);
+
 btnPlanterStats.addEventListener(
   "click",
   () => {
