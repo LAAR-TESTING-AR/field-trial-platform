@@ -2614,16 +2614,31 @@ btnPlanning.addEventListener(
           "
         >
 
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19182
-          </div>
+          <div>
+
+  <div
+    style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    "
+  >
+    BE19182
+  </div>
+
+  <div
+    style="
+      min-height:180px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "
+  >
+  </div>
+
+</div>
 
           <div
             style="
