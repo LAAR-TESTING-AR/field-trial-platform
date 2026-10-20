@@ -2578,14 +2578,15 @@ btnPlanning.addEventListener(
 
     <tr>
 
-      <th
-        style="
-          text-align:left;
-          padding:12px;
-        "
-      >
-        Week
-      </th>
+<th
+  style="
+    text-align:left;
+    padding:12px;
+    width:220px;
+  "
+>
+  Planning Week
+</th>
 
       <th>BE19182</th>
 
