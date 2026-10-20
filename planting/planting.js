@@ -2605,28 +2605,91 @@ btnPlanning.addEventListener(
 
     </tr>
 
-    <tr>
+   <tr>
 
-      <td
-        style="
-          padding:12px;
-          font-weight:600;
-        "
-      >
-        19/10 - 25/10
-      </td>
+  <td
+    style="
+      padding:12px;
+      font-weight:600;
+      vertical-align:top;
+    "
+  >
+    19/10 - 25/10
+  </td>
 
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td></td>
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
 
-    </tr>
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
 
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+  <td
+    style="
+      min-height:140px;
+      height:140px;
+      border:1px dashed #d5d5d5;
+      vertical-align:top;
+    "
+  ></td>
+
+</tr>
   </table>
 
 `;
