@@ -2,7 +2,7 @@ console.log("Planting Tracker v2 - filtros dependientes");
 
 const capaMapaActual = L.tileLayer(
   "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
+  
     maxZoom: 19,
     attribution: "&copy; OpenStreetMap contributors"
   }
@@ -2565,138 +2565,149 @@ btnPlanning.addEventListener(
       "visible"
     );
 
-document.getElementById(
-  "planningGrid"
-).innerHTML = `
+    document.getElementById(
+      "planningGrid"
+    ).innerHTML = `
 
-<div
-  style="
-    padding:20px;
-    text-align:center;
-  "
->
+      <div
+        style="
+          padding:20px;
+          text-align:center;
+        "
+      >
 
-<div
-  style="
-    font-size:24px;
-    font-weight:700;
-    color:#0b6b3a;
-    margin-bottom:4px;
-  "
->
-    19/10 - 25/10
-  </div>
+        <div
+          style="
+            font-size:24px;
+            font-weight:700;
+            color:#0b6b3a;
+            margin-bottom:4px;
+          "
+        >
+          19/10 - 25/10
+        </div>
 
-  <div
-    style="
-      font-size:13px;
-      color:#666;
-      margin-bottom:10px;
-    "
-  >
-    Current Week
-  </div>
-<div
-  style="
-    height:1px;
-    background:#d9e3dc;
-    margin:10px 0;
-  "
-></div>
-  <div
-    style="
-display:grid;
-grid-template-columns:
-  repeat(8, 1fr);
-gap:8px;
-align-items:start;
-    "
-  >
+        <div
+          style="
+            font-size:13px;
+            color:#666;
+            margin-bottom:10px;
+          "
+        >
+          Current Week
+        </div>
 
- background:#edf5ee;
+        <div
+          style="
+            height:1px;
+            background:#d9e3dc;
+            margin:10px 0;
+          "
+        ></div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19183
-</div>
+        <div
+          style="
+            display:grid;
+            grid-template-columns:repeat(8, 1fr);
+            gap:8px;
+            align-items:start;
+          "
+        >
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19184
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19182
+          </div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19185
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19183
+          </div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19186
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19184
+          </div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19187
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19185
+          </div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19188
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19186
+          </div>
 
-<div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  PP23191
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19187
+          </div>
 
-  </div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            BE19188
+          </div>
 
-</div>
+          <div
+            style="
+              background:#edf5ee;
+              padding:10px;
+              border-radius:10px;
+              font-weight:700;
+            "
+          >
+            PP23191
+          </div>
 
-`;
+        </div>
+
+      </div>
+
+    `;
+
   }
 );
 
