@@ -1230,3 +1230,24 @@ font-size: 28px;
   width: 100%;
 
 }
+#planningBoard {
+
+  margin-top: 20px;
+
+  border: 1px solid #d9e3dc;
+
+  border-radius: 12px;
+
+  background: white;
+
+  overflow: auto;
+
+  min-height: 500px;
+
+}
+
+#planningGrid {
+
+  min-width: 1200px;
+
+}
