@@ -437,7 +437,7 @@ main{
 }
 
 .kpi-card:nth-child(3){
-  --kpi-color:#d32f2f;
+  --kpi-color:#c89419;
 }
 
 .kpi-card:nth-child(4){
@@ -880,15 +880,22 @@ class="logo">
     <span class="kpi-label">AOI</span>
   </div>
 
-  <div class="kpi-card">
+ <div class="kpi-card">
     <span class="kpi-valor">38%</span>
-    <span class="kpi-label">Sown</span>
-  </div>
+    <span class="kpi-label">Planting</span>
+</div>
 
-  <div class="kpi-card">
-    <span class="kpi-valor">101</span>
-    <span class="kpi-label">Pending</span>
-  </div>
+<div class="kpi-card">
+    <span
+      class="kpi-valor"
+      id="kpiHarvesting">
+      0%
+    </span>
+
+    <span class="kpi-label">
+      Harvesting
+    </span>
+</div>
 
   <div class="kpi-card">
     <span class="kpi-valor">2</span>
@@ -938,9 +945,9 @@ class="logo">
   </div>
 <div class="master-stats">
 
-  <span id="masterRegions">
-    0 Regions
-  </span>
+<span id="masterTrials">
+  0 Trials
+</span>
 
   <span id="masterAccess">
     0 Access
@@ -966,7 +973,7 @@ class="logo">
   <span class="hoja hoja-derecha"></span>
 </div>
 
-      <h2>Sowing</h2>
+      <h2>Planting</h2>
 
       <p>
         Planting Tracker, KPIs, Timeline y Dashboard.
@@ -996,9 +1003,9 @@ class="logo">
 
      <div class="sowing-stats">
 
-  <span id="sowingCompleted">
-    0 Sown
-  </span>
+<span id="sowingCompleted">
+  0 Planting
+</span>
 
   <span id="sowingPending">
     0 Pending
@@ -1055,9 +1062,9 @@ class="logo">
 
 <div class="sowing-stats">
 
-  <span id="harvestingCompleted">
-    0 Harvested
-  </span>
+ <span id="harvestingCompleted">
+  0 Harvesting
+</span>
 
   <span id="harvestingPending">
     0 Pending
