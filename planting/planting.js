@@ -2605,21 +2605,100 @@ document.getElementById(
 ></div>
   <div
     style="
-      display:grid;
-      grid-template-columns:
-        repeat(8, minmax(180px,1fr));
-      gap:12px;
+     display:grid;
+grid-template-columns:
+  repeat(8, 1fr);
+gap:10px;
     "
   >
 
-    <div>BE19182</div>
-    <div>BE19183</div>
-    <div>BE19184</div>
-    <div>BE19185</div>
-    <div>BE19186</div>
-    <div>BE19187</div>
-    <div>BE19188</div>
-    <div>PP23191</div>
+  <div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19182
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19183
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19184
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19185
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19186
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19187
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  BE19188
+</div>
+
+<div
+  style="
+    background:#edf5ee;
+    padding:10px;
+    border-radius:10px;
+    font-weight:700;
+  "
+>
+  PP23191
+</div>
 
   </div>
 
