@@ -2565,6 +2565,26 @@ btnPlanning.addEventListener(
       "visible"
     );
 
+    document.getElementById(
+      "planningBoard"
+    ).innerHTML = `
+      <h4>
+        19/10 - 25/10
+      </h4>
+
+      <div>
+        BE19182
+      </div>
+
+      <div>
+        BE19185
+      </div>
+
+      <div>
+        BE19187
+      </div>
+    `;
+
   }
 );
 
