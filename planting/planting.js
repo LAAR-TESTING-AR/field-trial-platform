@@ -2572,6 +2572,7 @@ document.getElementById(
 <div
   style="
     padding:20px;
+    text-align:center;
   "
 >
 
