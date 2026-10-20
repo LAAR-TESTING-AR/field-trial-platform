@@ -2591,7 +2591,7 @@ document.getElementById(
     style="
       font-size:13px;
       color:#666;
-      margin-bottom:20px;
+      margin-bottom:10px;
     "
   >
     Current Week
@@ -2605,10 +2605,11 @@ document.getElementById(
 ></div>
   <div
     style="
-     display:grid;
+display:grid;
 grid-template-columns:
   repeat(8, 1fr);
-gap:10px;
+gap:8px;
+align-items:start;
     "
   >
 
