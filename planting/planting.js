@@ -2608,15 +2608,29 @@ btnPlanning.addEventListener(
 
    <tr>
 
-  <td
+<td
+  style="
+    padding:12px;
+    font-weight:600;
+    vertical-align:top;
+    width:220px;
+  "
+>
+
+  19/10 - 25/10
+
+  <div
     style="
-      padding:12px;
-      font-weight:600;
-      vertical-align:top;
+      font-size:12px;
+      color:#666;
+      font-weight:400;
+      margin-top:4px;
     "
   >
-    19/10 - 25/10
-  </td>
+    Current Week
+  </div>
+
+</td>
 
   <td
     style="
