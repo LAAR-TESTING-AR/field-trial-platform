@@ -2613,16 +2613,7 @@ align-items:start;
     "
   >
 
-  <div
-  style="
-    background:#edf5ee;
-    padding:10px;
-    border-radius:10px;
-    font-weight:700;
-  "
->
-  BE19182
-</div>
+ background:#edf5ee;
 
 <div
   style="
