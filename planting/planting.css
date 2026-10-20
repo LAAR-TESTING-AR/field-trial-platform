@@ -1248,6 +1248,6 @@ font-size: 28px;
 
 #planningGrid {
 
-  min-width: 1200px;
+  width: 100%;
 
 }
