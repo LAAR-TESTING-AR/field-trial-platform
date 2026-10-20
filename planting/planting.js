@@ -2576,14 +2576,14 @@ document.getElementById(
   "
 >
 
-  <div
-    style="
-      font-size:20px;
-      font-weight:700;
-      color:#0b6b3a;
-      margin-bottom:4px;
-    "
-  >
+<div
+  style="
+    font-size:24px;
+    font-weight:700;
+    color:#0b6b3a;
+    margin-bottom:4px;
+  "
+>
     19/10 - 25/10
   </div>
 
@@ -2596,7 +2596,13 @@ document.getElementById(
   >
     Current Week
   </div>
-
+<div
+  style="
+    height:1px;
+    background:#d9e3dc;
+    margin:20px 0;
+  "
+></div>
   <div
     style="
       display:grid;
