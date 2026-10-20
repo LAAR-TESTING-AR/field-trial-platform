@@ -1798,6 +1798,20 @@ const modalTimeline =
 
 const cerrarTimeline =
   document.getElementById("cerrarTimeline");
+const btnPlanning =
+  document.getElementById(
+    "btnPlanning"
+  );
+
+const modalPlanning =
+  document.getElementById(
+    "modalPlanning"
+  );
+
+const cerrarPlanning =
+  document.getElementById(
+    "cerrarPlanning"
+  );
 const btnPlanterStats =
   document.getElementById(
     "btnPlanterStats"
