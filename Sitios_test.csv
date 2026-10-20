@@ -318,7 +318,7 @@ NA,Junin TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.513
 NA,Rojas TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.213869,-60.647443,,,,,,,330000,30 Kg Microstar CMB,,Maximiliano Ravotti,N/A,,REFERENCE,,REFERENCE,
 NA,Rojas TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.213869,-60.647443,,,,,,,330000,30 Kg Microstar CMB,,Maximiliano Ravotti,N/A,,REFERENCE,,REFERENCE,
 NA,Rojas TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.213869,-60.647443,,,,,,,330000,30 Kg Microstar CMB,,Maximiliano Ravotti,N/A,,REFERENCE,,REFERENCE,
-NA,Ferre TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.118701,-61.204203,,,,,,,Completar,Completar,,Completar,Completar,,REFERENCE,,REFERENCE,
+NA,Ferre TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.118701,-61.204203,,,,,,,330000,30 Kg Microstar CMB,,Yésica Chazarreta,N/A,,REFERENCE,,REFERENCE,
 NA,Chivilcoy TCD,SPD-TCD,Soybean - Regulated,NA,Early,AA,Buenos Aires,II - 6,-34.94975,-60.109261,,,,,,,Completar,Completar,,Completar,Completar,,REFERENCE,,REFERENCE,
 NA,Colonia Videla TCD,SPD-TCD,Soybean - Regulated,NA,Early,AC,Córdoba,II - 2,-31.886166,-63.509429,,,,,,,Completar,Completar,,Completar,Completar,,REFERENCE,,REFERENCE,
 NA,Cordoba TCD (Campo Escuela),SPD-TCD,Soybean - Regulated,NA,Early,AC,Córdoba,II - 2,-31.485772,-64.005261,,,,,,,Completar,Completar,,Completar,Completar,,REFERENCE,,REFERENCE,
@@ -328,3 +328,4 @@ NA,La Cocha TCD,SPD-TCD,Soybean - Regulated,NA,Early,AN,Tucuman,NOA,-27.902094,-
 NA,Ferre TCD,SPD-TCD,Corn - Stewarded,NA,Late,AA,Buenos Aires,Nucleo,-34.118701,-61.204203,,,,,,,D3 - 75000,Completar,,Yésica Chazarreta,NA,,REFERENCE,,REFERENCE,
 NA,Jesus Maria,SPD-TCD,Corn - Stewarded,NA,Late,AC,Córdoba,Centro,-30.9815,-64.0942,,,,,,,,Completar,,Paula Colla,NA,,,,,
 NA,Rosario de Lerma,SPD-TCD,Corn - Stewarded,NA,Late,AN,Salta,NOA,-24.90203,-65.46967,,,,,,,,Completar,,Lourdes Suarez,NA,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,
