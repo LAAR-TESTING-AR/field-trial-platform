@@ -2566,25 +2566,70 @@ btnPlanning.addEventListener(
     );
 
     document.getElementById(
-      "planningBoard"
-    ).innerHTML = `
-      <h4>
+  "planningGrid"
+).innerHTML = `
+
+  <table
+    style="
+      width:100%;
+      border-collapse:collapse;
+    "
+  >
+
+    <tr>
+
+      <th
+        style="
+          text-align:left;
+          padding:12px;
+        "
+      >
+        Week
+      </th>
+
+      <th>BE19182</th>
+
+      <th>BE19183</th>
+
+      <th>BE19184</th>
+
+      <th>BE19185</th>
+
+      <th>BE19186</th>
+
+      <th>BE19187</th>
+
+      <th>BE19188</th>
+
+      <th>PP23191</th>
+
+    </tr>
+
+    <tr>
+
+      <td
+        style="
+          padding:12px;
+          font-weight:600;
+        "
+      >
         19/10 - 25/10
-      </h4>
+      </td>
 
-      <div>
-        BE19182
-      </div>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
 
-      <div>
-        BE19185
-      </div>
+    </tr>
 
-      <div>
-        BE19187
-      </div>
-    `;
+  </table>
 
+`;
   }
 );
 
