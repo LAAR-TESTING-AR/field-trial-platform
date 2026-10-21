@@ -1845,6 +1845,9 @@ let draggedPlanningCard =
 
 let semanaPlanningVisible =
   null;
+
+let planningWeekOffset = 0;
+let planningReferenceStart = null;
 const plantingPlanters = [
   "BE19182",
   "BE19183",
@@ -1892,9 +1895,7 @@ async function eliminarPlanning(
 
     await cargarPlanningDesdeSharePoint();
 
-    renderPlanningBoard(
-      semanaPlanningVisible
-    );
+    renderPlanningBoard();
 
   } catch (error) {
 
@@ -1987,9 +1988,7 @@ async function guardarCambiosPlanning() {
 
     await cargarPlanningDesdeSharePoint();
 
-    renderPlanningBoard(
-      semanaPlanningVisible
-    );
+    renderPlanningBoard();
 
     alert(
       "Cambios guardados correctamente"
@@ -2003,9 +2002,7 @@ async function guardarCambiosPlanning() {
       "Error guardando los cambios del Planning"
     );
 
-    renderPlanningBoard(
-      semanaPlanningVisible
-    );
+    renderPlanningBoard();
 
   }
 
@@ -2139,38 +2136,224 @@ function renderColumnaPlanter(
 ) {
 
   return `
-    <div>
+    <div
+      class="planning-drop-zone"
+      data-planter="${planter}"
+      data-week="${week}"
+      style="
+        min-height:112px;
+        border:1px dashed #d6e0da;
+        border-radius:10px;
+        background:#ffffff;
+        padding:6px;
+        box-sizing:border-box;
+      "
+    >
+      ${renderTarjetasPlanter(
+        planter,
+        week
+      )}
+    </div>
+  `;
+
+}
+
+function formatearRangoPlanning(
+  inicio
+) {
+
+  const fin = new Date(inicio);
+  fin.setDate(fin.getDate() + 6);
+
+  const inicioTxt =
+    inicio.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  const finTxt =
+    fin.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  return `${inicioTxt} - ${finTxt}`;
+
+}
+
+function obtenerSemanasPlanningVisibles() {
+
+  if (!planningReferenceStart) {
+    planningReferenceStart =
+      obtenerInicioSemana(new Date());
+  }
+
+  return [-1, 0, 1].map(
+    posicion => {
+
+      const inicio =
+        new Date(planningReferenceStart);
+
+      inicio.setDate(
+        inicio.getDate() +
+        ((planningWeekOffset + posicion) * 7)
+      );
+
+      return {
+        posicion,
+        inicio,
+        week: formatearRangoPlanning(inicio),
+        etiqueta:
+          posicion === -1
+            ? "Semana anterior"
+            : posicion === 0
+            ? "Semana central"
+            : "Semana siguiente"
+      };
+
+    }
+  );
+
+}
+
+function renderEncabezadoPlanters() {
+
+  return plantingPlanters
+    .map(
+      planter => `
+        <div style="
+          background:#edf5ee;
+          padding:9px 6px;
+          border-radius:9px;
+          font-weight:700;
+          text-align:center;
+          white-space:nowrap;
+          box-sizing:border-box;
+        ">
+          ${planter}
+        </div>
+      `
+    )
+    .join("");
+
+}
+
+function renderBloqueSemanaPlanning(
+  semana
+) {
+
+  const esSemanaActual =
+    semana.week ===
+    formatearRangoPlanning(
+      obtenerInicioSemana(new Date())
+    );
+
+  const cantidad =
+    planningData.filter(
+      item => item.week === semana.week
+    ).length;
+
+  return `
+    <section style="
+      border:1px solid ${
+        esSemanaActual
+          ? "#7bb695"
+          : "#dce5df"
+      };
+      border-radius:12px;
+      background:${
+        esSemanaActual
+          ? "#f7fbf8"
+          : "#fbfcfb"
+      };
+      overflow:hidden;
+      box-sizing:border-box;
+    ">
 
       <div style="
-        background:#edf5ee;
-        padding:10px;
-        border-radius:10px;
-        font-weight:700;
-        margin-bottom:8px;
-        text-align:center;
+        min-height:34px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:9px;
+        padding:5px 12px;
+        background:${
+          esSemanaActual
+            ? "#e5f2e9"
+            : "#f1f5f2"
+        };
+        border-bottom:1px solid #dce5df;
+        box-sizing:border-box;
       ">
-        ${planter}
-      </div>
 
-      <div
-        class="planning-drop-zone"
-        data-planter="${planter}"
-        data-week="${week}"
-        style="
-          min-height:80px;
-          border:1px dashed #d9e3dc;
-          border-radius:12px;
+        <span style="
+          font-size:12px;
+          font-weight:700;
+          color:${
+            esSemanaActual
+              ? "#0b6b3a"
+              : "#52645a"
+          };
+          text-transform:uppercase;
+          letter-spacing:.3px;
+        ">
+          ${
+            esSemanaActual
+              ? "Semana actual"
+              : semana.etiqueta
+          }
+        </span>
+
+        <span style="
+          font-size:15px;
+          font-weight:800;
+          color:#173f2a;
+        ">
+          ${semana.week}
+        </span>
+
+        <span style="
+          min-width:22px;
+          padding:2px 7px;
+          border-radius:999px;
           background:white;
-          padding:6px;
-        "
-      >
-        ${renderTarjetasPlanter(
-          planter,
-          week
-        )}
+          border:1px solid #d5dfd9;
+          color:#5d6c63;
+          font-size:11px;
+          font-weight:700;
+        ">
+          ${cantidad}
+        </span>
+
       </div>
 
-    </div>
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(8, minmax(0, 1fr));
+        gap:8px;
+        align-items:stretch;
+        padding:8px;
+        min-height:128px;
+        box-sizing:border-box;
+      ">
+        ${plantingPlanters
+          .map(
+            planter =>
+              renderColumnaPlanter(
+                planter,
+                semana.week
+              )
+          )
+          .join("")}
+      </div>
+
+    </section>
   `;
 
 }
@@ -2335,6 +2518,63 @@ function activarInteraccionesPlanning() {
   btnGuardarCambios?.addEventListener(
     "click",
     guardarCambiosPlanning
+  );
+
+  document
+    .getElementById("btnPlanningAnterior")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset -= 1;
+        renderPlanningBoard();
+      }
+    );
+
+  document
+    .getElementById("btnPlanningSiguiente")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset += 1;
+        renderPlanningBoard();
+      }
+    );
+
+  document
+    .getElementById("btnPlanningHoy")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset = 0;
+        renderPlanningBoard();
+      }
+    );
+
+  const navegadorSemanas =
+    document.getElementById(
+      "planningWeekNavigator"
+    );
+
+  navegadorSemanas?.addEventListener(
+    "wheel",
+    evento => {
+
+      if (
+        Math.abs(evento.deltaX) <=
+        Math.abs(evento.deltaY)
+      ) {
+        return;
+      }
+
+      evento.preventDefault();
+
+      planningWeekOffset +=
+        evento.deltaX > 0 ? 1 : -1;
+
+      renderPlanningBoard();
+
+    },
+    { passive: false }
   );
 
 }
@@ -3412,12 +3652,13 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
-function renderPlanningBoard(
-  semanaPlanningActual
-) {
+function renderPlanningBoard() {
+
+  const semanas =
+    obtenerSemanasPlanningVisibles();
 
   semanaPlanningVisible =
-    semanaPlanningActual;
+    semanas[1].week;
 
   const hayCambios =
     planningChanges.length > 0;
@@ -3426,49 +3667,146 @@ function renderPlanningBoard(
     "planningGrid"
   ).innerHTML = `
 
-    <div
-      style="
-        padding:20px;
-        text-align:center;
-      "
-    >
+    <div style="
+      padding:10px 16px 18px;
+      min-height:74vh;
+      box-sizing:border-box;
+      background:#ffffff;
+    ">
 
       <div
+        id="planningWeekNavigator"
         style="
-          display:flex;
+          display:grid;
+          grid-template-columns:auto 1fr auto;
           align-items:center;
-          justify-content:center;
           gap:12px;
-          flex-wrap:wrap;
-          margin-bottom:4px;
+          margin-bottom:9px;
         "
       >
 
-        <div
+        <button
+          id="btnPlanningAnterior"
+          type="button"
+          title="Mostrar una semana anterior"
           style="
-            font-size:24px;
-            font-weight:700;
+            width:38px;
+            height:34px;
+            border:1px solid #b9c9bf;
+            border-radius:9px;
+            background:white;
             color:#0b6b3a;
+            font-size:21px;
+            font-weight:800;
+            cursor:pointer;
           "
         >
-          ${semanaPlanningActual}
+          ‹
+        </button>
+
+        <div style="
+          text-align:center;
+          min-width:0;
+        ">
+          <div style="
+            font-size:14px;
+            font-weight:800;
+            color:#173f2a;
+          ">
+            ${semanas[0].week}
+            <span style="color:#9aaba1;padding:0 7px;">•</span>
+            ${semanas[1].week}
+            <span style="color:#9aaba1;padding:0 7px;">•</span>
+            ${semanas[2].week}
+          </div>
+          <button
+            id="btnPlanningHoy"
+            type="button"
+            style="
+              border:none;
+              background:none;
+              padding:2px 6px;
+              color:#627369;
+              font-size:11px;
+              cursor:pointer;
+            "
+          >
+            Volver a semana actual
+          </button>
         </div>
 
+        <button
+          id="btnPlanningSiguiente"
+          type="button"
+          title="Mostrar una semana siguiente"
+          style="
+            width:38px;
+            height:34px;
+            border:1px solid #b9c9bf;
+            border-radius:9px;
+            background:white;
+            color:#0b6b3a;
+            font-size:21px;
+            font-weight:800;
+            cursor:pointer;
+          "
+        >
+          ›
+        </button>
+
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(8, minmax(0, 1fr));
+        gap:8px;
+        padding:0 8px 7px;
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:white;
+      ">
+        ${renderEncabezadoPlanters()}
+      </div>
+
+      <div style="
+        display:grid;
+        gap:10px;
+      ">
+        ${semanas
+          .map(renderBloqueSemanaPlanning)
+          .join("")}
+      </div>
+
+      <div style="
+        position:sticky;
+        bottom:10px;
+        display:flex;
+        justify-content:flex-end;
+        padding-top:12px;
+        pointer-events:none;
+      ">
         <button
           id="btnGuardarCambiosPlanning"
           type="button"
           ${hayCambios ? "" : "disabled"}
           style="
+            pointer-events:auto;
             border:none;
-            border-radius:9px;
-            padding:8px 12px;
+            border-radius:10px;
+            padding:10px 16px;
             background:${
               hayCambios
                 ? "#0b6b3a"
                 : "#cfd8d3"
             };
             color:white;
-            font-weight:700;
+            font-weight:800;
+            box-shadow:${
+              hayCambios
+                ? "0 6px 18px rgba(11,107,58,.24)"
+                : "none"
+            };
             cursor:${
               hayCambios
                 ? "pointer"
@@ -3482,48 +3820,9 @@ function renderPlanningBoard(
               : ""
           }
         </button>
-
-      </div>
-
-      <div
-        style="
-          font-size:13px;
-          color:#666;
-          margin-bottom:10px;
-        "
-      >
-        Current Week
-      </div>
-
-      <div
-        style="
-          height:1px;
-          background:#d9e3dc;
-          margin:10px 0;
-        "
-      ></div>
-
-      <div
-        style="
-          display:grid;
-          grid-template-columns:repeat(8, minmax(0, 1fr));
-          gap:8px;
-          align-items:start;
-        "
-      >
-        ${plantingPlanters
-          .map(
-            planter =>
-              renderColumnaPlanter(
-                planter,
-                semanaPlanningActual
-              )
-          )
-          .join("")}
       </div>
 
     </div>
-
   `;
 
   activarInteraccionesPlanning();
@@ -3539,41 +3838,13 @@ btnPlanning.addEventListener(
     );
 
     planningChanges = [];
+    planningWeekOffset = 0;
+    planningReferenceStart =
+      obtenerInicioSemana(new Date());
 
     await cargarPlanningDesdeSharePoint();
 
-    const inicioSemanaPlanning =
-      obtenerInicioSemana(
-        new Date()
-      );
-
-    const finSemanaPlanning =
-      new Date(
-        inicioSemanaPlanning
-      );
-
-    finSemanaPlanning.setDate(
-      finSemanaPlanning.getDate() + 6
-    );
-
-    const semanaPlanningActual =
-      `${inicioSemanaPlanning.toLocaleDateString(
-        "es-AR",
-        {
-          day: "2-digit",
-          month: "2-digit"
-        }
-      )} - ${finSemanaPlanning.toLocaleDateString(
-        "es-AR",
-        {
-          day: "2-digit",
-          month: "2-digit"
-        }
-      )}`;
-
-    renderPlanningBoard(
-      semanaPlanningActual
-    );
+    renderPlanningBoard();
 
   }
 );
