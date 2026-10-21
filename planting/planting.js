@@ -1924,7 +1924,38 @@ function renderTarjetasPlanter(planter) {
     .join("");
 
 }
+function renderColumnaPlanter(planter) {
 
+  return `
+    <div>
+
+      <div style="
+        background:#edf5ee;
+        padding:10px;
+        border-radius:10px;
+        font-weight:700;
+        margin-bottom:8px;
+        text-align:center;
+      ">
+        ${planter}
+      </div>
+
+      <div style="
+        min-height:80px;
+        border:1px dashed #d9e3dc;
+        border-radius:12px;
+        background:white;
+        padding:6px;
+      ">
+
+        ${renderTarjetasPlanter(planter)}
+
+      </div>
+
+    </div>
+  `;
+
+}
 const btnPlanterStats =
   document.getElementById(
     "btnPlanterStats"
