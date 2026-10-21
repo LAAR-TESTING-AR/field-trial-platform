@@ -1819,6 +1819,11 @@ const btnAddPlanning =
     "btnAddPlanning"
   );
 
+const btnAddSpecialPlanning =
+  document.getElementById(
+    "btnAddSpecialPlanning"
+  );
+
 const planningForm =
   document.getElementById(
     "planningForm"
@@ -2250,7 +2255,12 @@ function crearTarjetaPlanning(item) {
               white-space:nowrap;
               line-height:1.15;
             ">
-              ${item.crop}
+              ${item.crop}${
+                item.planningType &&
+                item.planningType !== "Master"
+                  ? ` · ${item.planningType}`
+                  : ""
+              }
             </div>
           </div>
 
@@ -2822,6 +2832,438 @@ function activarInteraccionesPlanning() {
 
 }
 
+function obtenerCultivosPlanningManual() {
+
+  return [
+    ...new Set(
+      sitios
+        .map(
+          sitio =>
+            limpiarTexto(sitio.Crop)
+        )
+        .filter(Boolean)
+    )
+  ].sort(
+    (a, b) =>
+      a.localeCompare(
+        b,
+        "es",
+        { sensitivity: "base" }
+      )
+  );
+
+}
+
+function poblarSemanasPlanningManual(
+  select
+) {
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  const hoy = new Date();
+
+  for (let i = -8; i < 20; i++) {
+
+    const inicio =
+      obtenerInicioSemana(
+        new Date(
+          hoy.getFullYear(),
+          hoy.getMonth(),
+          hoy.getDate() + (i * 7)
+        )
+      );
+
+    const semana =
+      formatearRangoPlanning(inicio);
+
+    const option =
+      document.createElement("option");
+
+    option.value = semana;
+    option.textContent = semana;
+
+    if (i === 0) {
+      option.selected = true;
+    }
+
+    select.appendChild(option);
+
+  }
+
+}
+
+function crearFormularioSpecialPlanning() {
+
+  if (
+    document.getElementById(
+      "specialPlanningForm"
+    )
+  ) {
+    return;
+  }
+
+  const toolbar =
+    document.getElementById(
+      "planningToolbar"
+    );
+
+  if (!toolbar) {
+    return;
+  }
+
+  const form =
+    document.createElement("div");
+
+  form.id = "specialPlanningForm";
+  form.hidden = true;
+
+  form.innerHTML = `
+    <div style="
+      margin:10px 0 12px;
+      padding:12px;
+      border:1px solid #d9e3dc;
+      border-radius:10px;
+      background:#f8fbf9;
+    ">
+
+      <div style="
+        margin-bottom:10px;
+        color:#173f2a;
+        font-size:14px;
+        font-weight:800;
+      ">
+        Nursery / Special Planning
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:10px;
+      ">
+
+        <div>
+          <label for="specialPlanningType" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Type
+          </label>
+          <select id="specialPlanningType" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="Nursery">Nursery</option>
+            <option value="Special">Special</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="specialPlanningLocation" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Location
+          </label>
+          <input id="specialPlanningLocation" type="text" autocomplete="off" placeholder="Escribir localidad" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+        </div>
+
+        <div>
+          <label for="specialPlanningCrop" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Crop
+          </label>
+          <select id="specialPlanningCrop" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="">Seleccionar cultivo</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="specialPlanningIdentifier" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Identifier / AOI Name
+          </label>
+          <input id="specialPlanningIdentifier" type="text" autocomplete="off" placeholder="Ej. NURSERY-01" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+        </div>
+
+        <div>
+          <label for="specialPlanningWeek" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Week
+          </label>
+          <select id="specialPlanningWeek" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;"></select>
+        </div>
+
+        <div>
+          <label for="specialPlanningPlanter" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Planter
+          </label>
+          <select id="specialPlanningPlanter" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="">Seleccionar sembradora</option>
+            ${plantingPlanters
+              .map(
+                planter =>
+                  `<option value="${planter}">${planter}</option>`
+              )
+              .join("")}
+          </select>
+        </div>
+
+      </div>
+
+      <div style="
+        display:flex;
+        justify-content:flex-end;
+        gap:8px;
+        margin-top:12px;
+      ">
+        <button id="btnCancelarSpecialPlanning" type="button" style="padding:8px 12px;border:1px solid #bfc7c1;border-radius:8px;background:white;color:#536159;font-weight:700;cursor:pointer;">
+          Cancelar
+        </button>
+        <button id="btnGuardarSpecialPlanning" type="button" style="padding:8px 12px;border:none;border-radius:8px;background:#0b6b3a;color:white;font-weight:800;cursor:pointer;">
+          Agregar al Planning
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  toolbar.insertAdjacentElement(
+    "afterend",
+    form
+  );
+
+  document
+    .getElementById(
+      "btnCancelarSpecialPlanning"
+    )
+    ?.addEventListener(
+      "click",
+      () => {
+        form.hidden = true;
+      }
+    );
+
+  document
+    .getElementById(
+      "btnGuardarSpecialPlanning"
+    )
+    ?.addEventListener(
+      "click",
+      guardarSpecialPlanning
+    );
+
+}
+
+function prepararFormularioSpecialPlanning() {
+
+  crearFormularioSpecialPlanning();
+
+  const form =
+    document.getElementById(
+      "specialPlanningForm"
+    );
+
+  const cropSelect =
+    document.getElementById(
+      "specialPlanningCrop"
+    );
+
+  const weekSelect =
+    document.getElementById(
+      "specialPlanningWeek"
+    );
+
+  if (!form || !cropSelect) {
+    return;
+  }
+
+  cropSelect.innerHTML = `
+    <option value="">
+      Seleccionar cultivo
+    </option>
+  `;
+
+  obtenerCultivosPlanningManual()
+    .forEach(
+      cultivo => {
+        const option =
+          document.createElement("option");
+        option.value = cultivo;
+        option.textContent = cultivo;
+        cropSelect.appendChild(option);
+      }
+    );
+
+  poblarSemanasPlanningManual(
+    weekSelect
+  );
+
+  document.getElementById(
+    "specialPlanningType"
+  ).value = "Nursery";
+
+  document.getElementById(
+    "specialPlanningLocation"
+  ).value = "";
+
+  document.getElementById(
+    "specialPlanningIdentifier"
+  ).value = "";
+
+  document.getElementById(
+    "specialPlanningPlanter"
+  ).value = "";
+
+  planningForm.hidden = true;
+  form.hidden = false;
+
+  document.getElementById(
+    "specialPlanningLocation"
+  ).focus();
+
+}
+
+async function guardarSpecialPlanning() {
+
+  const type =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningType"
+      )?.value
+    );
+
+  const location =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningLocation"
+      )?.value
+    );
+
+  const crop =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningCrop"
+      )?.value
+    );
+
+  const aoiId =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningIdentifier"
+      )?.value
+    );
+
+  const week =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningWeek"
+      )?.value
+    );
+
+  const planter =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningPlanter"
+      )?.value
+    );
+
+  if (
+    !type ||
+    !location ||
+    !crop ||
+    !aoiId ||
+    !week ||
+    !planter
+  ) {
+    alert(
+      "Complete todos los campos de Nursery / Special"
+    );
+    return;
+  }
+
+  const existe =
+    planningData.some(
+      item =>
+        normalizarTexto(item.aoiId) ===
+        normalizarTexto(aoiId)
+    );
+
+  if (existe) {
+    alert(
+      "Este identificador ya se encuentra planificado"
+    );
+    return;
+  }
+
+  const sortOrder =
+    planningData.filter(
+      item =>
+        item.week === week &&
+        item.planter === planter
+    ).length;
+
+  const boton =
+    document.getElementById(
+      "btnGuardarSpecialPlanning"
+    );
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "Guardando...";
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            AOI_ID: aoiId,
+            Location: location,
+            Crop: crop,
+            PlanningType: type,
+            Week: week,
+            Planter: planter,
+            SortOrder: sortOrder
+          })
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "Error Flow Planning Nursery / Special"
+      );
+    }
+
+    document.getElementById(
+      "specialPlanningForm"
+    ).hidden = true;
+
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+
+    alert(
+      `${type} agregado correctamente al Planning`
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error guardando Nursery / Special"
+    );
+
+  } finally {
+
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent =
+        "Agregar al Planning";
+    }
+
+  }
+
+}
+
 async function cargarPlanningDesdeSharePoint() {
 
   try {
@@ -2872,19 +3314,28 @@ planningData = data.map(
       aoiId:
         item.AOI_ID,
 
+      planningType:
+        limpiarTexto(
+          item.PlanningType
+        ) || (sitio ? "Master" : "Special"),
+
       location:
         sitio
           ? limpiarTexto(
               sitio.Location
             )
-          : item.AOI_ID,
+          : limpiarTexto(
+              item.Location
+            ) || item.AOI_ID,
 
       crop:
         sitio
           ? limpiarTexto(
               sitio.Crop
             )
-          : "Sin cultivo",
+          : limpiarTexto(
+              item.Crop
+            ) || "Sin cultivo",
 
       plantingDate:
         sitio
@@ -4170,11 +4621,26 @@ btnAddPlanning?.addEventListener(
   () => {
 
     cargarLocalidadesPlanning();
-cargarSemanasPlanning();
+    cargarSemanasPlanning();
+
+    const specialForm =
+      document.getElementById(
+        "specialPlanningForm"
+      );
+
+    if (specialForm) {
+      specialForm.hidden = true;
+    }
+
     planningForm.hidden =
       false;
 
   }
+);
+
+btnAddSpecialPlanning?.addEventListener(
+  "click",
+  prepararFormularioSpecialPlanning
 );
 
 btnCancelarPlanning?.addEventListener(
@@ -4275,8 +4741,17 @@ if (existe) {
 
             body: JSON.stringify({
               AOI_ID: aoiId,
+              Location: locality,
+              Crop: crop,
+              PlanningType: "Master",
               Week: week,
-              Planter: planter
+              Planter: planter,
+              SortOrder:
+                planningData.filter(
+                  item =>
+                    item.week === week &&
+                    item.planter === planter
+                ).length
             })
           }
         );
@@ -4299,7 +4774,16 @@ if (existe) {
 
         crop,
 
-        aoiId
+        aoiId,
+
+        planningType: "Master",
+
+        sortOrder:
+          planningData.filter(
+            item =>
+              item.week === week &&
+              item.planter === planter
+          ).length
 
       });
 
