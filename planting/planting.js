@@ -2738,7 +2738,7 @@ btnPlanning.addEventListener(
 
 </div>
 
-
+</div>
   <div>
     <div style="
       background:#edf5ee;
