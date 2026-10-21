@@ -3236,47 +3236,13 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
+function renderPlanningBoard(
+  semanaPlanningActual
+) {
 
-btnPlanning.addEventListener(
-  "click",
-  async () => {
-
-    modalPlanning.classList.add(
-      "visible"
-    );
-await cargarPlanningDesdeSharePoint();
-const inicioSemanaPlanning =
-  obtenerInicioSemana(
-    new Date()
-  );
-
-const finSemanaPlanning =
-  new Date(
-    inicioSemanaPlanning
-  );
-
-finSemanaPlanning.setDate(
-  finSemanaPlanning.getDate() + 6
-);
-
-const semanaPlanningActual =
-  `${inicioSemanaPlanning.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit"
-    }
-  )} - ${finSemanaPlanning.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit"
-    }
-  )}`;
-    
-    document.getElementById(
-      "planningGrid"
-    ).innerHTML = `
+  document.getElementById(
+    "planningGrid"
+  ).innerHTML = `
 
       <div
         style="
@@ -3326,10 +3292,10 @@ const semanaPlanningActual =
           ${plantingPlanters
             .map(
               planter =>
-renderColumnaPlanter(
-  planter,
-  semanaPlanningActual
-)
+                renderColumnaPlanter(
+                  planter,
+                  semanaPlanningActual
+                )
             )
             .join("")}
 
@@ -3337,7 +3303,49 @@ renderColumnaPlanter(
 
       </div>
 
-    `;
+  `;
+
+}
+btnPlanning.addEventListener(
+  "click",
+  async () => {
+
+    modalPlanning.classList.add(
+      "visible"
+    );
+await cargarPlanningDesdeSharePoint();
+const inicioSemanaPlanning =
+  obtenerInicioSemana(
+    new Date()
+  );
+
+const finSemanaPlanning =
+  new Date(
+    inicioSemanaPlanning
+  );
+
+finSemanaPlanning.setDate(
+  finSemanaPlanning.getDate() + 6
+);
+
+const semanaPlanningActual =
+  `${inicioSemanaPlanning.toLocaleDateString(
+    "es-AR",
+    {
+      day: "2-digit",
+      month: "2-digit"
+    }
+  )} - ${finSemanaPlanning.toLocaleDateString(
+    "es-AR",
+    {
+      day: "2-digit",
+      month: "2-digit"
+    }
+  )}`;
+    
+renderPlanningBoard(
+  semanaPlanningActual
+);
 
   }
 );
