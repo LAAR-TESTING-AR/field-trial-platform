@@ -1833,31 +1833,7 @@ const cerrarPlanning =
     "cerrarPlanning"
   );
 
-const planningData = [
-
-  {
-    week: "19/10 - 25/10",
-    planter: "BE19182",
-    location: "Ramallo",
-    crop: "Corn Regulated",
-    aoiCount: 2
-  },
-
-  {
-    week: "19/10 - 25/10",
-    planter: "BE19182",
-    location: "Pergamino",
-    crop: "Soybean Stewarded",
-    aoiCount: 1
-  },
-  {
-    week: "19/10 - 25/10",
-    planter: "BE19183",
-    location: "Laborde",
-    crop: "Corn Parent Chr",
-    aoiCount: 3
-  }
-];
+let planningData = [];
 
 const plantingPlanters = [
   "BE19182",
