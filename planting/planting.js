@@ -2720,6 +2720,35 @@ btnPlanning.addEventListener(
       "visible"
     );
 
+const inicioSemanaPlanning =
+  obtenerInicioSemana(
+    new Date()
+  );
+
+const finSemanaPlanning =
+  new Date(
+    inicioSemanaPlanning
+  );
+
+finSemanaPlanning.setDate(
+  finSemanaPlanning.getDate() + 6
+);
+
+const semanaPlanningActual =
+  `${inicioSemanaPlanning.toLocaleDateString(
+    "es-AR",
+    {
+      day: "2-digit",
+      month: "2-digit"
+    }
+  )} - ${finSemanaPlanning.toLocaleDateString(
+    "es-AR",
+    {
+      day: "2-digit",
+      month: "2-digit"
+    }
+  )}`;
+    
     document.getElementById(
       "planningGrid"
     ).innerHTML = `
@@ -2739,7 +2768,7 @@ btnPlanning.addEventListener(
             margin-bottom:4px;
           "
         >
-          19/10 - 25/10
+          ${semanaPlanningActual}
         </div>
 
         <div
@@ -2772,9 +2801,9 @@ btnPlanning.addEventListener(
           ${plantingPlanters
             .map(
               planter =>
-             renderColumnaPlanter(
+renderColumnaPlanter(
   planter,
-  "19/10 - 25/10"
+  semanaPlanningActual
 )
             )
             .join("")}
