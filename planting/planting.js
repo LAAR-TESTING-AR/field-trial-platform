@@ -2121,12 +2121,21 @@ function renderColumnaPlanter(
         draggedPlanningCard.id
     );
 
-  if (item) {
+if (item) {
 
-    item.planter =
-      '${planter}';
+  item.planter =
+    '${planter}';
 
-  }
+  planningChanges.push({
+    id: item.id,
+    planter: '${planter}'
+  });
+
+  alert(
+    'Movido a ${planter}'
+  );
+
+}
 
  console.log(
   'Nuevo planter',
