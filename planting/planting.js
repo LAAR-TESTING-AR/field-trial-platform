@@ -2032,6 +2032,69 @@ function cargarLocalidadesPlanning() {
   );
 
 }
+function cargarSemanasPlanning() {
+
+  const comboSemana =
+    document.getElementById(
+      "planningWeek"
+    );
+
+  if (!comboSemana) {
+    return;
+  }
+
+  comboSemana.innerHTML = "";
+
+  const hoy = new Date();
+
+  for (let i = 0; i < 8; i++) {
+
+    const inicio =
+      obtenerInicioSemana(
+        new Date(
+          hoy.getFullYear(),
+          hoy.getMonth(),
+          hoy.getDate() + (i * 7)
+        )
+      );
+
+    const fin =
+      new Date(inicio);
+
+    fin.setDate(
+      fin.getDate() + 6
+    );
+
+    const semana =
+      `${inicio.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )} - ${fin.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )}`;
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value = semana;
+    option.textContent = semana;
+
+    comboSemana.appendChild(
+      option
+    );
+
+  }
+
+}
 function cargarCultivosPlanning() {
 
   const localidad =
@@ -3016,7 +3079,7 @@ btnAddPlanning?.addEventListener(
   () => {
 
     cargarLocalidadesPlanning();
-
+cargarSemanasPlanning();
     planningForm.hidden =
       false;
 
