@@ -1981,13 +1981,34 @@ async function cargarPlanningDesdeSharePoint() {
         }
       );
 
-    const data =
-      await response.json();
+const data =
+  await response.json();
 
-    console.log(
-      "Planning SharePoint",
-      data
-    );
+planningData = data.map(
+  item => ({
+
+    week:
+      item.Week,
+
+    planter:
+      item.Planter,
+
+    aoiId:
+      item.AOI_ID,
+
+    location:
+      item.AOI_ID,
+
+    crop:
+      "Pendiente"
+
+  })
+);
+
+console.log(
+  "PlanningData cargado",
+  planningData
+);
 
   } catch (error) {
 
