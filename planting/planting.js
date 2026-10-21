@@ -1836,7 +1836,10 @@ const cerrarPlanning =
   );
 
 let planningData = [];
+let planningChanges = [];
 
+let draggedPlanningCard =
+  null;
 const plantingPlanters = [
   "BE19182",
   "BE19183",
