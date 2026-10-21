@@ -1911,11 +1911,16 @@ function crearTarjetaPlanning(item) {
 
 }
 
-function renderTarjetasPlanter(planter) {
+function renderTarjetasPlanter(
+  planter,
+  week
+) {
 
   return planningData
     .filter(
-      item => item.planter === planter
+      item =>
+        item.planter === planter &&
+        item.week === week
     )
     .map(
       item =>
@@ -1948,7 +1953,10 @@ function renderColumnaPlanter(planter) {
         padding:6px;
       ">
 
-        ${renderTarjetasPlanter(planter)}
+       ${renderTarjetasPlanter(
+  planter,
+  "19/10 - 25/10"
+)}
 
       </div>
 
