@@ -1838,6 +1838,80 @@ const planningData = [
     aoiCount: 3
   }
 ];
+function crearTarjetaPlanning(item) {
+
+  return `
+    <div style="
+      background:white;
+      border-left:6px solid #f4c542;
+      border-top:1px solid #e5e7eb;
+      border-right:1px solid #e5e7eb;
+      border-bottom:1px solid #e5e7eb;
+      border-radius:10px;
+      padding:8px;
+      text-align:left;
+      font-size:12px;
+      margin-top:6px;
+    ">
+
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:6px;
+        margin-bottom:2px;
+      ">
+
+        <div style="
+          width:18px;
+          height:18px;
+          border-radius:50%;
+          background:#34c759;
+          flex-shrink:0;
+        ">
+        </div>
+
+        <div style="
+          font-weight:700;
+          font-size:13px;
+        ">
+          ${item.location}
+        </div>
+
+      </div>
+
+      <div style="
+        font-size:11px;
+        color:#555;
+      ">
+        ${item.crop}
+      </div>
+
+      <div style="
+        margin-top:2px;
+        font-size:11px;
+        color:#666;
+      ">
+        ${item.aoiCount} AOI
+      </div>
+
+    </div>
+  `;
+
+}
+
+function renderTarjetasPlanter(planter) {
+
+  return planningData
+    .filter(
+      item => item.planter === planter
+    )
+    .map(
+      item =>
+        crearTarjetaPlanning(item)
+    )
+    .join("");
+
+}
 
 const btnPlanterStats =
   document.getElementById(
