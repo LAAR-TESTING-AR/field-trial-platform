@@ -3925,15 +3925,15 @@ function renderLeyendaEstadoPlanning() {
       gap:14px;
       flex-wrap:wrap;
       color:#536159;
-      font-size:9px;
+      font-size:13px;
       line-height:1;
     ">
       <span>
-        <b style="color:#f4b400;">●</b>
+        <b style="color:#f4b400;font-size:18px;">●</b>
         Planificado
       </span>
       <span>
-        <b style="color:#2e7d32;">●</b>
+        <b style="color:#2e7d32;font-size:18px;">●</b>
         Sembrado
       </span>
     </div>
@@ -4063,7 +4063,7 @@ function renderPlanningBoard() {
         margin:0 8px 4px;
       ">
         ${renderLeyendaEstadoPlanning()}
-        <span style="color:#7a867f;font-size:8px;line-height:1;">
+        <span style="color:#7a867f;font-size:11px;line-height:1;">
           Las tarjetas sembradas pueden moverse o eliminarse.
         </span>
       </div>
