@@ -1807,7 +1807,20 @@ const modalPlanning =
   document.getElementById(
     "modalPlanning"
   );
+const btnAddPlanning =
+  document.getElementById(
+    "btnAddPlanning"
+  );
 
+const planningForm =
+  document.getElementById(
+    "planningForm"
+  );
+
+const btnCancelarPlanning =
+  document.getElementById(
+    "btnCancelarPlanning"
+  );
 const cerrarPlanning =
   document.getElementById(
     "cerrarPlanning"
@@ -2816,7 +2829,25 @@ renderColumnaPlanter(
 
   }
 );
+btnAddPlanning?.addEventListener(
+  "click",
+  () => {
 
+    planningForm.hidden =
+      false;
+
+  }
+);
+
+btnCancelarPlanning?.addEventListener(
+  "click",
+  () => {
+
+    planningForm.hidden =
+      true;
+
+  }
+);
 cerrarPlanning.addEventListener(
   "click",
   () => {
