@@ -2174,9 +2174,6 @@ function crearTarjetaPlanning(item) {
   const estado =
     configuracionEstadoPlanning(item);
 
-  const draggable =
-    !item.sembrado;
-
   const detalleEstado =
     item.sembrado
       ? `${item.plantingDate || "Fecha registrada"}${
@@ -2189,7 +2186,7 @@ function crearTarjetaPlanning(item) {
   return `
     <div
       class="planning-card"
-      draggable="${draggable}"
+      draggable="true"
       data-id="${item.id}"
       data-planter="${item.planter}"
       data-week="${item.week}"
@@ -2197,16 +2194,16 @@ function crearTarjetaPlanning(item) {
       title="${item.location} · ${item.crop} · ${item.aoiId} · ${detalleEstado}"
       style="
         background:${estado.fondo};
-        border-left:6px solid ${estado.color};
+        border-left:5px solid ${estado.color};
         border-top:1px solid #e2e8e4;
         border-right:1px solid #e2e8e4;
         border-bottom:1px solid #e2e8e4;
-        border-radius:10px;
-        padding:8px;
+        border-radius:9px;
+        padding:6px 7px;
         text-align:left;
-        font-size:12px;
-        margin-top:6px;
-        cursor:${draggable ? "grab" : "default"};
+        font-size:11px;
+        margin-top:5px;
+        cursor:grab;
         box-shadow:0 1px 2px rgba(20,45,30,.05);
         box-sizing:border-box;
       "
@@ -2216,38 +2213,42 @@ function crearTarjetaPlanning(item) {
         display:flex;
         justify-content:space-between;
         align-items:flex-start;
-        gap:6px;
+        gap:5px;
       ">
 
         <div style="
           display:flex;
           align-items:center;
-          gap:8px;
+          gap:6px;
           min-width:0;
         ">
 
           ${renderIconoCultivoPlanning(
             item.crop,
-            28
+            23
           )}
 
           <div style="min-width:0;">
             <div style="
               font-weight:800;
-              font-size:12px;
+              font-size:11px;
               color:#17251d;
-              overflow-wrap:anywhere;
+              overflow:hidden;
+              text-overflow:ellipsis;
+              white-space:nowrap;
               line-height:1.15;
             ">
               ${item.location}
             </div>
 
             <div style="
-              margin-top:2px;
-              font-size:10px;
+              margin-top:1px;
+              font-size:9px;
               color:#526158;
-              line-height:1.2;
-              overflow-wrap:anywhere;
+              overflow:hidden;
+              text-overflow:ellipsis;
+              white-space:nowrap;
+              line-height:1.15;
             ">
               ${item.crop}
             </div>
@@ -2255,49 +2256,56 @@ function crearTarjetaPlanning(item) {
 
         </div>
 
-        ${
-          item.sembrado
-            ? `
-              <span
-                title="Sembrado"
-                style="
-                  width:19px;
-                  height:19px;
-                  display:flex;
-                  align-items:center;
-                  justify-content:center;
-                  border-radius:50%;
-                  background:#2e7d32;
-                  color:white;
-                  font-size:11px;
-                  font-weight:900;
-                  flex:0 0 auto;
-                "
-              >
-                ✓
-              </span>
-            `
-            : `
-              <button
-                type="button"
-                class="btn-eliminar-planning"
-                data-id="${item.id}"
-                title="Eliminar del Planning"
-                style="
-                  border:none;
-                  background:none;
-                  cursor:pointer;
-                  color:#b73b3b;
-                  font-size:13px;
-                  padding:0;
-                  opacity:.72;
-                  flex:0 0 auto;
-                "
-              >
-                🗑
-              </button>
-            `
-        }
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:4px;
+          flex:0 0 auto;
+        ">
+
+          ${
+            item.sembrado
+              ? `
+                <span
+                  title="Sembrado"
+                  style="
+                    width:17px;
+                    height:17px;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    border-radius:50%;
+                    background:#2e7d32;
+                    color:white;
+                    font-size:10px;
+                    font-weight:900;
+                  "
+                >
+                  ✓
+                </span>
+              `
+              : ""
+          }
+
+          <button
+            type="button"
+            class="btn-eliminar-planning"
+            data-id="${item.id}"
+            title="Eliminar del Planning"
+            style="
+              border:none;
+              background:none;
+              cursor:pointer;
+              color:#b73b3b;
+              font-size:12px;
+              padding:0;
+              opacity:.75;
+            "
+          >
+            🗑
+          </button>
+
+        </div>
 
       </div>
 
@@ -2305,16 +2313,16 @@ function crearTarjetaPlanning(item) {
         display:flex;
         justify-content:space-between;
         align-items:center;
-        gap:6px;
-        margin-top:7px;
-        padding-top:5px;
+        gap:5px;
+        margin-top:5px;
+        padding-top:4px;
         border-top:1px solid ${estado.color}2d;
       ">
 
         <span style="
           min-width:0;
           color:#6a756e;
-          font-size:9px;
+          font-size:8px;
           overflow:hidden;
           text-overflow:ellipsis;
           white-space:nowrap;
@@ -2324,9 +2332,12 @@ function crearTarjetaPlanning(item) {
 
         <span style="
           color:${estado.color};
-          font-size:9px;
+          font-size:8px;
           font-weight:800;
+          overflow:hidden;
+          text-overflow:ellipsis;
           white-space:nowrap;
+          text-align:right;
         ">
           ${detalleEstado}
         </span>
@@ -2598,13 +2609,6 @@ function activarInteraccionesPlanning() {
     )
     .forEach(
       tarjeta => {
-
-        if (
-          tarjeta.dataset.sembrado ===
-          "true"
-        ) {
-          return;
-        }
 
         tarjeta.addEventListener(
           "dragstart",
@@ -4143,10 +4147,15 @@ function renderPlanningBoard() {
   ).innerHTML = `
 
     <div style="
-      padding:10px 16px 18px;
-      min-height:74vh;
+      height:calc(100vh - 150px);
+      min-height:520px;
+      max-height:860px;
+      display:grid;
+      grid-template-rows:auto auto auto auto minmax(0, 1fr) auto;
+      padding:10px 16px 10px;
       box-sizing:border-box;
       background:#ffffff;
+      overflow:hidden;
     ">
 
       <div
@@ -4156,7 +4165,7 @@ function renderPlanningBoard() {
           grid-template-columns:auto 1fr auto;
           align-items:center;
           gap:12px;
-          margin-bottom:9px;
+          margin-bottom:7px;
         "
       >
 
@@ -4175,19 +4184,10 @@ function renderPlanningBoard() {
             font-weight:800;
             cursor:pointer;
           "
-        >
-          ‹
-        </button>
+        >‹</button>
 
-        <div style="
-          text-align:center;
-          min-width:0;
-        ">
-          <div style="
-            font-size:14px;
-            font-weight:800;
-            color:#173f2a;
-          ">
+        <div style="text-align:center;min-width:0;">
+          <div style="font-size:14px;font-weight:800;color:#173f2a;">
             ${semanas[0].week}
             <span style="color:#9aaba1;padding:0 7px;">•</span>
             ${semanas[1].week}
@@ -4205,9 +4205,7 @@ function renderPlanningBoard() {
               font-size:11px;
               cursor:pointer;
             "
-          >
-            Volver a semana actual
-          </button>
+          >Volver a semana actual</button>
         </div>
 
         <button
@@ -4225,9 +4223,7 @@ function renderPlanningBoard() {
             font-weight:800;
             cursor:pointer;
           "
-        >
-          ›
-        </button>
+        >›</button>
 
       </div>
 
@@ -4236,14 +4232,11 @@ function renderPlanningBoard() {
         align-items:center;
         justify-content:space-between;
         gap:10px;
-        margin:0 8px 8px;
+        margin:0 8px 7px;
       ">
         ${renderLeyendaEstadoPlanning()}
-        <span style="
-          color:#7a867f;
-          font-size:9px;
-        ">
-          Las tarjetas sembradas quedan bloqueadas para evitar reprogramaciones accidentales.
+        <span style="color:#7a867f;font-size:9px;">
+          Las tarjetas sembradas conservan el estado verde y pueden moverse o eliminarse.
         </span>
       </div>
 
@@ -4254,37 +4247,49 @@ function renderPlanningBoard() {
         grid-template-columns:repeat(8, minmax(0, 1fr));
         gap:8px;
         padding:0 8px 7px;
-        position:sticky;
-        top:0;
-        z-index:5;
         background:white;
+        z-index:5;
       ">
         ${renderEncabezadoPlanters()}
       </div>
 
-      <div style="
-        display:grid;
-        gap:10px;
-      ">
-        ${semanas
-          .map(renderBloqueSemanaPlanning)
-          .join("")}
+      <div
+        id="planningWeeksScroll"
+        style="
+          min-height:0;
+          overflow-y:auto;
+          overflow-x:hidden;
+          overscroll-behavior:contain;
+          scrollbar-gutter:stable;
+          padding:0 5px 8px 0;
+        "
+      >
+        <div style="
+          display:grid;
+          gap:10px;
+          padding-bottom:4px;
+        ">
+          ${semanas
+            .map(renderBloqueSemanaPlanning)
+            .join("")}
+        </div>
       </div>
 
       <div style="
-        position:sticky;
-        bottom:10px;
         display:flex;
         justify-content:flex-end;
-        padding-top:12px;
-        pointer-events:none;
+        align-items:center;
+        min-height:52px;
+        padding:8px 4px 0;
+        border-top:1px solid #e5ebe7;
+        background:white;
+        z-index:20;
       ">
         <button
           id="btnGuardarCambiosPlanning"
           type="button"
           ${hayCambios ? "" : "disabled"}
           style="
-            pointer-events:auto;
             border:none;
             border-radius:10px;
             padding:10px 16px;
