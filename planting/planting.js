@@ -1842,6 +1842,9 @@ let planningChanges = [];
 
 let draggedPlanningCard =
   null;
+
+let semanaPlanningVisible =
+  null;
 const plantingPlanters = [
   "BE19182",
   "BE19183",
@@ -1883,7 +1886,15 @@ async function eliminarPlanning(
 
     }
 
-    btnPlanning.click();
+    planningChanges = planningChanges.filter(
+      cambio => cambio.id !== id
+    );
+
+    await cargarPlanningDesdeSharePoint();
+
+    renderPlanningBoard(
+      semanaPlanningVisible
+    );
 
   } catch (error) {
 
@@ -1897,52 +1908,103 @@ async function eliminarPlanning(
 
 }
 
-async function actualizarPlanningTest(
-  id
+function registrarCambioPlanning(
+  item,
+  planter,
+  week,
+  sortOrder = 0
 ) {
+
+  const cambio = {
+    id: item.id,
+    week,
+    planter,
+    sortOrder
+  };
+
+  const indiceExistente =
+    planningChanges.findIndex(
+      actual => actual.id === item.id
+    );
+
+  if (indiceExistente >= 0) {
+    planningChanges[indiceExistente] =
+      cambio;
+  } else {
+    planningChanges.push(cambio);
+  }
+
+}
+
+async function guardarCambiosPlanning() {
+
+  if (planningChanges.length === 0) {
+    return;
+  }
+
+  const btnGuardarCambios =
+    document.getElementById(
+      "btnGuardarCambiosPlanning"
+    );
+
+  if (btnGuardarCambios) {
+    btnGuardarCambios.disabled = true;
+    btnGuardarCambios.textContent =
+      "Guardando...";
+  }
 
   try {
 
-    const response =
-      await fetch(
-        URL_FLOW_PLANNING_UPDATE,
-        {
-          method: "POST",
+    for (const cambio of planningChanges) {
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+      const response =
+        await fetch(
+          URL_FLOW_PLANNING_UPDATE,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              ID: cambio.id,
+              Week: cambio.week,
+              Planter: cambio.planter,
+              SortOrder: cambio.sortOrder
+            })
+          }
+        );
 
-          body: JSON.stringify({
-            ID: id,
-            Week: "19/10 - 25/10",
-            Planter: "BE19186",
-            SortOrder: 0
-          })
-        }
-      );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Error Update Planning"
-      );
+      if (!response.ok) {
+        throw new Error(
+          `Error actualizando Planning ID ${cambio.id}`
+        );
+      }
 
     }
 
-    alert(
-      "Planning actualizado"
+    planningChanges = [];
+
+    await cargarPlanningDesdeSharePoint();
+
+    renderPlanningBoard(
+      semanaPlanningVisible
     );
 
-    btnPlanning.click();
+    alert(
+      "Cambios guardados correctamente"
+    );
 
   } catch (error) {
 
     console.error(error);
 
     alert(
-      "Error actualizando"
+      "Error guardando los cambios del Planning"
+    );
+
+    renderPlanningBoard(
+      semanaPlanningVisible
     );
 
   }
@@ -1952,99 +2014,79 @@ async function actualizarPlanningTest(
 function crearTarjetaPlanning(item) {
 
   return `
-   <div
-  draggable="true"
-  data-id="${item.id}"
-  data-planter="${item.planter}"
-  data-week="${item.week}"
-ondragstart="
-  draggedPlanningCard = {
-    id: ${item.id},
-    planter: '${item.planter}',
-    week: '${item.week}'
-  };
+    <div
+      class="planning-card"
+      draggable="true"
+      data-id="${item.id}"
+      data-planter="${item.planter}"
+      data-week="${item.week}"
+      style="
+        background:white;
+        border-left:6px solid #f4c542;
+        border-top:1px solid #e5e7eb;
+        border-right:1px solid #e5e7eb;
+        border-bottom:1px solid #e5e7eb;
+        border-radius:10px;
+        padding:8px;
+        text-align:left;
+        font-size:12px;
+        margin-top:6px;
+        cursor:grab;
+      "
+    >
 
-  console.log(
-    'Dragging',
-    ${item.id}
-  );
-"
-  style="
-    background:white;
-    border-left:6px solid #f4c542;
-    border-top:1px solid #e5e7eb;
-    border-right:1px solid #e5e7eb;
-    border-bottom:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:8px;
-    text-align:left;
-    font-size:12px;
-    margin-top:6px;
-    cursor:grab;
-  "
->
+      <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:6px;
+        margin-bottom:2px;
+      ">
 
-<div style="
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:2px;
-">
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:6px;
+          min-width:0;
+        ">
 
-  <div style="
-    display:flex;
-    align-items:center;
-    gap:6px;
-  ">
+          <div style="
+            width:18px;
+            height:18px;
+            border-radius:50%;
+            background:#34c759;
+            flex-shrink:0;
+          "></div>
 
-    <div style="
-      width:18px;
-      height:18px;
-      border-radius:50%;
-      background:#34c759;
-      flex-shrink:0;
-    ">
-    </div>
+          <div style="
+            font-weight:700;
+            font-size:13px;
+            overflow-wrap:anywhere;
+          ">
+            ${item.location}
+          </div>
 
-    <div style="
-      font-weight:700;
-      font-size:13px;
-    ">
-      ${item.location}
-    </div>
+        </div>
 
-  </div>
+        <button
+          type="button"
+          class="btn-eliminar-planning"
+          data-id="${item.id}"
+          title="Eliminar tarjeta"
+          style="
+            border:none;
+            background:none;
+            cursor:pointer;
+            color:#c62828;
+            font-size:14px;
+            padding:0;
+            flex-shrink:0;
+          "
+        >
+          🗑
+        </button>
 
-  <button
-    type="button"
-    onclick="eliminarPlanning(${item.id})"
-    style="
-      border:none;
-      background:none;
-      cursor:pointer;
-      color:#c62828;
-      font-size:14px;
-      padding:0;
-    "
-  >
-    🗑
-  </button>
-<button
-  type="button"
-  onclick="actualizarPlanningTest(${item.id})"
-  style="
-    border:none;
-    background:none;
-    cursor:pointer;
-    color:#1565c0;
-    font-size:14px;
-    padding:0;
-    margin-left:4px;
-  "
->
-  ↔
-</button>
-</div>
+      </div>
 
       <div style="
         font-size:11px;
@@ -2057,6 +2099,7 @@ ondragstart="
         margin-top:2px;
         font-size:11px;
         color:#666;
+        overflow-wrap:anywhere;
       ">
         ${item.aoiId}
       </div>
@@ -2077,6 +2120,11 @@ function renderTarjetasPlanter(
         item.planter === planter &&
         item.week === week
     )
+    .sort(
+      (a, b) =>
+        (a.sortOrder || 0) -
+        (b.sortOrder || 0)
+    )
     .map(
       item =>
         crearTarjetaPlanning(item)
@@ -2084,6 +2132,7 @@ function renderTarjetasPlanter(
     .join("");
 
 }
+
 function renderColumnaPlanter(
   planter,
   week
@@ -2103,67 +2152,190 @@ function renderColumnaPlanter(
         ${planter}
       </div>
 
-<div
-  data-planter="${planter}"
-  data-week="${week}"
-
-  ondragover="
-    event.preventDefault();
-  "
-
- ondrop="
-  event.preventDefault();
-
-  const item =
-    planningData.find(
-      p =>
-        p.id ===
-        draggedPlanningCard.id
-    );
-
-if (item) {
-
-  item.planter =
-    '${planter}';
-
-  planningChanges.push({
-    id: item.id,
-    planter: '${planter}'
-  });
-
-  alert(
-    'Movido a ${planter}'
-  );
-console.log(
-  planningData
-);
-}
-
- console.log(
-  'Nuevo planter',
-  item.planter
-);
-"
-
-  style="
-    min-height:80px;
-    border:1px dashed #d9e3dc;
-    border-radius:12px;
-    background:white;
-    padding:6px;
-  "
->
-
-
+      <div
+        class="planning-drop-zone"
+        data-planter="${planter}"
+        data-week="${week}"
+        style="
+          min-height:80px;
+          border:1px dashed #d9e3dc;
+          border-radius:12px;
+          background:white;
+          padding:6px;
+        "
+      >
         ${renderTarjetasPlanter(
           planter,
           week
         )}
-
       </div>
 
     </div>
   `;
+
+}
+
+function activarInteraccionesPlanning() {
+
+  document
+    .querySelectorAll(
+      ".planning-card"
+    )
+    .forEach(
+      tarjeta => {
+
+        tarjeta.addEventListener(
+          "dragstart",
+          evento => {
+
+            const id =
+              Number(
+                tarjeta.dataset.id
+              );
+
+            draggedPlanningCard = {
+              id,
+              planter:
+                tarjeta.dataset.planter,
+              week:
+                tarjeta.dataset.week
+            };
+
+            evento.dataTransfer.effectAllowed =
+              "move";
+
+            evento.dataTransfer.setData(
+              "text/plain",
+              String(id)
+            );
+
+            tarjeta.style.opacity =
+              "0.55";
+
+          }
+        );
+
+        tarjeta.addEventListener(
+          "dragend",
+          () => {
+            tarjeta.style.opacity = "1";
+          }
+        );
+
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".planning-drop-zone"
+    )
+    .forEach(
+      zona => {
+
+        zona.addEventListener(
+          "dragover",
+          evento => {
+            evento.preventDefault();
+            evento.dataTransfer.dropEffect =
+              "move";
+          }
+        );
+
+        zona.addEventListener(
+          "drop",
+          evento => {
+
+            evento.preventDefault();
+
+            if (!draggedPlanningCard) {
+              return;
+            }
+
+            const item =
+              planningData.find(
+                actual =>
+                  actual.id ===
+                  draggedPlanningCard.id
+              );
+
+            if (!item) {
+              return;
+            }
+
+            const planterDestino =
+              zona.dataset.planter;
+
+            const weekDestino =
+              zona.dataset.week;
+
+            const cantidadDestino =
+              planningData.filter(
+                actual =>
+                  actual.id !== item.id &&
+                  actual.planter ===
+                    planterDestino &&
+                  actual.week ===
+                    weekDestino
+              ).length;
+
+            item.planter = planterDestino;
+            item.week = weekDestino;
+            item.sortOrder = cantidadDestino;
+
+            registrarCambioPlanning(
+              item,
+              planterDestino,
+              weekDestino,
+              cantidadDestino
+            );
+
+            draggedPlanningCard = null;
+
+            renderPlanningBoard(
+              semanaPlanningVisible
+            );
+
+          }
+        );
+
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-eliminar-planning"
+    )
+    .forEach(
+      boton => {
+
+        boton.addEventListener(
+          "click",
+          async evento => {
+
+            evento.stopPropagation();
+
+            const id =
+              Number(
+                boton.dataset.id
+              );
+
+            await eliminarPlanning(id);
+
+          }
+        );
+
+      }
+    );
+
+  const btnGuardarCambios =
+    document.getElementById(
+      "btnGuardarCambiosPlanning"
+    );
+
+  btnGuardarCambios?.addEventListener(
+    "click",
+    guardarCambiosPlanning
+  );
 
 }
 
@@ -2202,8 +2374,12 @@ planningData = data.map(
       );
 
     return {
-id:
-  item.ID,
+      id:
+        item.ID,
+
+      sortOrder:
+        Number(item.SortOrder) || 0,
+
       week:
         item.Week,
 
@@ -3238,10 +3414,122 @@ cerrarTimeline.addEventListener("click", () => {
 });
 function renderPlanningBoard(
   semanaPlanningActual
-) 
-renderPlanningBoard(
-  semanaPlanningActual
-);
+) {
+
+  semanaPlanningVisible =
+    semanaPlanningActual;
+
+  const hayCambios =
+    planningChanges.length > 0;
+
+  document.getElementById(
+    "planningGrid"
+  ).innerHTML = `
+
+    <div
+      style="
+        padding:20px;
+        text-align:center;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:12px;
+          flex-wrap:wrap;
+          margin-bottom:4px;
+        "
+      >
+
+        <div
+          style="
+            font-size:24px;
+            font-weight:700;
+            color:#0b6b3a;
+          "
+        >
+          ${semanaPlanningActual}
+        </div>
+
+        <button
+          id="btnGuardarCambiosPlanning"
+          type="button"
+          ${hayCambios ? "" : "disabled"}
+          style="
+            border:none;
+            border-radius:9px;
+            padding:8px 12px;
+            background:${
+              hayCambios
+                ? "#0b6b3a"
+                : "#cfd8d3"
+            };
+            color:white;
+            font-weight:700;
+            cursor:${
+              hayCambios
+                ? "pointer"
+                : "default"
+            };
+          "
+        >
+          💾 Guardar cambios${
+            hayCambios
+              ? ` (${planningChanges.length})`
+              : ""
+          }
+        </button>
+
+      </div>
+
+      <div
+        style="
+          font-size:13px;
+          color:#666;
+          margin-bottom:10px;
+        "
+      >
+        Current Week
+      </div>
+
+      <div
+        style="
+          height:1px;
+          background:#d9e3dc;
+          margin:10px 0;
+        "
+      ></div>
+
+      <div
+        style="
+          display:grid;
+          grid-template-columns:repeat(8, minmax(0, 1fr));
+          gap:8px;
+          align-items:start;
+        "
+      >
+        ${plantingPlanters
+          .map(
+            planter =>
+              renderColumnaPlanter(
+                planter,
+                semanaPlanningActual
+              )
+          )
+          .join("")}
+      </div>
+
+    </div>
+
+  `;
+
+  activarInteraccionesPlanning();
+
+}
+
 btnPlanning.addEventListener(
   "click",
   async () => {
@@ -3249,42 +3537,47 @@ btnPlanning.addEventListener(
     modalPlanning.classList.add(
       "visible"
     );
-await cargarPlanningDesdeSharePoint();
-const inicioSemanaPlanning =
-  obtenerInicioSemana(
-    new Date()
-  );
 
-const finSemanaPlanning =
-  new Date(
-    inicioSemanaPlanning
-  );
+    planningChanges = [];
 
-finSemanaPlanning.setDate(
-  finSemanaPlanning.getDate() + 6
-);
+    await cargarPlanningDesdeSharePoint();
 
-const semanaPlanningActual =
-  `${inicioSemanaPlanning.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit"
-    }
-  )} - ${finSemanaPlanning.toLocaleDateString(
-    "es-AR",
-    {
-      day: "2-digit",
-      month: "2-digit"
-    }
-  )}`;
-    
-renderPlanningBoard(
-  semanaPlanningActual
-);
+    const inicioSemanaPlanning =
+      obtenerInicioSemana(
+        new Date()
+      );
+
+    const finSemanaPlanning =
+      new Date(
+        inicioSemanaPlanning
+      );
+
+    finSemanaPlanning.setDate(
+      finSemanaPlanning.getDate() + 6
+    );
+
+    const semanaPlanningActual =
+      `${inicioSemanaPlanning.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )} - ${finSemanaPlanning.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )}`;
+
+    renderPlanningBoard(
+      semanaPlanningActual
+    );
 
   }
 );
+
 btnAddPlanning?.addEventListener(
   "click",
   () => {
