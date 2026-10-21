@@ -1907,30 +1907,53 @@ function crearTarjetaPlanning(item) {
       margin-top:6px;
     ">
 
-      <div style="
-        display:flex;
-        align-items:center;
-        gap:6px;
-        margin-bottom:2px;
-      ">
+<div style="
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:2px;
+">
 
-        <div style="
-          width:18px;
-          height:18px;
-          border-radius:50%;
-          background:#34c759;
-          flex-shrink:0;
-        ">
-        </div>
+  <div style="
+    display:flex;
+    align-items:center;
+    gap:6px;
+  ">
 
-        <div style="
-          font-weight:700;
-          font-size:13px;
-        ">
-          ${item.location}
-        </div>
+    <div style="
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:#34c759;
+      flex-shrink:0;
+    ">
+    </div>
 
-      </div>
+    <div style="
+      font-weight:700;
+      font-size:13px;
+    ">
+      ${item.location}
+    </div>
+
+  </div>
+
+  <button
+    type="button"
+    onclick="eliminarPlanning(${item.id})"
+    style="
+      border:none;
+      background:none;
+      cursor:pointer;
+      color:#c62828;
+      font-size:14px;
+      padding:0;
+    "
+  >
+    🗑
+  </button>
+
+</div>
 
       <div style="
         font-size:11px;
