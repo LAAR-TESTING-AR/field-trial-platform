@@ -3102,7 +3102,7 @@ btnCancelarPlanning?.addEventListener(
 );
 btnGuardarPlanning?.addEventListener(
   "click",
-  () => {
+  async () => {
 
     const locality =
       document.getElementById(
@@ -3153,27 +3153,72 @@ btnGuardarPlanning?.addEventListener(
       return;
     }
 
-    planningData.push({
+    const aoiId =
+      limpiarTexto(
+        registro["AOI ID"]
+      );
 
-      week,
+    try {
 
-      planter,
+      const response =
+        await fetch(
+          URL_FLOW_PLANNING,
+          {
+            method: "POST",
 
-      location: locality,
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-      crop,
+            body: JSON.stringify({
+              AOI_ID: aoiId,
+              Week: week,
+              Planter: planter
+            })
+          }
+        );
 
-      aoiId:
-        limpiarTexto(
-          registro["AOI ID"]
-        )
+      if (!response.ok) {
 
-    });
+        throw new Error(
+          "Error Flow Planning"
+        );
 
-    planningForm.hidden =
-      true;
+      }
 
-    btnPlanning.click();
+      planningData.push({
+
+        week,
+
+        planter,
+
+        location: locality,
+
+        crop,
+
+        aoiId
+
+      });
+
+      planningForm.hidden =
+        true;
+
+      alert(
+        "Planning guardado correctamente"
+      );
+
+      btnPlanning.click();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error guardando Planning"
+      );
+
+    }
 
   }
 );
