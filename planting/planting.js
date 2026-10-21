@@ -1980,6 +1980,59 @@ function renderColumnaPlanter(
   `;
 
 }
+function cargarLocalidadesPlanning() {
+
+  const comboLocality =
+    document.getElementById(
+      "planningLocality"
+    );
+
+  if (!comboLocality) {
+    return;
+  }
+
+  const localidades =
+    [
+      ...new Set(
+        sitios
+          .map(
+            sitio =>
+              limpiarTexto(
+                sitio.Location
+              )
+          )
+          .filter(Boolean)
+      )
+    ]
+    .sort();
+
+  comboLocality.innerHTML = `
+    <option value="">
+      Seleccionar localidad
+    </option>
+  `;
+
+  localidades.forEach(
+    localidad => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value = localidad;
+
+      option.textContent = localidad;
+
+      comboLocality.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
 const btnPlanterStats =
   document.getElementById(
     "btnPlanterStats"
@@ -2832,6 +2885,8 @@ renderColumnaPlanter(
 btnAddPlanning?.addEventListener(
   "click",
   () => {
+
+    cargarLocalidadesPlanning();
 
     planningForm.hidden =
       false;
