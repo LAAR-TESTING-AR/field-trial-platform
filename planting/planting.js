@@ -1929,7 +1929,10 @@ function renderTarjetasPlanter(
     .join("");
 
 }
-function renderColumnaPlanter(planter) {
+function renderColumnaPlanter(
+  planter,
+  week
+) {
 
   return `
     <div>
@@ -1953,10 +1956,10 @@ function renderColumnaPlanter(planter) {
         padding:6px;
       ">
 
-       ${renderTarjetasPlanter(
-  planter,
-  "19/10 - 25/10"
-)}
+        ${renderTarjetasPlanter(
+          planter,
+          week
+        )}
 
       </div>
 
@@ -2769,9 +2772,10 @@ btnPlanning.addEventListener(
           ${plantingPlanters
             .map(
               planter =>
-                renderColumnaPlanter(
-                  planter
-                )
+             renderColumnaPlanter(
+  planter,
+  "19/10 - 25/10"
+)
             )
             .join("")}
 
