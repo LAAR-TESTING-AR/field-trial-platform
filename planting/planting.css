@@ -1250,3 +1250,50 @@ text-align: center;
   width: 100%;
 
 }
+#planningToolbar{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  margin-bottom:10px;
+  flex-wrap:wrap;
+}
+
+#btnAddPlanning,
+#btnAddSpecialPlanning{
+
+  border:none;
+  border-radius:10px;
+
+  padding:10px 14px;
+
+  background:#e6efe8;
+
+  color:#0b6b3a;
+
+  font-size:14px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  transition:
+    background .15s ease,
+    transform .15s ease;
+
+  box-shadow:
+    0 1px 2px rgba(0,0,0,.05);
+}
+
+#btnAddPlanning:hover,
+#btnAddSpecialPlanning:hover{
+  background:#d9e8dd;
+}
+
+#btnAddPlanning:active,
+#btnAddSpecialPlanning:active{
+  transform:translateY(1px);
+}
