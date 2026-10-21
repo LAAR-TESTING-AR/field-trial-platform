@@ -1999,7 +1999,8 @@ planningData = data.map(
       );
 
     return {
-
+id:
+  item.ID,
       week:
         item.Week,
 
