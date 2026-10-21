@@ -2750,177 +2750,26 @@ btnPlanning.addEventListener(
         ></div>
 
         <div
-  style="
-    display:grid;
-    grid-template-columns:repeat(8, 1fr);
-    gap:8px;
-    align-items:start;
-  "
->
+          style="
+            display:grid;
+            grid-template-columns:repeat(8, 1fr);
+            gap:8px;
+            align-items:start;
+          "
+        >
 
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19182
-    </div>
+          ${plantingPlanters
+            .map(
+              planter =>
+                renderColumnaPlanter(
+                  planter
+                )
+            )
+            .join("")}
 
-<div style="
-  min-height:80px;
-  border:1px dashed #d9e3dc;
-  border-radius:12px;
-  background:white;
-  padding:6px;
-">
+        </div>
 
-  ${renderTarjetasPlanter("BE19182")}
-
-</div>
-
-</div>
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19183
-    </div>
-
-    <div style="
-  min-height:80px;
-  border:1px dashed #d9e3dc;
-  border-radius:12px;
-  background:white;
-  padding:6px;
-">
-
-  ${renderTarjetasPlanter("BE19183")}
-
-</div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19184
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19185
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19186
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19187
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      BE19188
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-  <div>
-    <div style="
-      background:#edf5ee;
-      padding:10px;
-      border-radius:10px;
-      font-weight:700;
-      margin-bottom:8px;
-    ">
-      PP23191
-    </div>
-
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
-  </div>
-
-</div>
+      </div>
 
     `;
 
