@@ -519,7 +519,101 @@
     </button>
 
   </div>
+<div
+  id="planningForm"
+  hidden
+>
 
+  <div class="planning-form-grid">
+
+    <div>
+      <label for="planningLocality">
+        Locality
+      </label>
+
+      <select id="planningLocality">
+        <option value="">
+          Seleccionar localidad
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label for="planningCrop">
+        Crop
+      </label>
+
+      <select
+        id="planningCrop"
+        disabled
+      >
+        <option value="">
+          Seleccionar cultivo
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label>
+        AOI Name SPD
+      </label>
+
+      <div id="planningAoiPreview">
+        Seleccione localidad y cultivo
+      </div>
+    </div>
+
+    <div>
+      <label for="planningWeek">
+        Semana
+      </label>
+
+      <select id="planningWeek">
+      </select>
+    </div>
+
+    <div>
+      <label for="planningPlanter">
+        Sembradora
+      </label>
+
+      <select id="planningPlanter">
+        <option value="">
+          Seleccionar sembradora
+        </option>
+
+        <option value="BE19182">BE19182</option>
+        <option value="BE19183">BE19183</option>
+        <option value="BE19184">BE19184</option>
+        <option value="BE19185">BE19185</option>
+        <option value="BE19186">BE19186</option>
+        <option value="BE19187">BE19187</option>
+        <option value="BE19188">BE19188</option>
+        <option value="PP23191">PP23191</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="planning-form-actions">
+
+    <button
+      id="btnCancelarPlanning"
+      type="button"
+    >
+      Cancelar
+    </button>
+
+    <button
+      id="btnGuardarPlanning"
+      type="button"
+    >
+      Agregar al Planning
+    </button>
+
+  </div>
+
+</div>
  <div id="planningBoard">
 
   <div id="planningGrid">
