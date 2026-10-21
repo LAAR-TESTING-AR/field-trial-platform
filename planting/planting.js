@@ -2726,7 +2726,7 @@ btnPlanning.addEventListener(
       BE19182
     </div>
 
- <div style="
+<div style="
   min-height:80px;
   border:1px dashed #d9e3dc;
   border-radius:12px;
@@ -2734,104 +2734,10 @@ btnPlanning.addEventListener(
   padding:6px;
 ">
 
-  <div style="
-    background:white;
-    border-left:6px solid #f4c542;
-border-top:1px solid #e5e7eb;
-border-right:1px solid #e5e7eb;
-border-bottom:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:8px;
-    text-align:left;
-    font-size:12px;
-  ">
-
-<div style="
-  display:flex;
-  align-items:center;
-  gap:6px;
-  margin-bottom:2px;
-">
-
-  <div style="
-    width:18px;
-    height:18px;
-    border-radius:50%;
-    background:#34c759;
-    flex-shrink:0;
-  ">
-  </div>
-
-  <div style="
-    font-weight:700;
-    font-size:13px;
-  ">
-    Ramallo
-  </div>
+  ${renderTarjetasPlanter("BE19182")}
 
 </div>
 
-<div style="
-  font-size:11px;
-  color:#555;
-">
-  Corn Regulated
-</div>
-
-<div style="
-  margin-top:2px;
-  font-size:11px;
-  color:#666;
-">
-  2 AOI
-</div>
-
-  </div>
-
-  <div style="
-    background:white;
-    border-left:6px solid #f4c542;
-    border-top:1px solid #e5e7eb;
-    border-right:1px solid #e5e7eb;
-    border-bottom:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:8px;
-    text-align:left;
-    font-size:12px;
-    margin-top:6px;
-  ">
-
-    <div style="
-      font-size:18px;
-      margin-bottom:4px;
-    ">
-      🟣
-    </div>
-
-    <div style="
-      font-weight:700;
-    ">
-      Pergamino
-    </div>
-
-    <div style="
-      font-size:11px;
-      color:#555;
-    ">
-      Soybean Stewarded
-    </div>
-
-    <div style="
-      margin-top:4px;
-      font-size:11px;
-    ">
-      1 AOI
-    </div>
-
-  </div>
-
-</div>
-  </div>
 
   <div>
     <div style="
