@@ -1896,6 +1896,59 @@ async function eliminarPlanning(
   }
 
 }
+
+async function actualizarPlanningTest(
+  id
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING_UPDATE,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            ID: id,
+            Week: "19/10 - 25/10",
+            Planter: "BE19186",
+            SortOrder: 0
+          })
+        }
+      );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Error Update Planning"
+      );
+
+    }
+
+    alert(
+      "Planning actualizado"
+    );
+
+    btnPlanning.click();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error actualizando"
+    );
+
+  }
+
+}
+
 function crearTarjetaPlanning(item) {
 
   return `
@@ -1957,7 +2010,21 @@ function crearTarjetaPlanning(item) {
   >
     🗑
   </button>
-
+<button
+  type="button"
+  onclick="actualizarPlanningTest(${item.id})"
+  style="
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:#1565c0;
+    font-size:14px;
+    padding:0;
+    margin-left:4px;
+  "
+>
+  ↔
+</button>
 </div>
 
       <div style="
