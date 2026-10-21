@@ -2103,13 +2103,32 @@ function renderColumnaPlanter(
         ${planter}
       </div>
 
-      <div style="
-        min-height:80px;
-        border:1px dashed #d9e3dc;
-        border-radius:12px;
-        background:white;
-        padding:6px;
-      ">
+<div
+  data-planter="${planter}"
+  data-week="${week}"
+
+  ondragover="
+    event.preventDefault();
+  "
+
+  ondrop="
+    event.preventDefault();
+
+    console.log(
+      'DROP',
+      '${planter}'
+    );
+  "
+
+  style="
+    min-height:80px;
+    border:1px dashed #d9e3dc;
+    border-radius:12px;
+    background:white;
+    padding:6px;
+  "
+>
+
 
         ${renderTarjetasPlanter(
           planter,
