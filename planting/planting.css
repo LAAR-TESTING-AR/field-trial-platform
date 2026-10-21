@@ -516,18 +516,14 @@ text-align: center;
     gap: 8px;
   }
 
-  #btnTimeline,
-  #btnPlanterStats {
-
-    flex: 1;
-
-    margin-top: 0;
-
-    padding: 8px;
-
-    font-size: 13px;
-
-  }
+ #btnPlanning,
+#btnTimeline,
+#btnPlanterStats {
+  flex: 1;
+  margin-top: 0;
+  padding: 8px;
+  font-size: 13px;
+}
 
   .icono-timeline {
     font-size: 16px;
@@ -535,30 +531,33 @@ text-align: center;
 
 }
 
+#btnPlanning,
 #btnTimeline,
 #btnPlanterStats {
   width: 100%;
-  margin-top: 12px;
-  padding: 14px;
+  margin-top: 8px;
+  padding: 10px 12px;
   border: none;
   border-radius: 10px;
   background: #e6efe8;
   color: #0b6b3a;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
 }
 .icono-timeline {
-font-size: 28px;
+  font-size: 22px;
 }
+#btnPlanning:hover,
 #btnTimeline:hover,
 #btnPlanterStats:hover {
   background: #d9e8dd;
 }
+
 .modal-timeline {
   display: none;
 
