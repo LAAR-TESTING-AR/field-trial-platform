@@ -1829,7 +1829,7 @@ const planningData = [
     location: "Pergamino",
     crop: "Soybean Stewarded",
     aoiCount: 1
-  }
+  },
   {
     week: "19/10 - 25/10",
     planter: "BE19183",
