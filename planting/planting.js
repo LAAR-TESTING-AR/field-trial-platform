@@ -3035,12 +3035,12 @@ cerrarTimeline.addEventListener("click", () => {
 
 btnPlanning.addEventListener(
   "click",
-  () => {
+  async () => {
 
     modalPlanning.classList.add(
       "visible"
     );
-cargarPlanningDesdeSharePoint();
+await cargarPlanningDesdeSharePoint();
 const inicioSemanaPlanning =
   obtenerInicioSemana(
     new Date()
