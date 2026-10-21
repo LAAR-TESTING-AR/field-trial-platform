@@ -1821,6 +1821,10 @@ const btnCancelarPlanning =
   document.getElementById(
     "btnCancelarPlanning"
   );
+const btnGuardarPlanning =
+  document.getElementById(
+    "btnGuardarPlanning"
+  );
 const cerrarPlanning =
   document.getElementById(
     "cerrarPlanning"
@@ -3095,7 +3099,83 @@ btnCancelarPlanning?.addEventListener(
 
   }
 );
+btnGuardarPlanning?.addEventListener(
+  "click",
+  () => {
 
+    const locality =
+      document.getElementById(
+        "planningLocality"
+      ).value;
+
+    const crop =
+      document.getElementById(
+        "planningCrop"
+      ).value;
+
+    const week =
+      document.getElementById(
+        "planningWeek"
+      ).value;
+
+    const planter =
+      document.getElementById(
+        "planningPlanter"
+      ).value;
+
+    if (
+      !locality ||
+      !crop ||
+      !week ||
+      !planter
+    ) {
+
+      alert(
+        "Complete todos los campos"
+      );
+
+      return;
+    }
+
+    const registro =
+      sitios.find(
+        sitio =>
+          limpiarTexto(
+            sitio.Location
+          ) === locality &&
+          limpiarTexto(
+            sitio.Crop
+          ) === crop
+      );
+
+    if (!registro) {
+      return;
+    }
+
+    planningData.push({
+
+      week,
+
+      planter,
+
+      location: locality,
+
+      crop,
+
+      aoiId:
+        limpiarTexto(
+          registro["AOI ID"]
+        )
+
+    });
+
+    planningForm.hidden =
+      true;
+
+    btnPlanning.click();
+
+  }
+);
 document
   .getElementById(
     "planningLocality"
