@@ -4026,7 +4026,7 @@ function renderPlanningBoard() {
               background:none;
               padding:0 0 0 4px;
               color:#627369;
-              font-size:9px;
+              font-size:13px;
               cursor:pointer;
               text-decoration:underline;
               white-space:nowrap;
