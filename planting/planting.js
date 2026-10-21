@@ -2606,120 +2606,167 @@ btnPlanning.addEventListener(
         ></div>
 
         <div
-          style="
-            display:grid;
-            grid-template-columns:repeat(8, 1fr);
-            gap:8px;
-            align-items:start;
-          "
-        >
+  style="
+    display:grid;
+    grid-template-columns:repeat(8, 1fr);
+    gap:8px;
+    align-items:start;
+  "
+>
 
-          <div>
-
-  <div
-    style="
+  <div>
+    <div style="
       background:#edf5ee;
       padding:10px;
       border-radius:10px;
       font-weight:700;
       margin-bottom:8px;
-    "
-  >
-    BE19182
-  </div>
+    ">
+      BE19182
+    </div>
 
-  <div
-    style="
+    <div style="
       min-height:80px;
       border:1px dashed #d9e3dc;
       border-radius:12px;
       background:white;
-    "
-  >
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19183
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19184
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19185
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19186
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19187
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      BE19188
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
+  </div>
+
+  <div>
+    <div style="
+      background:#edf5ee;
+      padding:10px;
+      border-radius:10px;
+      font-weight:700;
+      margin-bottom:8px;
+    ">
+      PP23191
+    </div>
+
+    <div style="
+      min-height:80px;
+      border:1px dashed #d9e3dc;
+      border-radius:12px;
+      background:white;
+    "></div>
   </div>
 
 </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19183
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19184
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19185
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19186
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19187
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            BE19188
-          </div>
-
-          <div
-            style="
-              background:#edf5ee;
-              padding:10px;
-              border-radius:10px;
-              font-weight:700;
-            "
-          >
-            PP23191
-          </div>
-
-        </div>
-
-      </div>
 
     `;
 
