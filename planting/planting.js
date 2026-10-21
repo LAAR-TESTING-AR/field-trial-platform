@@ -1838,6 +1838,18 @@ const planningData = [
     aoiCount: 3
   }
 ];
+
+const plantingPlanters = [
+  "BE19182",
+  "BE19183",
+  "BE19184",
+  "BE19185",
+  "BE19186",
+  "BE19187",
+  "BE19188",
+  "PP23191"
+];
+
 function crearTarjetaPlanning(item) {
 
   return `
