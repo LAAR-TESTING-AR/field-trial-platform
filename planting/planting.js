@@ -1963,6 +1963,10 @@ function crearTarjetaPlanning(item) {
     planter: '${item.planter}',
     week: '${item.week}'
   };
+  console.log(
+  "Dragging",
+  ${item.id}
+);
 "
   style="
     background:white;
