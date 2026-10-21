@@ -2008,97 +2008,329 @@ async function guardarCambiosPlanning() {
 
 }
 
+function configuracionCultivoPlanning(
+  cultivo
+) {
+
+  const nombre =
+    limpiarTexto(cultivo)
+      .toLowerCase();
+
+  const parent =
+    nombre.includes("parent chr");
+
+  const stewarded =
+    nombre.includes("stewarded");
+
+  const regulated =
+    nombre.includes("regulated");
+
+  let tipo = "otro";
+  let icono = "📍";
+  let color = "#64748b";
+
+  if (nombre.startsWith("canola")) {
+    tipo = "canola";
+    icono = "🌼";
+    color = "#2563eb";
+  } else if (nombre.startsWith("corn")) {
+    tipo = "corn";
+    icono = "🌽";
+    color = "#c2410c";
+  } else if (nombre.startsWith("mustard")) {
+    tipo = "mustard";
+    icono = "🌿";
+    color = "#312e81";
+  } else if (nombre.startsWith("soybean")) {
+    tipo = "soybean";
+    icono = "🌱";
+    color = "#7c4a1d";
+  } else if (nombre.startsWith("sunflower")) {
+    tipo = "sunflower";
+    icono = "🌻";
+    color = "#d4a017";
+  }
+
+  if (parent) {
+    color = "#f97316";
+  }
+
+  if (stewarded) {
+    color = "#7e22ce";
+  }
+
+  if (regulated) {
+    color = "#166534";
+  }
+
+  return {
+    tipo,
+    icono,
+    color,
+    parent,
+    stewarded,
+    regulated
+  };
+
+}
+
+function renderIconoCultivoPlanning(
+  cultivo,
+  size = 26
+) {
+
+  const cfg =
+    configuracionCultivoPlanning(
+      cultivo
+    );
+
+  const insignia =
+    cfg.parent
+      ? "PC"
+      : cfg.stewarded
+      ? "S"
+      : cfg.regulated
+      ? "R"
+      : "";
+
+  return `
+    <span
+      title="${cultivo}"
+      style="
+        position:relative;
+        width:${size}px;
+        height:${size}px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:50%;
+        background:${cfg.color}18;
+        border:2px solid ${cfg.color};
+        box-sizing:border-box;
+        flex:0 0 auto;
+        font-size:${Math.max(13, size - 10)}px;
+        line-height:1;
+      "
+    >
+      ${cfg.icono}
+      ${
+        insignia
+          ? `
+            <span style="
+              position:absolute;
+              right:-5px;
+              bottom:-5px;
+              min-width:14px;
+              height:14px;
+              padding:0 2px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              border-radius:8px;
+              background:${cfg.color};
+              color:white;
+              border:2px solid white;
+              box-sizing:border-box;
+              font-size:7px;
+              font-weight:900;
+              letter-spacing:-.2px;
+            ">
+              ${insignia}
+            </span>
+          `
+          : ""
+      }
+    </span>
+  `;
+
+}
+
+function configuracionEstadoPlanning(
+  item
+) {
+
+  if (item.sembrado) {
+    return {
+      clave: "sembrado",
+      etiqueta: "Sembrado",
+      color: "#2e7d32",
+      fondo: "#f3faf4",
+      indicador: "✓"
+    };
+  }
+
+  return {
+    clave: "planificado",
+    etiqueta: "Planificado",
+    color: "#f4b400",
+    fondo: "#fffdf5",
+    indicador: ""
+  };
+
+}
+
 function crearTarjetaPlanning(item) {
+
+  const estado =
+    configuracionEstadoPlanning(item);
+
+  const draggable =
+    !item.sembrado;
+
+  const detalleEstado =
+    item.sembrado
+      ? `${item.plantingDate || "Fecha registrada"}${
+          item.actualPlanter
+            ? ` · ${item.actualPlanter}`
+            : ""
+        }`
+      : estado.etiqueta;
 
   return `
     <div
       class="planning-card"
-      draggable="true"
+      draggable="${draggable}"
       data-id="${item.id}"
       data-planter="${item.planter}"
       data-week="${item.week}"
+      data-sembrado="${item.sembrado}"
+      title="${item.location} · ${item.crop} · ${item.aoiId} · ${detalleEstado}"
       style="
-        background:white;
-        border-left:6px solid #f4c542;
-        border-top:1px solid #e5e7eb;
-        border-right:1px solid #e5e7eb;
-        border-bottom:1px solid #e5e7eb;
+        background:${estado.fondo};
+        border-left:6px solid ${estado.color};
+        border-top:1px solid #e2e8e4;
+        border-right:1px solid #e2e8e4;
+        border-bottom:1px solid #e2e8e4;
         border-radius:10px;
         padding:8px;
         text-align:left;
         font-size:12px;
         margin-top:6px;
-        cursor:grab;
+        cursor:${draggable ? "grab" : "default"};
+        box-shadow:0 1px 2px rgba(20,45,30,.05);
+        box-sizing:border-box;
       "
     >
 
       <div style="
         display:flex;
         justify-content:space-between;
-        align-items:center;
+        align-items:flex-start;
         gap:6px;
-        margin-bottom:2px;
       ">
 
         <div style="
           display:flex;
           align-items:center;
-          gap:6px;
+          gap:8px;
           min-width:0;
         ">
 
-          <div style="
-            width:18px;
-            height:18px;
-            border-radius:50%;
-            background:#34c759;
-            flex-shrink:0;
-          "></div>
+          ${renderIconoCultivoPlanning(
+            item.crop,
+            28
+          )}
 
-          <div style="
-            font-weight:700;
-            font-size:13px;
-            overflow-wrap:anywhere;
-          ">
-            ${item.location}
+          <div style="min-width:0;">
+            <div style="
+              font-weight:800;
+              font-size:12px;
+              color:#17251d;
+              overflow-wrap:anywhere;
+              line-height:1.15;
+            ">
+              ${item.location}
+            </div>
+
+            <div style="
+              margin-top:2px;
+              font-size:10px;
+              color:#526158;
+              line-height:1.2;
+              overflow-wrap:anywhere;
+            ">
+              ${item.crop}
+            </div>
           </div>
 
         </div>
 
-        <button
-          type="button"
-          class="btn-eliminar-planning"
-          data-id="${item.id}"
-          title="Eliminar tarjeta"
-          style="
-            border:none;
-            background:none;
-            cursor:pointer;
-            color:#c62828;
-            font-size:14px;
-            padding:0;
-            flex-shrink:0;
-          "
-        >
-          🗑
-        </button>
+        ${
+          item.sembrado
+            ? `
+              <span
+                title="Sembrado"
+                style="
+                  width:19px;
+                  height:19px;
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  border-radius:50%;
+                  background:#2e7d32;
+                  color:white;
+                  font-size:11px;
+                  font-weight:900;
+                  flex:0 0 auto;
+                "
+              >
+                ✓
+              </span>
+            `
+            : `
+              <button
+                type="button"
+                class="btn-eliminar-planning"
+                data-id="${item.id}"
+                title="Eliminar del Planning"
+                style="
+                  border:none;
+                  background:none;
+                  cursor:pointer;
+                  color:#b73b3b;
+                  font-size:13px;
+                  padding:0;
+                  opacity:.72;
+                  flex:0 0 auto;
+                "
+              >
+                🗑
+              </button>
+            `
+        }
 
       </div>
 
       <div style="
-        font-size:11px;
-        color:#555;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:6px;
+        margin-top:7px;
+        padding-top:5px;
+        border-top:1px solid ${estado.color}2d;
       ">
-        ${item.crop}
-      </div>
 
-      <div style="
-        margin-top:2px;
-        font-size:11px;
-        color:#666;
-        overflow-wrap:anywhere;
-      ">
-        ${item.aoiId}
+        <span style="
+          min-width:0;
+          color:#6a756e;
+          font-size:9px;
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+        ">
+          ${item.aoiId}
+        </span>
+
+        <span style="
+          color:${estado.color};
+          font-size:9px;
+          font-weight:800;
+          white-space:nowrap;
+        ">
+          ${detalleEstado}
+        </span>
+
       </div>
 
     </div>
@@ -2366,6 +2598,13 @@ function activarInteraccionesPlanning() {
     )
     .forEach(
       tarjeta => {
+
+        if (
+          tarjeta.dataset.sembrado ===
+          "true"
+        ) {
+          return;
+        }
 
         tarjeta.addEventListener(
           "dragstart",
@@ -2641,7 +2880,28 @@ planningData = data.map(
           ? limpiarTexto(
               sitio.Crop
             )
-          : "Sin cultivo"
+          : "Sin cultivo",
+
+      plantingDate:
+        sitio
+          ? limpiarTexto(
+              sitio[
+                "Planting Date (MM/DD/YYYY)"
+              ]
+            )
+          : "",
+
+      sembrado:
+        sitio
+          ? estaSembrado(sitio)
+          : false,
+
+      actualPlanter:
+        sitio
+          ? limpiarTexto(
+              sitio.Planter
+            )
+          : ""
 
     };
 
@@ -3652,6 +3912,221 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
+function obtenerSitiosNoPlanificados() {
+
+  const idsPlanificados =
+    new Set(
+      planningData.map(
+        item =>
+          limpiarTexto(item.aoiId)
+      )
+    );
+
+  return sitios
+    .filter(
+      sitio => {
+
+        const aoiId =
+          limpiarTexto(
+            sitio["AOI ID"]
+          );
+
+        const operations =
+          normalizarTexto(
+            sitio.Operations
+          );
+
+        return (
+          aoiId &&
+          !esDrop(sitio) &&
+          !estaSembrado(sitio) &&
+          operations !== "contractor" &&
+          !idsPlanificados.has(aoiId)
+        );
+
+      }
+    )
+    .sort(
+      (a, b) =>
+        limpiarTexto(a.Location)
+          .localeCompare(
+            limpiarTexto(b.Location),
+            "es",
+            { sensitivity: "base" }
+          )
+    );
+
+}
+
+function renderNoPlanificadosPlanning() {
+
+  const noPlanificados =
+    obtenerSitiosNoPlanificados();
+
+  const muestra =
+    noPlanificados.slice(0, 60);
+
+  return `
+    <details
+      id="planningNoPlanificados"
+      style="
+        margin-bottom:10px;
+        border:1px solid #efc7c7;
+        border-radius:10px;
+        background:#fffafa;
+        overflow:hidden;
+      "
+    >
+      <summary style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+        padding:8px 12px;
+        cursor:pointer;
+        color:#9f2828;
+        font-size:12px;
+        font-weight:800;
+        list-style:none;
+      ">
+        <span style="
+          width:9px;
+          height:9px;
+          border-radius:50%;
+          background:#d32f2f;
+          flex:0 0 auto;
+        "></span>
+        No planificados
+        <span style="
+          min-width:24px;
+          padding:2px 7px;
+          border-radius:999px;
+          background:white;
+          border:1px solid #efc7c7;
+          text-align:center;
+          font-size:10px;
+        ">
+          ${noPlanificados.length}
+        </span>
+        <span style="
+          margin-left:auto;
+          color:#8a6a6a;
+          font-weight:600;
+          font-size:10px;
+        ">
+          Abrir para consultar
+        </span>
+      </summary>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
+        gap:7px;
+        max-height:260px;
+        overflow:auto;
+        padding:8px;
+        border-top:1px solid #f2dede;
+      ">
+        ${
+          muestra.length
+            ? muestra
+                .map(
+                  sitio => `
+                    <div style="
+                      display:flex;
+                      align-items:center;
+                      gap:8px;
+                      min-width:0;
+                      padding:7px 8px;
+                      background:white;
+                      border-left:5px solid #d32f2f;
+                      border-top:1px solid #eee;
+                      border-right:1px solid #eee;
+                      border-bottom:1px solid #eee;
+                      border-radius:8px;
+                    ">
+                      ${renderIconoCultivoPlanning(
+                        limpiarTexto(sitio.Crop),
+                        25
+                      )}
+                      <div style="min-width:0;">
+                        <div style="
+                          font-size:11px;
+                          font-weight:800;
+                          color:#2b352f;
+                          overflow:hidden;
+                          text-overflow:ellipsis;
+                          white-space:nowrap;
+                        ">
+                          ${limpiarTexto(
+                            sitio.Location
+                          )}
+                        </div>
+                        <div style="
+                          font-size:9px;
+                          color:#656f69;
+                          overflow:hidden;
+                          text-overflow:ellipsis;
+                          white-space:nowrap;
+                        ">
+                          ${limpiarTexto(sitio.Crop)} · ${limpiarTexto(
+                            sitio["AOI ID"]
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  `
+                )
+                .join("")
+            : `
+                <div style="
+                  padding:12px;
+                  color:#68746d;
+                  font-size:11px;
+                ">
+                  No hay AOI pendientes de planificación.
+                </div>
+              `
+        }
+      </div>
+
+      ${
+        noPlanificados.length > muestra.length
+          ? `
+            <div style="
+              padding:5px 10px 8px;
+              color:#806b6b;
+              font-size:9px;
+              text-align:right;
+            ">
+              Se muestran ${muestra.length} de ${noPlanificados.length}. Usá Add Planning para buscar el AOI restante.
+            </div>
+          `
+          : ""
+      }
+    </details>
+  `;
+
+}
+
+function renderLeyendaEstadoPlanning() {
+
+  return `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      color:#536159;
+      font-size:10px;
+    ">
+      <span><b style="color:#d32f2f;">●</b> No planificado</span>
+      <span><b style="color:#f4b400;">●</b> Planificado</span>
+      <span><b style="color:#2e7d32;">●</b> Sembrado</span>
+    </div>
+  `;
+
+}
+
 function renderPlanningBoard() {
 
   const semanas =
@@ -3755,6 +4230,24 @@ function renderPlanningBoard() {
         </button>
 
       </div>
+
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin:0 8px 8px;
+      ">
+        ${renderLeyendaEstadoPlanning()}
+        <span style="
+          color:#7a867f;
+          font-size:9px;
+        ">
+          Las tarjetas sembradas quedan bloqueadas para evitar reprogramaciones accidentales.
+        </span>
+      </div>
+
+      ${renderNoPlanificadosPlanning()}
 
       <div style="
         display:grid;
