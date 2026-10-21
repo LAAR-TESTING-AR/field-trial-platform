@@ -2635,18 +2635,21 @@ btnPlanning.addEventListener(
 
   <div style="
     background:white;
-    border:2px solid #f4c542;
+    border-left:6px solid #f4c542;
+border-top:1px solid #e5e7eb;
+border-right:1px solid #e5e7eb;
+border-bottom:1px solid #e5e7eb;
     border-radius:10px;
     padding:8px;
     text-align:left;
     font-size:12px;
   ">
 
-    🌽 Corn Regulated
+🌽 Corn Regulated
 
-    <br><strong>Ramallo</strong>
+<br><strong>Ramallo</strong>
 
-    <br>AOI1-AOI2
+<br>2 AOI
 
   </div>
 
