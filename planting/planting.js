@@ -2751,11 +2751,16 @@ btnPlanning.addEventListener(
     </div>
 
     <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
+  min-height:80px;
+  border:1px dashed #d9e3dc;
+  border-radius:12px;
+  background:white;
+  padding:6px;
+">
+
+  ${renderTarjetasPlanter("BE19183")}
+
+</div>
   </div>
 
   <div>
