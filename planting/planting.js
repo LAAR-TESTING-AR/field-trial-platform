@@ -1963,6 +1963,43 @@ function renderColumnaPlanter(
   `;
 
 }
+
+async function cargarPlanningDesdeSharePoint() {
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING_GET,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: "{}"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    console.log(
+      "Planning SharePoint",
+      data
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Error leyendo Planning",
+      error
+    );
+
+  }
+
+}
+
 function cargarLocalidadesPlanning() {
 
   const comboLocality =
@@ -2960,7 +2997,7 @@ btnPlanning.addEventListener(
     modalPlanning.classList.add(
       "visible"
     );
-
+cargarPlanningDesdeSharePoint();
 const inicioSemanaPlanning =
   obtenerInicioSemana(
     new Date()
