@@ -62,7 +62,8 @@ mapa.on("baselayerchange", function (evento) {
 let sitios = [];
 const URL_FLOW_SIEMBRA =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/d1ccb1bbfc2d42b1971a8e732db9aba7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a8tOXFBAyVBQZYwChwZCWsyvLfc33_lmeIcMHcH74Qs";
-
+const URL_FLOW_PLANNING =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
 let modalSiembra;
 let modalFechaSiembra;
 let modalPlanter;
