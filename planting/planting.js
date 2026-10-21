@@ -1985,26 +1985,48 @@ const data =
   await response.json();
 
 planningData = data.map(
-  item => ({
+  item => {
 
-    week:
-      item.Week,
+    const sitio =
+      sitios.find(
+        s =>
+          limpiarTexto(
+            s["AOI ID"]
+          ) ===
+          limpiarTexto(
+            item.AOI_ID
+          )
+      );
 
-    planter:
-      item.Planter,
+    return {
 
-    aoiId:
-      item.AOI_ID,
+      week:
+        item.Week,
 
-    location:
-      item.AOI_ID,
+      planter:
+        item.Planter,
 
-    crop:
-      "Pendiente"
+      aoiId:
+        item.AOI_ID,
 
-  })
+      location:
+        sitio
+          ? limpiarTexto(
+              sitio.Location
+            )
+          : item.AOI_ID,
+
+      crop:
+        sitio
+          ? limpiarTexto(
+              sitio.Crop
+            )
+          : "Sin cultivo"
+
+    };
+
+  }
 );
-
 console.log(
   "PlanningData cargado",
   planningData
