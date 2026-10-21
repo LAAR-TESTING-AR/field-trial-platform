@@ -2645,11 +2645,32 @@ border-bottom:1px solid #e5e7eb;
     font-size:12px;
   ">
 
-🌽 Corn Regulated
+<div style="
+  font-size:18px;
+  margin-bottom:4px;
+">
+  🟢
+</div>
 
-<br><strong>Ramallo</strong>
+<div style="
+  font-weight:700;
+">
+  Ramallo
+</div>
 
-<br>2 AOI
+<div style="
+  font-size:11px;
+  color:#555;
+">
+  Corn Regulated
+</div>
+
+<div style="
+  margin-top:4px;
+  font-size:11px;
+">
+  2 AOI
+</div>
 
   </div>
 
