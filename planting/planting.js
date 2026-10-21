@@ -1957,6 +1957,13 @@ function crearTarjetaPlanning(item) {
   data-id="${item.id}"
   data-planter="${item.planter}"
   data-week="${item.week}"
+  ondragstart="
+  draggedPlanningCard = {
+    id: ${item.id},
+    planter: '${item.planter}',
+    week: '${item.week}'
+  };
+"
   style="
     background:white;
     border-left:6px solid #f4c542;
