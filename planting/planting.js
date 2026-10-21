@@ -2111,14 +2111,25 @@ function renderColumnaPlanter(
     event.preventDefault();
   "
 
-  ondrop="
-    event.preventDefault();
+ ondrop="
+  event.preventDefault();
 
-    console.log(
-      'DROP',
-      '${planter}'
+  const item =
+    planningData.find(
+      p =>
+        p.id ===
+        draggedPlanningCard.id
     );
-  "
+
+  if (item) {
+
+    item.planter =
+      '${planter}';
+
+  }
+
+  btnPlanning.click();
+"
 
   style="
     min-height:80px;
