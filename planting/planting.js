@@ -3215,7 +3215,23 @@ btnGuardarPlanning?.addEventListener(
       limpiarTexto(
         registro["AOI ID"]
       );
+const existe =
+  planningData.some(
+    item =>
+      limpiarTexto(
+        item.aoiId
+      ) === aoiId
+  );
 
+if (existe) {
+
+  alert(
+    "Este AOI ya se encuentra planificado"
+  );
+
+  return;
+
+}
     try {
 
       const response =
