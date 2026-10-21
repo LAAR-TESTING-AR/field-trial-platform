@@ -3916,216 +3916,26 @@ ticks: {
 cerrarTimeline.addEventListener("click", () => {
   modalTimeline.classList.remove("visible");
 });
-function obtenerSitiosNoPlanificados() {
-
-  const idsPlanificados =
-    new Set(
-      planningData.map(
-        item =>
-          limpiarTexto(item.aoiId)
-      )
-    );
-
-  return sitios
-    .filter(
-      sitio => {
-
-        const aoiId =
-          limpiarTexto(
-            sitio["AOI ID"]
-          );
-
-        const operations =
-          normalizarTexto(
-            sitio.Operations
-          );
-
-        return (
-          aoiId &&
-          !esDrop(sitio) &&
-          !estaSembrado(sitio) &&
-          operations !== "contractor" &&
-          !idsPlanificados.has(aoiId)
-        );
-
-      }
-    )
-    .sort(
-      (a, b) =>
-        limpiarTexto(a.Location)
-          .localeCompare(
-            limpiarTexto(b.Location),
-            "es",
-            { sensitivity: "base" }
-          )
-    );
-
-}
-
-function renderNoPlanificadosPlanning() {
-
-  const noPlanificados =
-    obtenerSitiosNoPlanificados();
-
-  const muestra =
-    noPlanificados.slice(0, 60);
-
-  return `
-    <details
-      id="planningNoPlanificados"
-      style="
-        margin-bottom:10px;
-        border:1px solid #efc7c7;
-        border-radius:10px;
-        background:#fffafa;
-        overflow:hidden;
-      "
-    >
-      <summary style="
-        display:flex;
-        align-items:center;
-        gap:8px;
-        padding:8px 12px;
-        cursor:pointer;
-        color:#9f2828;
-        font-size:12px;
-        font-weight:800;
-        list-style:none;
-      ">
-        <span style="
-          width:9px;
-          height:9px;
-          border-radius:50%;
-          background:#d32f2f;
-          flex:0 0 auto;
-        "></span>
-        No planificados
-        <span style="
-          min-width:24px;
-          padding:2px 7px;
-          border-radius:999px;
-          background:white;
-          border:1px solid #efc7c7;
-          text-align:center;
-          font-size:10px;
-        ">
-          ${noPlanificados.length}
-        </span>
-        <span style="
-          margin-left:auto;
-          color:#8a6a6a;
-          font-weight:600;
-          font-size:10px;
-        ">
-          Abrir para consultar
-        </span>
-      </summary>
-
-      <div style="
-        display:grid;
-        grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));
-        gap:7px;
-        max-height:260px;
-        overflow:auto;
-        padding:8px;
-        border-top:1px solid #f2dede;
-      ">
-        ${
-          muestra.length
-            ? muestra
-                .map(
-                  sitio => `
-                    <div style="
-                      display:flex;
-                      align-items:center;
-                      gap:8px;
-                      min-width:0;
-                      padding:7px 8px;
-                      background:white;
-                      border-left:5px solid #d32f2f;
-                      border-top:1px solid #eee;
-                      border-right:1px solid #eee;
-                      border-bottom:1px solid #eee;
-                      border-radius:8px;
-                    ">
-                      ${renderIconoCultivoPlanning(
-                        limpiarTexto(sitio.Crop),
-                        25
-                      )}
-                      <div style="min-width:0;">
-                        <div style="
-                          font-size:11px;
-                          font-weight:800;
-                          color:#2b352f;
-                          overflow:hidden;
-                          text-overflow:ellipsis;
-                          white-space:nowrap;
-                        ">
-                          ${limpiarTexto(
-                            sitio.Location
-                          )}
-                        </div>
-                        <div style="
-                          font-size:9px;
-                          color:#656f69;
-                          overflow:hidden;
-                          text-overflow:ellipsis;
-                          white-space:nowrap;
-                        ">
-                          ${limpiarTexto(sitio.Crop)} · ${limpiarTexto(
-                            sitio["AOI ID"]
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  `
-                )
-                .join("")
-            : `
-                <div style="
-                  padding:12px;
-                  color:#68746d;
-                  font-size:11px;
-                ">
-                  No hay AOI pendientes de planificación.
-                </div>
-              `
-        }
-      </div>
-
-      ${
-        noPlanificados.length > muestra.length
-          ? `
-            <div style="
-              padding:5px 10px 8px;
-              color:#806b6b;
-              font-size:9px;
-              text-align:right;
-            ">
-              Se muestran ${muestra.length} de ${noPlanificados.length}. Usá Add Planning para buscar el AOI restante.
-            </div>
-          `
-          : ""
-      }
-    </details>
-  `;
-
-}
-
 function renderLeyendaEstadoPlanning() {
 
   return `
     <div style="
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
       flex-wrap:wrap;
       color:#536159;
-      font-size:10px;
+      font-size:9px;
+      line-height:1;
     ">
-      <span><b style="color:#d32f2f;">●</b> No planificado</span>
-      <span><b style="color:#f4b400;">●</b> Planificado</span>
-      <span><b style="color:#2e7d32;">●</b> Sembrado</span>
+      <span>
+        <b style="color:#f4b400;">●</b>
+        Planificado
+      </span>
+      <span>
+        <b style="color:#2e7d32;">●</b>
+        Sembrado
+      </span>
     </div>
   `;
 
@@ -4147,12 +3957,12 @@ function renderPlanningBoard() {
   ).innerHTML = `
 
     <div style="
-      height:calc(100vh - 150px);
-      min-height:520px;
-      max-height:860px;
+      height:calc(100vh - 126px);
+      min-height:540px;
+      max-height:900px;
       display:grid;
-      grid-template-rows:auto auto auto auto minmax(0, 1fr) auto;
-      padding:10px 16px 10px;
+      grid-template-rows:auto auto auto minmax(0, 1fr) auto;
+      padding:7px 16px 8px;
       box-sizing:border-box;
       background:#ffffff;
       overflow:hidden;
@@ -4162,10 +3972,11 @@ function renderPlanningBoard() {
         id="planningWeekNavigator"
         style="
           display:grid;
-          grid-template-columns:auto 1fr auto;
+          grid-template-columns:34px 1fr 34px;
           align-items:center;
-          gap:12px;
-          margin-bottom:7px;
+          gap:9px;
+          min-height:31px;
+          margin-bottom:3px;
         "
       >
 
@@ -4174,38 +3985,53 @@ function renderPlanningBoard() {
           type="button"
           title="Mostrar una semana anterior"
           style="
-            width:38px;
-            height:34px;
+            width:34px;
+            height:30px;
             border:1px solid #b9c9bf;
-            border-radius:9px;
+            border-radius:8px;
             background:white;
             color:#0b6b3a;
-            font-size:21px;
+            font-size:19px;
             font-weight:800;
             cursor:pointer;
+            padding:0;
           "
         >‹</button>
 
-        <div style="text-align:center;min-width:0;">
-          <div style="font-size:14px;font-weight:800;color:#173f2a;">
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:9px;
+          min-width:0;
+          white-space:nowrap;
+        ">
+          <span style="font-size:13px;font-weight:800;color:#173f2a;">
             ${semanas[0].week}
-            <span style="color:#9aaba1;padding:0 7px;">•</span>
+          </span>
+          <span style="color:#9aaba1;">•</span>
+          <span style="font-size:13px;font-weight:900;color:#0b6b3a;">
             ${semanas[1].week}
-            <span style="color:#9aaba1;padding:0 7px;">•</span>
+          </span>
+          <span style="color:#9aaba1;">•</span>
+          <span style="font-size:13px;font-weight:800;color:#173f2a;">
             ${semanas[2].week}
-          </div>
+          </span>
           <button
             id="btnPlanningHoy"
             type="button"
+            title="Volver a la semana actual"
             style="
               border:none;
               background:none;
-              padding:2px 6px;
+              padding:0 0 0 4px;
               color:#627369;
-              font-size:11px;
+              font-size:9px;
               cursor:pointer;
+              text-decoration:underline;
+              white-space:nowrap;
             "
-          >Volver a semana actual</button>
+          >Hoy</button>
         </div>
 
         <button
@@ -4213,15 +4039,16 @@ function renderPlanningBoard() {
           type="button"
           title="Mostrar una semana siguiente"
           style="
-            width:38px;
-            height:34px;
+            width:34px;
+            height:30px;
             border:1px solid #b9c9bf;
-            border-radius:9px;
+            border-radius:8px;
             background:white;
             color:#0b6b3a;
-            font-size:21px;
+            font-size:19px;
             font-weight:800;
             cursor:pointer;
+            padding:0;
           "
         >›</button>
 
@@ -4231,22 +4058,21 @@ function renderPlanningBoard() {
         display:flex;
         align-items:center;
         justify-content:space-between;
-        gap:10px;
-        margin:0 8px 7px;
+        gap:8px;
+        min-height:20px;
+        margin:0 8px 4px;
       ">
         ${renderLeyendaEstadoPlanning()}
-        <span style="color:#7a867f;font-size:9px;">
-          Las tarjetas sembradas conservan el estado verde y pueden moverse o eliminarse.
+        <span style="color:#7a867f;font-size:8px;line-height:1;">
+          Las tarjetas sembradas pueden moverse o eliminarse.
         </span>
       </div>
-
-      ${renderNoPlanificadosPlanning()}
 
       <div style="
         display:grid;
         grid-template-columns:repeat(8, minmax(0, 1fr));
         gap:8px;
-        padding:0 8px 7px;
+        padding:0 8px 5px;
         background:white;
         z-index:5;
       ">
@@ -4266,7 +4092,7 @@ function renderPlanningBoard() {
       >
         <div style="
           display:grid;
-          gap:10px;
+          gap:8px;
           padding-bottom:4px;
         ">
           ${semanas
@@ -4279,8 +4105,8 @@ function renderPlanningBoard() {
         display:flex;
         justify-content:flex-end;
         align-items:center;
-        min-height:52px;
-        padding:8px 4px 0;
+        min-height:46px;
+        padding:6px 4px 0;
         border-top:1px solid #e5ebe7;
         background:white;
         z-index:20;
@@ -4291,13 +4117,9 @@ function renderPlanningBoard() {
           ${hayCambios ? "" : "disabled"}
           style="
             border:none;
-            border-radius:10px;
-            padding:10px 16px;
-            background:${
-              hayCambios
-                ? "#0b6b3a"
-                : "#cfd8d3"
-            };
+            border-radius:9px;
+            padding:9px 14px;
+            background:${hayCambios ? "#0b6b3a" : "#cfd8d3"};
             color:white;
             font-weight:800;
             box-shadow:${
@@ -4305,11 +4127,7 @@ function renderPlanningBoard() {
                 ? "0 6px 18px rgba(11,107,58,.24)"
                 : "none"
             };
-            cursor:${
-              hayCambios
-                ? "pointer"
-                : "default"
-            };
+            cursor:${hayCambios ? "pointer" : "default"};
           "
         >
           💾 Guardar cambios${
