@@ -66,6 +66,8 @@ const URL_FLOW_PLANNING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
 const URL_FLOW_PLANNING_GET =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/24/workflows/af587c26aece442f80e564de5760ef4c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pLrdlfm9Ppj7utl9RMcw8iR_ZoL5h75LICgKvIykcPE";
+const URL_FLOW_PLANNING_DELETE =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/29/workflows/bf37955d8b4e4564ace52d7d377ea427/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIeyWIwFS9mFfY6Jj4x0iXPPdNZFhfdgYtLeTHrRMhw";
 let modalSiembra;
 let modalFechaSiembra;
 let modalPlanter;
