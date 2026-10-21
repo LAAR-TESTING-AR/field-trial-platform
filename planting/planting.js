@@ -1920,7 +1920,7 @@ function crearTarjetaPlanning(item) {
         font-size:11px;
         color:#666;
       ">
-        ${item.aoiCount} AOI
+        ${item.aoiId}
       </div>
 
     </div>
