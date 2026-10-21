@@ -3238,74 +3238,10 @@ cerrarTimeline.addEventListener("click", () => {
 });
 function renderPlanningBoard(
   semanaPlanningActual
-) {
-
-  document.getElementById(
-    "planningGrid"
-  ).innerHTML = `
-
-      <div
-        style="
-          padding:20px;
-          text-align:center;
-        "
-      >
-
-        <div
-          style="
-            font-size:24px;
-            font-weight:700;
-            color:#0b6b3a;
-            margin-bottom:4px;
-          "
-        >
-          ${semanaPlanningActual}
-        </div>
-
-        <div
-          style="
-            font-size:13px;
-            color:#666;
-            margin-bottom:10px;
-          "
-        >
-          Current Week
-        </div>
-
-        <div
-          style="
-            height:1px;
-            background:#d9e3dc;
-            margin:10px 0;
-          "
-        ></div>
-
-        <div
-          style="
-            display:grid;
-            grid-template-columns:repeat(8, 1fr);
-            gap:8px;
-            align-items:start;
-          "
-        >
-
-          ${plantingPlanters
-            .map(
-              planter =>
-                renderColumnaPlanter(
-                  planter,
-                  semanaPlanningActual
-                )
-            )
-            .join("")}
-
-        </div>
-
-      </div>
-
-  `;
-
-}
+) 
+renderPlanningBoard(
+  semanaPlanningActual
+);
 btnPlanning.addEventListener(
   "click",
   async () => {
