@@ -2630,7 +2630,7 @@ btnPlanning.addEventListener(
 
   <div
     style="
-      min-height:180px;
+      min-height:80px;
       border:1px dashed #d9e3dc;
       border-radius:12px;
       background:white;
