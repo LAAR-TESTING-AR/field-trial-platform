@@ -2128,7 +2128,10 @@ function renderColumnaPlanter(
 
   }
 
-  btnPlanning.click();
+ console.log(
+  'Nuevo planter',
+  item.planter
+);
 "
 
   style="
