@@ -4596,6 +4596,200 @@ function renderPlanningBoard() {
 
 }
 
+function estilizarFormularioMasterPlanning() {
+
+  if (!planningForm) {
+    return;
+  }
+
+  planningForm.style.margin =
+    "10px 0 12px";
+
+  planningForm.style.padding =
+    "12px";
+
+  planningForm.style.border =
+    "1px solid #d9e3dc";
+
+  planningForm.style.borderRadius =
+    "10px";
+
+  planningForm.style.background =
+    "#f8fbf9";
+
+  planningForm.style.boxSizing =
+    "border-box";
+
+  let titulo =
+    document.getElementById(
+      "masterPlanningFormTitle"
+    );
+
+  if (!titulo) {
+
+    titulo =
+      document.createElement("div");
+
+    titulo.id =
+      "masterPlanningFormTitle";
+
+    titulo.textContent =
+      "Master Planning";
+
+    titulo.style.marginBottom =
+      "10px";
+
+    titulo.style.color =
+      "#173f2a";
+
+    titulo.style.fontSize =
+      "14px";
+
+    titulo.style.fontWeight =
+      "800";
+
+    planningForm.prepend(titulo);
+
+  }
+
+  const grid =
+    planningForm.querySelector(
+      ".planning-form-grid"
+    );
+
+  if (grid) {
+
+    grid.style.display = "grid";
+
+    grid.style.gridTemplateColumns =
+      "repeat(3, minmax(0, 1fr))";
+
+    grid.style.gap = "10px";
+
+    grid.style.alignItems = "start";
+
+  }
+
+  planningForm
+    .querySelectorAll("label")
+    .forEach(
+      label => {
+
+        label.style.display = "block";
+        label.style.marginBottom = "4px";
+        label.style.color = "#536159";
+        label.style.fontSize = "11px";
+        label.style.fontWeight = "700";
+
+      }
+    );
+
+  planningForm
+    .querySelectorAll("select")
+    .forEach(
+      select => {
+
+        select.style.width = "100%";
+        select.style.boxSizing = "border-box";
+        select.style.padding = "9px";
+        select.style.border =
+          "1px solid #bfc7c1";
+        select.style.borderRadius = "8px";
+        select.style.background = "white";
+        select.style.color = "#25352c";
+        select.style.fontSize = "13px";
+
+      }
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (preview) {
+
+    preview.style.minHeight = "38px";
+    preview.style.maxHeight = "74px";
+    preview.style.overflowY = "auto";
+    preview.style.boxSizing = "border-box";
+    preview.style.padding = "9px";
+    preview.style.border =
+      "1px solid #bfc7c1";
+    preview.style.borderRadius = "8px";
+    preview.style.background = "white";
+    preview.style.color = "#25352c";
+    preview.style.fontSize = "12px";
+    preview.style.lineHeight = "1.35";
+
+  }
+
+  const actions =
+    planningForm.querySelector(
+      ".planning-form-actions"
+    );
+
+  if (actions) {
+
+    actions.style.display = "flex";
+    actions.style.justifyContent = "flex-end";
+    actions.style.gap = "8px";
+    actions.style.marginTop = "12px";
+
+  }
+
+  if (btnCancelarPlanning) {
+
+    btnCancelarPlanning.style.padding =
+      "8px 12px";
+
+    btnCancelarPlanning.style.border =
+      "1px solid #bfc7c1";
+
+    btnCancelarPlanning.style.borderRadius =
+      "8px";
+
+    btnCancelarPlanning.style.background =
+      "white";
+
+    btnCancelarPlanning.style.color =
+      "#536159";
+
+    btnCancelarPlanning.style.fontWeight =
+      "700";
+
+    btnCancelarPlanning.style.cursor =
+      "pointer";
+
+  }
+
+  if (btnGuardarPlanning) {
+
+    btnGuardarPlanning.style.padding =
+      "8px 12px";
+
+    btnGuardarPlanning.style.border =
+      "none";
+
+    btnGuardarPlanning.style.borderRadius =
+      "8px";
+
+    btnGuardarPlanning.style.background =
+      "#0b6b3a";
+
+    btnGuardarPlanning.style.color =
+      "white";
+
+    btnGuardarPlanning.style.fontWeight =
+      "800";
+
+    btnGuardarPlanning.style.cursor =
+      "pointer";
+
+  }
+
+}
+
 btnPlanning.addEventListener(
   "click",
   async () => {
@@ -4620,6 +4814,7 @@ btnAddPlanning?.addEventListener(
   "click",
   () => {
 
+    estilizarFormularioMasterPlanning();
     cargarLocalidadesPlanning();
     cargarSemanasPlanning();
 
