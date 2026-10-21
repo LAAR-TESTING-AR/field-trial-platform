@@ -2136,10 +2136,7 @@ function actualizarAoiPlanning() {
     return;
 
   }
-console.log(
-  "Ejemplo sitio:",
-  sitios[0]
-);
+
   const aoi = sitios
     .filter(
       sitio =>
@@ -2153,7 +2150,7 @@ console.log(
     .map(
       sitio =>
         limpiarTexto(
-          sitio["AOI Name SPD"]
+          sitio["AOI ID"]
         )
     )
     .filter(Boolean);
