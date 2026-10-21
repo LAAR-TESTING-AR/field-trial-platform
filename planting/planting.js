@@ -2674,6 +2674,48 @@ border-bottom:1px solid #e5e7eb;
 
   </div>
 
+  <div style="
+    background:white;
+    border-left:6px solid #f4c542;
+    border-top:1px solid #e5e7eb;
+    border-right:1px solid #e5e7eb;
+    border-bottom:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:8px;
+    text-align:left;
+    font-size:12px;
+    margin-top:6px;
+  ">
+
+    <div style="
+      font-size:18px;
+      margin-bottom:4px;
+    ">
+      🟣
+    </div>
+
+    <div style="
+      font-weight:700;
+    ">
+      Pergamino
+    </div>
+
+    <div style="
+      font-size:11px;
+      color:#555;
+    ">
+      Soybean Stewarded
+    </div>
+
+    <div style="
+      margin-top:4px;
+      font-size:11px;
+    ">
+      1 AOI
+    </div>
+
+  </div>
+
 </div>
   </div>
 
