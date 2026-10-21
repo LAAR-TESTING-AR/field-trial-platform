@@ -2105,6 +2105,60 @@ function cargarCultivosPlanning() {
 
   comboCrop.disabled =
     false;
+actualizarAoiPlanning();
+}
+function actualizarAoiPlanning() {
+
+  const locality =
+    document.getElementById(
+      "planningLocality"
+    )?.value;
+
+  const crop =
+    document.getElementById(
+      "planningCrop"
+    )?.value;
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (!preview) {
+    return;
+  }
+
+  if (!locality || !crop) {
+
+    preview.textContent =
+      "Seleccione localidad y cultivo";
+
+    return;
+
+  }
+
+  const aoi = sitios
+    .filter(
+      sitio =>
+        limpiarTexto(
+          sitio.Location
+        ) === locality &&
+        limpiarTexto(
+          sitio.Crop
+        ) === crop
+    )
+    .map(
+      sitio =>
+        limpiarTexto(
+          sitio["AOI Name SPD"]
+        )
+    )
+    .filter(Boolean);
+
+  preview.innerHTML =
+    aoi.length
+      ? aoi.join("<br>")
+      : "Sin AOI disponibles";
 
 }
 
@@ -2987,7 +3041,14 @@ document
     "change",
     cargarCultivosPlanning
   );
-
+document
+  .getElementById(
+    "planningCrop"
+  )
+  ?.addEventListener(
+    "change",
+    actualizarAoiPlanning
+  );
 cerrarPlanning.addEventListener(
   "click",
   () => {
