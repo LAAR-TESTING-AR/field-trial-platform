@@ -2136,7 +2136,10 @@ function actualizarAoiPlanning() {
     return;
 
   }
-
+console.log(
+  "Ejemplo sitio:",
+  sitios[0]
+);
   const aoi = sitios
     .filter(
       sitio =>
