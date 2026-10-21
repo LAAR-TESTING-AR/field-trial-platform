@@ -2134,7 +2134,9 @@ if (item) {
   alert(
     'Movido a ${planter}'
   );
-
+console.log(
+  planningData
+);
 }
 
  console.log(
