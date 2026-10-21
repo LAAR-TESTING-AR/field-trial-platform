@@ -2646,16 +2646,28 @@ border-bottom:1px solid #e5e7eb;
   ">
 
 <div style="
-  font-size:18px;
-  margin-bottom:4px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:2px;
 ">
-  🟢
-</div>
 
-<div style="
-  font-weight:700;
-">
-  Ramallo
+  <div style="
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#34c759;
+    flex-shrink:0;
+  ">
+  </div>
+
+  <div style="
+    font-weight:700;
+    font-size:13px;
+  ">
+    Ramallo
+  </div>
+
 </div>
 
 <div style="
@@ -2666,8 +2678,9 @@ border-bottom:1px solid #e5e7eb;
 </div>
 
 <div style="
-  margin-top:4px;
+  margin-top:2px;
   font-size:11px;
+  color:#666;
 ">
   2 AOI
 </div>
