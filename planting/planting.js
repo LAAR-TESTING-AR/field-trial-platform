@@ -2625,12 +2625,32 @@ btnPlanning.addEventListener(
       BE19182
     </div>
 
-    <div style="
-      min-height:80px;
-      border:1px dashed #d9e3dc;
-      border-radius:12px;
-      background:white;
-    "></div>
+ <div style="
+  min-height:80px;
+  border:1px dashed #d9e3dc;
+  border-radius:12px;
+  background:white;
+  padding:6px;
+">
+
+  <div style="
+    background:white;
+    border:2px solid #f4c542;
+    border-radius:10px;
+    padding:8px;
+    text-align:left;
+    font-size:12px;
+  ">
+
+    🌽 Corn Regulated
+
+    <br><strong>Ramallo</strong>
+
+    <br>AOI1-AOI2
+
+  </div>
+
+</div>
   </div>
 
   <div>
