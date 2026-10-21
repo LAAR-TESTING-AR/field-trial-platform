@@ -1847,7 +1847,50 @@ const plantingPlanters = [
   "BE19188",
   "PP23191"
 ];
+async function eliminarPlanning(
+  id
+) {
 
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING_DELETE,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            ID: id
+          })
+        }
+      );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Error eliminando Planning"
+      );
+
+    }
+
+    btnPlanning.click();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error eliminando Planning"
+    );
+
+  }
+
+}
 function crearTarjetaPlanning(item) {
 
   return `
