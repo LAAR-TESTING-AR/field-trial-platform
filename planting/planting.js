@@ -1812,6 +1812,27 @@ const cerrarPlanning =
   document.getElementById(
     "cerrarPlanning"
   );
+
+const planningData = [
+
+  {
+    week: "19/10 - 25/10",
+    planter: "BE19182",
+    location: "Ramallo",
+    crop: "Corn Regulated",
+    aoiCount: 2
+  },
+
+  {
+    week: "19/10 - 25/10",
+    planter: "BE19182",
+    location: "Pergamino",
+    crop: "Soybean Stewarded",
+    aoiCount: 1
+  }
+
+];
+
 const btnPlanterStats =
   document.getElementById(
     "btnPlanterStats"
