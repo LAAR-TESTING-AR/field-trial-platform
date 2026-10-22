@@ -27,103 +27,188 @@ const mapa = L.map("mapa", {
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
-let spiderfierMasterList = null;
-let promesaSpiderfierMasterList = null;
+let marcadoresMasterList = [];
+let lineasMarcadoresDesplegados = [];
+let marcadoresDesplegados = [];
 
-function cargarSpiderfierMasterList() {
-  if (window.OverlappingMarkerSpiderfier) {
-    return Promise.resolve();
-  }
-
-  if (promesaSpiderfierMasterList) {
-    return promesaSpiderfierMasterList;
-  }
-
-  promesaSpiderfierMasterList = new Promise((resolve, reject) => {
-    const src = "https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js";
-    const existente = document.querySelector(`script[src="${src}"]`);
-
-    if (existente) {
-      existente.addEventListener("load", resolve, { once: true });
-      existente.addEventListener("error", reject, { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-
-  return promesaSpiderfierMasterList;
-}
-
-function inicializarSpiderfierMasterList() {
-  if (
-    spiderfierMasterList ||
-    !window.OverlappingMarkerSpiderfier
-  ) {
-    return;
-  }
-
-  spiderfierMasterList = new window.OverlappingMarkerSpiderfier(
-    mapa,
-    {
-      keepSpiderfied: true,
-      nearbyDistance: 28,
-      circleSpiralSwitchover: 9,
-      legWeight: 1.5
-    }
+function contraerMarcadoresMasterList() {
+  lineasMarcadoresDesplegados.forEach(
+    linea => capaMarcadores.removeLayer(linea)
   );
 
-  spiderfierMasterList.addListener(
-    "click",
+  lineasMarcadoresDesplegados = [];
+
+  marcadoresDesplegados.forEach(
     marcador => {
-      marcador.openPopup();
+      if (marcador._posicionReal) {
+        marcador.setLatLng(
+          marcador._posicionReal
+        );
+      }
+      marcador._estaDesplegado = false;
     }
   );
 
-  spiderfierMasterList.addListener(
-    "spiderfy",
-    () => {
-      mapa.closePopup();
+  marcadoresDesplegados = [];
+}
+
+function obtenerMarcadoresCercanosMasterList(
+  marcador,
+  distanciaMaxima = 42
+) {
+  const puntoBase =
+    mapa.latLngToContainerPoint(
+      marcador._posicionReal ||
+      marcador.getLatLng()
+    );
+
+  return marcadoresMasterList.filter(
+    candidato => {
+      if (!capaMarcadores.hasLayer(candidato)) {
+        return false;
+      }
+
+      const puntoCandidato =
+        mapa.latLngToContainerPoint(
+          candidato._posicionReal ||
+          candidato.getLatLng()
+        );
+
+      return puntoBase.distanceTo(
+        puntoCandidato
+      ) <= distanciaMaxima;
     }
   );
 }
 
-function limpiarSpiderfierMasterList() {
-  if (!spiderfierMasterList) {
-    return;
+function desplegarMarcadoresMasterList(
+  marcadores
+) {
+  contraerMarcadoresMasterList();
+
+  if (marcadores.length < 2) {
+    return false;
   }
 
-  if (
-    typeof spiderfierMasterList.unspiderfy ===
-    "function"
-  ) {
-    spiderfierMasterList.unspiderfy();
-  }
+  const centroLatLng =
+    marcadores[0]._posicionReal ||
+    marcadores[0].getLatLng();
 
-  if (
-    typeof spiderfierMasterList.clearMarkers ===
-    "function"
-  ) {
-    spiderfierMasterList.clearMarkers();
-  }
+  const centroPunto =
+    mapa.latLngToLayerPoint(
+      centroLatLng
+    );
+
+  const cantidad = marcadores.length;
+  const radio =
+    Math.max(
+      46,
+      Math.min(76, 34 + cantidad * 6)
+    );
+
+  marcadores.forEach(
+    (marcador, indice) => {
+      const angulo =
+        (-Math.PI / 2) +
+        ((Math.PI * 2 * indice) /
+          cantidad);
+
+      const destinoPunto =
+        L.point(
+          centroPunto.x +
+            Math.cos(angulo) * radio,
+          centroPunto.y +
+            Math.sin(angulo) * radio
+        );
+
+      const destinoLatLng =
+        mapa.layerPointToLatLng(
+          destinoPunto
+        );
+
+      const linea = L.polyline(
+        [centroLatLng, destinoLatLng],
+        {
+          color: "#526158",
+          weight: 1.5,
+          opacity: 0.72,
+          interactive: false,
+          dashArray: "3 3"
+        }
+      ).addTo(capaMarcadores);
+
+      lineasMarcadoresDesplegados.push(
+        linea
+      );
+
+      marcador.setLatLng(
+        destinoLatLng
+      );
+
+      marcador._estaDesplegado = true;
+      marcador.setZIndexOffset(
+        3000 + indice
+      );
+    }
+  );
+
+  marcadoresDesplegados = marcadores;
+  mapa.closePopup();
+
+  return true;
 }
 
-function registrarMarcadorSpiderfierMasterList(
+function registrarMarcadorMasterList(
   marcador
 ) {
-  if (
-    spiderfierMasterList &&
-    typeof spiderfierMasterList.addMarker ===
-      "function"
-  ) {
-    spiderfierMasterList.addMarker(marcador);
-  }
+  marcador._posicionReal =
+    L.latLng(
+      marcador.getLatLng()
+    );
+
+  marcador._estaDesplegado = false;
+  marcador.off("click");
+
+  marcador.on(
+    "click",
+    evento => {
+      if (
+        evento.originalEvent &&
+        typeof evento.originalEvent.stopPropagation ===
+          "function"
+      ) {
+        evento.originalEvent.stopPropagation();
+      }
+
+      if (marcador._estaDesplegado) {
+        marcador.openPopup();
+        return;
+      }
+
+      const cercanos =
+        obtenerMarcadoresCercanosMasterList(
+          marcador
+        );
+
+      if (
+        !desplegarMarcadoresMasterList(
+          cercanos
+        )
+      ) {
+        marcador.openPopup();
+      }
+    }
+  );
+
+  marcadoresMasterList.push(marcador);
 }
+
+mapa.on(
+  "click zoomstart movestart",
+  () => {
+    contraerMarcadoresMasterList();
+  }
+);
 
 L.control.layers(
   {
@@ -507,7 +592,8 @@ function actualizarLeyenda(sitiosFiltrados) {
 }
 
 function actualizarMapa() {
-  limpiarSpiderfierMasterList();
+  contraerMarcadoresMasterList();
+  marcadoresMasterList = [];
   capaMarcadores.clearLayers();
   const sitiosFiltrados = sitios.filter(coincideConFiltros);
   const coordenadas = [];
@@ -530,9 +616,7 @@ function actualizarMapa() {
         )
         .addTo(capaMarcadores);
 
-      marcadorTrial.off("click");
-
-      registrarMarcadorSpiderfierMasterList(
+      registrarMarcadorMasterList(
         marcadorTrial
       );
       coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
@@ -559,9 +643,7 @@ function actualizarMapa() {
         )
         .addTo(capaMarcadores);
 
-      marcadorAccess.off("click");
-
-      registrarMarcadorSpiderfierMasterList(
+      registrarMarcadorMasterList(
         marcadorAccess
       );
       coordenadas.push([sitio.latitudeAccess, sitio.longitudeAccess]);
@@ -776,22 +858,6 @@ limpiarFiltros.addEventListener(
 mapa.on("popupopen", ocultarLeyenda);
 mapa.on("click", ocultarLeyenda);
 agregarLeyendaPremium();
-
-cargarSpiderfierMasterList()
-  .then(() => {
-    inicializarSpiderfierMasterList();
-
-    if (sitios.length) {
-      actualizarMapa();
-    }
-  })
-  .catch(error => {
-    console.warn(
-      "No se pudo cargar el despliegue de marcadores cercanos:",
-      error
-    );
-  });
-
 cargarSitios();
 const syncBtn =
   document.getElementById(
