@@ -1304,4 +1304,8 @@ text-align: center;
     display: none !important;
   }
 
+  .planning-card {
+    min-height: auto !important;
+  }
+
 }
