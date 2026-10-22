@@ -1297,3 +1297,11 @@ text-align: center;
 #btnAddSpecialPlanning:active{
   transform:translateY(1px);
 }
+@media (max-width: 768px) {
+
+  .planning-card-aoi,
+  .planning-card-status {
+    display: none !important;
+  }
+
+}
