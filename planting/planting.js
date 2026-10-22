@@ -462,19 +462,6 @@ function estaPlanificado(
         ) === aoiId
     );
 
-  if (
-    aoiId ===
-    "ANCY04NRDLET"
-  ) {
-
-    console.log(
-      "BUSCANDO",
-      aoiId,
-      encontrado,
-      planningData
-    );
-
-  }
 
   return Boolean(
     encontrado
@@ -1518,14 +1505,6 @@ if (
 
 }
     
-if (planificado) {
-
-  console.log(
-    "PLANIFICADO:",
-    sitio["AOI ID"]
-  );
-
-}
 let color =
   "#d32f2f";
 
