@@ -106,7 +106,7 @@ ACCY04NSUART,Suardi ,SPD,Corn,IMPACT 3R,Late,AC,Santa Fe,Centro,-30.49787,-61.91
 ACCY04NSUCOT,Suco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Oeste,-33.42862,-64.78857,,,,,,,D2 - 65000,Estandar,2.295,Milani,Open Rio IV,,REFERENCE,,REFERENCE,
 AACY04NTR2HT,Tres Arroyos,Contractor,Corn,HYPER,Late,XL,Buenos Aires,Sudeste,-38.694861,-59.771189,-38.692788,-59.774181,,,,,D1 - 55000,Estandar,0.1827,Cantero,Sarlangue,Se siembra en Orense,REFERENCE,,REFERENCE,
 ACCY04NMAK2T,Vicuña Mackenna,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AC,Córdoba,Oeste,-34.18846,-64.34118,,,,,,,D3 - 75000,Alta,2.3715,Milani,Open Rio IV,,REFERENCE,,REFERENCE,
-ACCY04NVMRST,Villa Maria del Rio Seco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-30.02585,-63.75195,,,10/22/2026,BE19184,,,D2 - 65000,Estandar,2.295,Attme,Capristo,,REFERENCE,,REFERENCE,
+ACCY04NVMRST,Villa Maria del Rio Seco,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,Centro,-30.02585,-63.75195,,,,,,,D2 - 65000,Estandar,2.295,Attme,Capristo,,REFERENCE,,REFERENCE,
 ACCY04NVVALT,Villa Valeria,SPD,Corn,IMPACT 3R,Late,AC,Córdoba,Oeste,-34.34024,-64.52098,,,,,,,D2 - 65000,Baja,0.1968,Milani,Espelet,,REFERENCE,,REFERENCE,
 AACY04NVGU2T,Villaguay,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AA,Entre Ríos,Litoral,-32.08565,-59.00467,,,,,,,D3 - 75000,Baja,2.295,Vilchez,Bernardi,,REFERENCE,,REFERENCE,
 Completar,Cordoba PC1,SPD,Corn - Parent Chr,ARPC,Early,AC,Córdoba,Centro,-31.491074,-64.020521,,,,,,,,,0,Cano,Capristo,,REFERENCE,,REFERENCE,
