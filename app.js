@@ -530,6 +530,8 @@ function actualizarMapa() {
         )
         .addTo(capaMarcadores);
 
+      marcadorTrial.off("click");
+
       registrarMarcadorSpiderfierMasterList(
         marcadorTrial
       );
@@ -556,6 +558,8 @@ function actualizarMapa() {
           }
         )
         .addTo(capaMarcadores);
+
+      marcadorAccess.off("click");
 
       registrarMarcadorSpiderfierMasterList(
         marcadorAccess
