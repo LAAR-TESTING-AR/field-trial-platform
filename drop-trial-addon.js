@@ -95,21 +95,47 @@
   let marcadoresCercanosAddon = [];
   let marcadoresAbiertosAddon = [];
   let lineasAbiertasAddon = [];
+  let cerrandoGrupoAddon = false;
 
   function normalizarLocalidadAddon(valor) {
     return String(valor || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
   function cerrarGrupoAddon() {
-    lineasAbiertasAddon.forEach(linea => {
-      if (capaMarcadores.hasLayer(linea)) capaMarcadores.removeLayer(linea);
-    });
-    lineasAbiertasAddon = [];
-    marcadoresAbiertosAddon.forEach(marcador => {
-      if (marcador._posicionRealAddon) marcador.setLatLng(marcador._posicionRealAddon);
-      marcador._abiertoAddon = false;
-    });
-    marcadoresAbiertosAddon = [];
+    if (cerrandoGrupoAddon) return;
+    if (
+      !marcadoresAbiertosAddon.length &&
+      !lineasAbiertasAddon.length
+    ) {
+      return;
+    }
+
+    cerrandoGrupoAddon = true;
+
+    try {
+      mapa.closePopup();
+
+      lineasAbiertasAddon.forEach(linea => {
+        if (capaMarcadores.hasLayer(linea)) {
+          capaMarcadores.removeLayer(linea);
+        }
+      });
+      lineasAbiertasAddon = [];
+
+      marcadoresAbiertosAddon.forEach(marcador => {
+        marcador._abiertoAddon = false;
+
+        if (marcador._posicionRealAddon) {
+          marcador.setLatLng(
+            marcador._posicionRealAddon
+          );
+        }
+      });
+
+      marcadoresAbiertosAddon = [];
+    } finally {
+      cerrandoGrupoAddon = false;
+    }
   }
 
   function candidatosAddon(marcador) {
@@ -152,7 +178,9 @@
     marcador.on("click", evento => {
       if (evento.originalEvent) L.DomEvent.stop(evento.originalEvent);
       if (marcador._abiertoAddon) {
-        marcador.openPopup();
+        window.setTimeout(() => {
+          marcador.openPopup();
+        }, 0);
         return;
       }
       if (!abrirGrupoAddon(candidatosAddon(marcador))) marcador.openPopup();
@@ -160,7 +188,7 @@
     marcadoresCercanosAddon.push(marcador);
   }
 
-  mapa.on("zoomstart movestart", cerrarGrupoAddon);
+  mapa.on("zoomstart", cerrarGrupoAddon);
   mapa.on("click", cerrarGrupoAddon);
 
   window.actualizarMapa = function () {
