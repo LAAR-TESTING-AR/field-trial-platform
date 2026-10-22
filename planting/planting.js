@@ -1343,7 +1343,10 @@ function crearPopup(sitio, estado) {
 
   let bloqueAccion = "";
 
-if (estado === "PENDIENTE") {
+if (
+  estado === "NO PLANIFICADO" ||
+  estado === "PLANIFICADO"
+) {
 
   const esViewer =
     window.FieldTrialAppMode &&
