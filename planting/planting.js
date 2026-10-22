@@ -4682,17 +4682,39 @@ function renderPlanningBoard() {
           min-width:0;
           white-space:nowrap;
         ">
-          <span style="font-size:13px;font-weight:800;color:#173f2a;">
-            ${semanas[0].week}
-          </span>
-          <span style="color:#9aaba1;">•</span>
-          <span style="font-size:13px;font-weight:900;color:#0b6b3a;">
-            ${semanas[1].week}
-          </span>
-          <span style="color:#9aaba1;">•</span>
-          <span style="font-size:13px;font-weight:800;color:#173f2a;">
-            ${semanas[2].week}
-          </span>
+<span style="
+  font-size:13px;
+  font-weight:700;
+  color:#617265;
+  opacity:.75;
+">
+  ${semanas[0].week}
+</span>
+
+<span style="color:#a7b5ac;">•</span>
+
+<span style="
+  font-size:15px;
+  font-weight:900;
+  color:#0b6b3a;
+  background:#e8f4ec;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid #cbe4d3;
+">
+  ${semanas[1].week}
+</span>
+
+<span style="color:#a7b5ac;">•</span>
+
+<span style="
+  font-size:13px;
+  font-weight:700;
+  color:#617265;
+  opacity:.75;
+">
+  ${semanas[2].week}
+</span>
           <button
             id="btnPlanningHoy"
             type="button"
