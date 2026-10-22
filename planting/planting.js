@@ -2285,51 +2285,65 @@ function crearTarjetaPlanning(item) {
         gap:5px;
       ">
 
-        <div style="
-          display:flex;
-          align-items:center;
-          gap:6px;
-          min-width:0;
-        ">
+        <div
+  class="planning-card-main"
+  style="
+    min-width:0;
+  "
+>
 
-          ${renderIconoCultivoPlanning(
-            item.crop,
-            23
-          )}
+  <div
+    class="planning-card-location"
+    style="
+      font-weight:800;
+      font-size:11px;
+      color:#17251d;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      line-height:1.15;
+    "
+  >
+    ${item.location}
+  </div>
 
-          <div style="min-width:0;">
-            <div style="
-              font-weight:800;
-              font-size:11px;
-              color:#17251d;
-              overflow:hidden;
-              text-overflow:ellipsis;
-              white-space:nowrap;
-              line-height:1.15;
-            ">
-              ${item.location}
-            </div>
+  <div
+    class="planning-card-crop"
+    style="
+      margin-top:2px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+      min-width:0;
+      font-size:9px;
+      color:#526158;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    "
+  >
 
-            <div style="
-              margin-top:1px;
-              font-size:9px;
-              color:#526158;
-              overflow:hidden;
-              text-overflow:ellipsis;
-              white-space:nowrap;
-              line-height:1.15;
-            ">
-              ${item.crop}${
-                item.planningType &&
-                item.planningType !== "Master"
-                  ? ` · ${item.planningType}`
-                  : ""
-              }
-            </div>
-          </div>
+    ${renderIconoCultivoPlanning(
+      item.crop,
+      18
+    )}
 
-        </div>
+    <span>
+      ${item.crop}${
 
+        item.planningType &&
+        item.planningType !== "Master"
+
+          ? ` · ${item.planningType}`
+
+          : ""
+
+      }
+    </span>
+
+  </div>
+
+</div>
         <div style="
           display:flex;
           align-items:center;
