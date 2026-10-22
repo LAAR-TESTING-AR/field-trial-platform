@@ -444,6 +444,7 @@ function estaSembrado(sitio) {
     )
   );
 }
+
 function estaPlanificado(
   sitio
 ) {
@@ -1482,7 +1483,14 @@ const sembrado =
 
 const planificado =
   estaPlanificado(sitio);
+if (planificado) {
 
+  console.log(
+    "PLANIFICADO:",
+    sitio["AOI ID"]
+  );
+
+}
 let color =
   "#d32f2f";
 
