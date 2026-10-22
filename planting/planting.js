@@ -4768,8 +4768,151 @@ function descargarPlanningPDF(canvas, nombre) {
   pdf.save(`${nombre}.pdf`);
 }
 
+async function asegurarLibreriaExcelPlanning() {
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    () => Boolean(window.XLSX)
+  );
+}
+
+function obtenerFilasExcelPlanning() {
+  const semanas = obtenerSemanasPlanningVisibles();
+  const ordenSemanas = new Map(
+    semanas.map((semana, index) => [semana.week, index])
+  );
+
+  const filas = planningData
+    .filter(item => ordenSemanas.has(item.week))
+    .slice()
+    .sort((a, b) => {
+      const semanaA = ordenSemanas.get(a.week) ?? 99;
+      const semanaB = ordenSemanas.get(b.week) ?? 99;
+      if (semanaA !== semanaB) return semanaA - semanaB;
+
+      const planterA = plantingPlanters.indexOf(a.planter);
+      const planterB = plantingPlanters.indexOf(b.planter);
+      if (planterA !== planterB) return planterA - planterB;
+
+      return (a.sortOrder || 0) - (b.sortOrder || 0);
+    })
+    .map(item => ({
+      Week: item.week || "",
+      Planter: item.planter || "",
+      Location: item.location || "",
+      Crop: item.crop || "",
+      "AOI ID": item.aoiId || "",
+      "Planning Type": item.planningType || "Master",
+      Status: item.sembrado ? "Sembrado" : "Planificado",
+      "Planting Date": item.plantingDate || "",
+      "Actual Planter": item.actualPlanter || "",
+      SortOrder: Number(item.sortOrder) || 0
+    }));
+
+  return { semanas, filas };
+}
+
+function crearResumenExcelPlanning(semanas) {
+  return semanas.map((semana, index) => {
+    const items = planningData.filter(item => item.week === semana.week);
+    const sembrados = items.filter(item => item.sembrado).length;
+    const planificados = items.length - sembrados;
+
+    return {
+      "Visible Position": index === 0 ? "Previous" : index === 1 ? "Central" : "Next",
+      Week: semana.week,
+      Planificados: planificados,
+      Sembrados: sembrados,
+      Total: items.length
+    };
+  });
+}
+
+function aplicarAnchosHojaPlanning(hoja, anchos) {
+  hoja["!cols"] = anchos.map(width => ({ wch: width }));
+}
+
+async function exportarPlanningExcel() {
+  const boton = document.getElementById("btnExportPlanningExcel");
+  const textoOriginal = boton?.textContent || "📊 Export Excel";
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "Generando...";
+  }
+
+  try {
+    await asegurarLibreriaExcelPlanning();
+
+    const { semanas, filas } = obtenerFilasExcelPlanning();
+    const resumen = crearResumenExcelPlanning(semanas);
+
+    const workbook = window.XLSX.utils.book_new();
+
+    const hojaPlanning = window.XLSX.utils.json_to_sheet(
+      filas.length ? filas : [{
+        Week: "",
+        Planter: "",
+        Location: "",
+        Crop: "",
+        "AOI ID": "",
+        "Planning Type": "",
+        Status: "",
+        "Planting Date": "",
+        "Actual Planter": "",
+        SortOrder: ""
+      }]
+    );
+
+    aplicarAnchosHojaPlanning(
+      hojaPlanning,
+      [18, 13, 22, 24, 18, 15, 13, 16, 15, 10]
+    );
+
+    hojaPlanning["!autofilter"] = {
+      ref: hojaPlanning["!ref"] || "A1:J1"
+    };
+
+    const hojaSummary = window.XLSX.utils.json_to_sheet(resumen);
+    aplicarAnchosHojaPlanning(hojaSummary, [18, 18, 14, 12, 10]);
+
+    window.XLSX.utils.book_append_sheet(
+      workbook,
+      hojaPlanning,
+      "Planning"
+    );
+
+    window.XLSX.utils.book_append_sheet(
+      workbook,
+      hojaSummary,
+      "Summary"
+    );
+
+    const nombre = nombreArchivoPlanning(
+      `Planting_Planning_${semanas[0].week}_${semanas[2].week}`
+    );
+
+    window.XLSX.writeFile(
+      workbook,
+      `${nombre}.xlsx`
+    );
+
+  } catch (error) {
+    console.error("Error exportando Planning a Excel", error);
+    alert("No se pudo generar el archivo Excel de Planning");
+  } finally {
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent = textoOriginal;
+    }
+  }
+}
+
 async function exportarPlanning(formato) {
-  const botones = [document.getElementById("btnExportPlanningPDF"), document.getElementById("btnExportPlanningPNG")].filter(Boolean);
+  const botones = [
+    document.getElementById("btnExportPlanningPDF"),
+    document.getElementById("btnExportPlanningPNG"),
+    document.getElementById("btnExportPlanningExcel")
+  ].filter(Boolean);
   const textos = botones.map(b => b.textContent);
   botones.forEach(b => { b.disabled = true; b.textContent = "Generando..."; });
   let reporte;
@@ -4804,7 +4947,8 @@ function agregarBotonesExportPlanning() {
     grupo.style.marginLeft = "auto";
     grupo.innerHTML = `
       <button id="btnExportPlanningPDF" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">📄 Export PDF</button>
-      <button id="btnExportPlanningPNG" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">🖼 Export PNG</button>`;
+      <button id="btnExportPlanningPNG" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">🖼 Export PNG</button>
+      <button id="btnExportPlanningExcel" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">📊 Export Excel</button>`;
     toolbar.style.display = "flex";
     toolbar.style.alignItems = "center";
     toolbar.style.gap = "8px";
@@ -4820,6 +4964,11 @@ function agregarBotonesExportPlanning() {
   if (png && !png.dataset.exportReady) {
     png.dataset.exportReady = "1";
     png.addEventListener("click", () => exportarPlanning("png"));
+  }
+  const excel = document.getElementById("btnExportPlanningExcel");
+  if (excel && !excel.dataset.exportReady) {
+    excel.dataset.exportReady = "1";
+    excel.addEventListener("click", exportarPlanningExcel);
   }
 }
 
