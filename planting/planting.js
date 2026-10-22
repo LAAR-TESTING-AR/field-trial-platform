@@ -1887,6 +1887,10 @@ const btnAddSpecialPlanning =
   document.getElementById(
     "btnAddSpecialPlanning"
   );
+const btnAddNoActivityPlanning =
+  document.getElementById(
+    "btnAddNoActivityPlanning"
+  );
 
 const planningForm =
   document.getElementById(
@@ -2012,6 +2016,22 @@ async function guardarCambiosPlanning() {
     return;
   }
 
+  document.querySelectorAll(".btn-editar-noactivity").forEach(boton => {
+    boton.addEventListener("click", evento => {
+      evento.stopPropagation();
+      const item = planningData.find(x => Number(x.id) === Number(boton.dataset.id));
+      if (item) abrirFormularioNoActivity(item, false);
+    });
+  });
+
+  document.querySelectorAll(".btn-duplicar-noactivity").forEach(boton => {
+    boton.addEventListener("click", evento => {
+      evento.stopPropagation();
+      const item = planningData.find(x => Number(x.id) === Number(boton.dataset.id));
+      if (item) abrirFormularioNoActivity(item, true);
+    });
+  });
+
   const btnGuardarCambios =
     document.getElementById(
       "btnGuardarCambiosPlanning"
@@ -2040,7 +2060,9 @@ async function guardarCambiosPlanning() {
               ID: cambio.id,
               Week: cambio.week,
               Planter: cambio.planter,
-              SortOrder: cambio.sortOrder
+              SortOrder: cambio.sortOrder,
+              DowntimeReason: cambio.downtimeReason || "",
+              Comment: cambio.comment || ""
             })
           }
         );
@@ -2238,7 +2260,7 @@ function configuracionEstadoPlanning(
 
 }
 
-  function crearTarjetaPlanning(item) {
+  function crearTarjetaPlanningBase(item) {
     const estado =
       configuracionEstadoPlanning(item);
     const detalleEstado =
@@ -2477,6 +2499,43 @@ function configuracionEstadoPlanning(
       </div>
     `;
   }
+function crearTarjetaNoActivityPlanning(item) {
+  const motivo = limpiarTexto(item.downtimeReason) || "No Activity";
+  const comentario = limpiarTexto(item.comment);
+  const iconos = {
+    "No Activity": "⏸",
+    "Repair / Maintenance": "🔧",
+    "Rain / Weather": "🌧️",
+    "Logistics": "🚚",
+    "Other": "⚠️"
+  };
+  const icono = iconos[motivo] || "⏸";
+  const esMobile = window.matchMedia("(max-width: 1100px), (pointer: coarse)").matches;
+  return `
+    <div class="planning-card planning-card-noactivity" draggable="true"
+      data-id="${item.id}" data-planter="${item.planter}" data-week="${item.week}" data-sembrado="false"
+      title="${motivo}${comentario ? ` · ${comentario}` : ""}"
+      style="background:#f5f7f8;border-left:5px solid #64748b;border-top:1px solid #dfe4e8;border-right:1px solid #dfe4e8;border-bottom:1px solid #dfe4e8;border-radius:9px;padding:${esMobile ? "5px 4px" : "6px 7px"};margin-top:5px;cursor:grab;box-sizing:border-box;overflow:hidden;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;min-width:0;">
+        <div style="min-width:0;flex:1 1 auto;">
+          <div style="font-size:${esMobile ? "9px" : "11px"};font-weight:800;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icono} ${motivo}</div>
+          ${comentario ? `<div style="margin-top:3px;font-size:${esMobile ? "8px" : "9px"};color:#64748b;line-height:1.2;overflow:hidden;text-overflow:ellipsis;${esMobile ? "white-space:nowrap;" : "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"}">${comentario}</div>` : ""}
+        </div>
+        <div style="display:flex;gap:2px;flex:0 0 auto;">
+          <button type="button" class="btn-editar-noactivity" data-id="${item.id}" title="Editar" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">✏️</button>
+          <button type="button" class="btn-duplicar-noactivity" data-id="${item.id}" title="Duplicar a otra semana" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">📋</button>
+          <button type="button" class="btn-eliminar-planning" data-id="${item.id}" title="Eliminar" style="border:none;background:none;cursor:pointer;color:#b73b3b;padding:0;font-size:${esMobile ? "10px" : "12px"};">🗑</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function crearTarjetaPlanning(item) {
+  return item.planningType === "NoActivity"
+    ? crearTarjetaNoActivityPlanning(item)
+    : crearTarjetaPlanningBase(item);
+}
+
 function renderTarjetasPlanter(
   planter,
   week
@@ -3289,6 +3348,111 @@ function poblarSemanasPlanningManual(
 
 }
 
+function siguienteSemanaPlanning(week) {
+  const partes = String(week || "").split(" - ");
+  if (!partes[0]) return formatearRangoPlanning(obtenerInicioSemana(new Date()));
+  const md = partes[0].split("/").map(Number);
+  const hoy = new Date();
+  let anio = hoy.getFullYear();
+  let inicio = new Date(anio, md[1] - 1, md[0]);
+  if (Math.abs(inicio - hoy) > 180 * 86400000) {
+    anio += inicio < hoy ? 1 : -1;
+    inicio = new Date(anio, md[1] - 1, md[0]);
+  }
+  inicio.setDate(inicio.getDate() + 7);
+  return formatearRangoPlanning(inicio);
+}
+
+function crearFormularioNoActivityPlanning() {
+  if (document.getElementById("noActivityPlanningForm")) return;
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar) return;
+  const form = document.createElement("div");
+  form.id = "noActivityPlanningForm";
+  form.hidden = true;
+  form.innerHTML = `
+    <div style="margin:10px 0 12px;padding:12px;border:1px solid #d9e3dc;border-radius:10px;background:#f8fbf9;">
+      <div id="noActivityFormTitle" style="margin-bottom:10px;color:#173f2a;font-size:14px;font-weight:800;">No Activity / Downtime</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Reason</label><select id="noActivityReason" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"><option>No Activity</option><option>Repair / Maintenance</option><option>Rain / Weather</option><option>Logistics</option><option>Other</option></select></div>
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Planter</label><select id="noActivityPlanter" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"><option value="">Seleccionar sembradora</option>${plantingPlanters.map(p => `<option value="${p}">${p}</option>`).join("")}</select></div>
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Week</label><select id="noActivityWeek" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"></select></div>
+        <div style="grid-column:1/-1;"><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Comment</label><textarea id="noActivityComment" rows="3" placeholder="Motivo o detalle libre" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;resize:vertical;"></textarea></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;"><button id="btnCancelarNoActivity" type="button" style="padding:8px 12px;border:1px solid #bfc7c1;border-radius:8px;background:white;color:#536159;font-weight:700;cursor:pointer;">Cancelar</button><button id="btnGuardarNoActivity" type="button" style="padding:8px 12px;border:none;border-radius:8px;background:#475569;color:white;font-weight:800;cursor:pointer;">Agregar al Planning</button></div>
+    </div>`;
+  toolbar.insertAdjacentElement("afterend", form);
+  form.dataset.editId = "";
+  document.getElementById("btnCancelarNoActivity")?.addEventListener("click", () => form.hidden = true);
+  document.getElementById("btnGuardarNoActivity")?.addEventListener("click", guardarNoActivityPlanning);
+}
+
+function abrirFormularioNoActivity(item = null, duplicate = false) {
+  crearFormularioNoActivityPlanning();
+  const form = document.getElementById("noActivityPlanningForm");
+  planningForm.hidden = true;
+  const special = document.getElementById("specialPlanningForm");
+  if (special) special.hidden = true;
+  poblarSemanasPlanningManual(document.getElementById("noActivityWeek"));
+  const reason = document.getElementById("noActivityReason");
+  const planter = document.getElementById("noActivityPlanter");
+  const week = document.getElementById("noActivityWeek");
+  const comment = document.getElementById("noActivityComment");
+  reason.value = item?.downtimeReason || "No Activity";
+  planter.value = item?.planter || "";
+  comment.value = item?.comment || "";
+  if (item) {
+    const targetWeek = duplicate ? siguienteSemanaPlanning(item.week) : item.week;
+    if (![...week.options].some(o => o.value === targetWeek)) {
+      const o = document.createElement("option"); o.value = targetWeek; o.textContent = targetWeek; week.appendChild(o);
+    }
+    week.value = targetWeek;
+  }
+  form.dataset.editId = item && !duplicate ? String(item.id) : "";
+  document.getElementById("noActivityFormTitle").textContent = duplicate ? "Duplicate No Activity / Downtime" : item ? "Edit No Activity / Downtime" : "No Activity / Downtime";
+  document.getElementById("btnGuardarNoActivity").textContent = duplicate ? "Duplicar" : item ? "Guardar cambios" : "Agregar al Planning";
+  form.hidden = false;
+}
+
+async function guardarNoActivityPlanning() {
+  const form = document.getElementById("noActivityPlanningForm");
+  const reason = limpiarTexto(document.getElementById("noActivityReason")?.value);
+  const planter = limpiarTexto(document.getElementById("noActivityPlanter")?.value);
+  const week = limpiarTexto(document.getElementById("noActivityWeek")?.value);
+  const comment = limpiarTexto(document.getElementById("noActivityComment")?.value);
+  if (!reason || !planter || !week) { alert("Complete Reason, Planter y Week"); return; }
+  const editId = Number(form?.dataset.editId || 0);
+  const boton = document.getElementById("btnGuardarNoActivity");
+  if (boton) { boton.disabled = true; boton.textContent = "Guardando..."; }
+  try {
+    if (editId) {
+      const item = planningData.find(x => Number(x.id) === editId);
+      const response = await fetch(URL_FLOW_PLANNING_UPDATE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ ID:editId, Week:week, Planter:planter, SortOrder:Number(item?.sortOrder)||0, DowntimeReason:reason, Comment:comment }) });
+      if (!response.ok) throw new Error("Error actualizando No Activity");
+    } else {
+      const sortOrder = planningData.filter(x => x.week === week && x.planter === planter).length;
+      const response = await fetch(URL_FLOW_PLANNING, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ AOI_ID:"", Location:"", Crop:"", PlanningType:"NoActivity", Week:week, Planter:planter, SortOrder:sortOrder, DowntimeReason:reason, Comment:comment }) });
+      if (!response.ok) throw new Error("Error creando No Activity");
+    }
+    form.hidden = true;
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+  } catch(error) { console.error(error); alert("Error guardando No Activity / Downtime"); }
+  finally { if (boton) { boton.disabled = false; boton.textContent = "Agregar al Planning"; } }
+}
+
+function asegurarBotonNoActivityPlanning() {
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar || document.getElementById("btnAddNoActivityPlanning")) return;
+  const btn = document.createElement("button");
+  btn.id = "btnAddNoActivityPlanning";
+  btn.type = "button";
+  btn.innerHTML = "⏸ Add No Activity";
+  const referencia = document.getElementById("btnAddSpecialPlanning");
+  if (referencia) referencia.insertAdjacentElement("afterend", btn); else toolbar.prepend(btn);
+  btn.addEventListener("click", () => abrirFormularioNoActivity());
+}
+
 function crearFormularioSpecialPlanning() {
 
   if (
@@ -3749,7 +3913,13 @@ planningData = data.map(
           ? limpiarTexto(
               sitio.Planter
             )
-          : ""
+          : "",
+
+      downtimeReason:
+        limpiarTexto(item.DowntimeReason),
+
+      comment:
+        limpiarTexto(item.Comment)
 
     };
 
@@ -4928,6 +5098,10 @@ function nombreArchivoPlanning(texto) {
 }
 
 function renderTarjetaExportPlanning(item) {
+  if (item.planningType === "NoActivity") {
+    const motivo = item.downtimeReason || "No Activity";
+    return `<div style="margin-top:5px;padding:8px;border-left:5px solid #64748b;border:1px solid #dfe4e8;border-left-width:5px;border-radius:8px;background:#f5f7f8;"><div style="font-size:11px;font-weight:800;color:#334155;">⏸ ${motivo}</div>${item.comment ? `<div style="margin-top:3px;font-size:8px;color:#64748b;">${item.comment}</div>` : ""}</div>`;
+  }
   const estado = configuracionEstadoPlanning(item);
   const cfg = configuracionCultivoPlanning(item.crop);
   const tipo = item.planningType && item.planningType !== "Master"
@@ -5080,7 +5254,9 @@ function obtenerFilasExcelPlanning() {
       Status: item.sembrado ? "Sembrado" : "Planificado",
       "Planting Date": item.plantingDate || "",
       "Actual Planter": item.actualPlanter || "",
-      SortOrder: Number(item.sortOrder) || 0
+      SortOrder: Number(item.sortOrder) || 0,
+      "Downtime Reason": item.downtimeReason || "",
+      Comment: item.comment || ""
     }));
 
   return { semanas, filas };
@@ -5089,14 +5265,17 @@ function obtenerFilasExcelPlanning() {
 function crearResumenExcelPlanning(semanas) {
   return semanas.map((semana, index) => {
     const items = planningData.filter(item => item.week === semana.week);
-    const sembrados = items.filter(item => item.sembrado).length;
-    const planificados = items.length - sembrados;
+    const noActivity = items.filter(item => item.planningType === "NoActivity").length;
+    const operativos = items.filter(item => item.planningType !== "NoActivity");
+    const sembrados = operativos.filter(item => item.sembrado).length;
+    const planificados = operativos.length - sembrados;
 
     return {
       "Visible Position": index === 0 ? "Previous" : index === 1 ? "Central" : "Next",
       Week: semana.week,
       Planificados: planificados,
       Sembrados: sembrados,
+      "No Activity": noActivity,
       Total: items.length
     };
   });
@@ -5472,6 +5651,7 @@ function renderPlanningBoard() {
     </div>
   `;
 
+  asegurarBotonNoActivityPlanning();
   agregarBotonesExportPlanning();
   activarInteraccionesPlanning();
 
