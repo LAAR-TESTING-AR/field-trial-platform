@@ -3449,6 +3449,49 @@ console.table(
 
 }
 
+function obtenerAoiPlanificadosMaster() {
+
+  return new Set(
+    planningData
+      .filter(
+        item =>
+          !item.planningType ||
+          item.planningType === "Master"
+      )
+      .map(
+        item =>
+          normalizarTexto(
+            item.aoiId
+          )
+      )
+      .filter(Boolean)
+  );
+
+}
+
+function obtenerSitiosDisponiblesPlanning() {
+
+  const aoiPlanificados =
+    obtenerAoiPlanificadosMaster();
+
+  return sitios.filter(
+    sitio => {
+
+      const aoiId =
+        normalizarTexto(
+          sitio["AOI ID"]
+        );
+
+      return (
+        aoiId &&
+        !aoiPlanificados.has(aoiId)
+      );
+
+    }
+  );
+
+}
+
 function cargarLocalidadesPlanning() {
 
   const comboLocality =
@@ -3456,14 +3499,27 @@ function cargarLocalidadesPlanning() {
       "planningLocality"
     );
 
+  const comboCrop =
+    document.getElementById(
+      "planningCrop"
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
   if (!comboLocality) {
     return;
   }
 
+  const sitiosDisponibles =
+    obtenerSitiosDisponiblesPlanning();
+
   const localidades =
     [
       ...new Set(
-        sitios
+        sitiosDisponibles
           .map(
             sitio =>
               limpiarTexto(
@@ -3472,8 +3528,14 @@ function cargarLocalidadesPlanning() {
           )
           .filter(Boolean)
       )
-    ]
-    .sort();
+    ].sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "es",
+          { sensitivity: "base" }
+        )
+    );
 
   comboLocality.innerHTML = `
     <option value="">
@@ -3490,7 +3552,6 @@ function cargarLocalidadesPlanning() {
         );
 
       option.value = localidad;
-
       option.textContent = localidad;
 
       comboLocality.appendChild(
@@ -3500,7 +3561,24 @@ function cargarLocalidadesPlanning() {
     }
   );
 
+  if (comboCrop) {
+    comboCrop.innerHTML = `
+      <option value="">
+        Seleccionar cultivo
+      </option>
+    `;
+    comboCrop.disabled = true;
+  }
+
+  if (preview) {
+    preview.textContent =
+      localidades.length
+        ? "Seleccione localidad y cultivo"
+        : "No hay AOI disponibles para planificar";
+  }
+
 }
+
 function cargarSemanasPlanning() {
 
   const comboSemana =
@@ -3564,6 +3642,7 @@ function cargarSemanasPlanning() {
   }
 
 }
+
 function cargarCultivosPlanning() {
 
   const localidad =
@@ -3574,6 +3653,11 @@ function cargarCultivosPlanning() {
   const comboCrop =
     document.getElementById(
       "planningCrop"
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
     );
 
   if (!comboCrop) {
@@ -3587,17 +3671,20 @@ function cargarCultivosPlanning() {
   `;
 
   if (!localidad) {
-
     comboCrop.disabled = true;
 
-    return;
+    if (preview) {
+      preview.textContent =
+        "Seleccione localidad y cultivo";
+    }
 
+    return;
   }
 
   const cultivos =
     [
       ...new Set(
-        sitios
+        obtenerSitiosDisponiblesPlanning()
           .filter(
             sitio =>
               limpiarTexto(
@@ -3612,8 +3699,14 @@ function cargarCultivosPlanning() {
           )
           .filter(Boolean)
       )
-    ]
-    .sort();
+    ].sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "es",
+          { sensitivity: "base" }
+        )
+    );
 
   cultivos.forEach(
     cultivo => {
@@ -3624,9 +3717,7 @@ function cargarCultivosPlanning() {
         );
 
       option.value = cultivo;
-
-      option.textContent =
-        cultivo;
+      option.textContent = cultivo;
 
       comboCrop.appendChild(
         option
@@ -3636,9 +3727,17 @@ function cargarCultivosPlanning() {
   );
 
   comboCrop.disabled =
-    false;
-actualizarAoiPlanning();
+    cultivos.length === 0;
+
+  if (preview) {
+    preview.textContent =
+      cultivos.length
+        ? "Seleccione un cultivo"
+        : "No hay cultivos disponibles para esta localidad";
+  }
+
 }
+
 function actualizarAoiPlanning() {
 
   const locality =
@@ -3661,31 +3760,29 @@ function actualizarAoiPlanning() {
   }
 
   if (!locality || !crop) {
-
     preview.textContent =
       "Seleccione localidad y cultivo";
-
     return;
-
   }
 
-  const aoi = sitios
-    .filter(
-      sitio =>
-        limpiarTexto(
-          sitio.Location
-        ) === locality &&
-        limpiarTexto(
-          sitio.Crop
-        ) === crop
-    )
-    .map(
-      sitio =>
-        limpiarTexto(
-          sitio["AOI ID"]
-        )
-    )
-    .filter(Boolean);
+  const aoi =
+    obtenerSitiosDisponiblesPlanning()
+      .filter(
+        sitio =>
+          limpiarTexto(
+            sitio.Location
+          ) === locality &&
+          limpiarTexto(
+            sitio.Crop
+          ) === crop
+      )
+      .map(
+        sitio =>
+          limpiarTexto(
+            sitio["AOI ID"]
+          )
+      )
+      .filter(Boolean);
 
   preview.innerHTML =
     aoi.length
@@ -4957,15 +5054,16 @@ btnGuardarPlanning?.addEventListener(
     }
 
     const registro =
-      sitios.find(
-        sitio =>
-          limpiarTexto(
-            sitio.Location
-          ) === locality &&
-          limpiarTexto(
-            sitio.Crop
-          ) === crop
-      );
+      obtenerSitiosDisponiblesPlanning()
+        .find(
+          sitio =>
+            limpiarTexto(
+              sitio.Location
+            ) === locality &&
+            limpiarTexto(
+              sitio.Crop
+            ) === crop
+        );
 
     if (!registro) {
       return;
