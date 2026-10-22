@@ -1759,7 +1759,7 @@ Papa.parse(
       encabezado.replace(/^\uFEFF/, "")
     ),
 
-  complete: resultado => {
+ complete: async resultado => {
     sitios = resultado.data.filter(
       sitio =>
         limpiarTexto(sitio["AOI ID"]) &&
@@ -1770,7 +1770,10 @@ Papa.parse(
       `Sitios cargados: ${sitios.length}`
     );
 cargarFiltrosTimeline();
-    actualizarVista();
+
+await cargarPlanningDesdeSharePoint();
+
+actualizarVista();
 console.log(
 "Pendientes guardados:",
 obtenerSiembrasPendientes()
