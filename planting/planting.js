@@ -4777,16 +4777,19 @@ function renderPlanningBoard() {
         </div>
       </div>
 
-      <div style="
-        display:flex;
-        justify-content:flex-end;
-        align-items:center;
-        min-height:46px;
-        padding:6px 4px 0;
-        border-top:1px solid #e5ebe7;
-        background:white;
-        z-index:20;
-      ">
+<div
+  class="planning-save-container"
+  style="
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    min-height:46px;
+    padding:6px 4px 0;
+    border-top:1px solid #e5ebe7;
+    background:white;
+    z-index:20;
+  "
+>
         <button
           id="btnGuardarCambiosPlanning"
           type="button"
