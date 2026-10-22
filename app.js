@@ -27,6 +27,104 @@ const mapa = L.map("mapa", {
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
+let spiderfierMasterList = null;
+let promesaSpiderfierMasterList = null;
+
+function cargarSpiderfierMasterList() {
+  if (window.OverlappingMarkerSpiderfier) {
+    return Promise.resolve();
+  }
+
+  if (promesaSpiderfierMasterList) {
+    return promesaSpiderfierMasterList;
+  }
+
+  promesaSpiderfierMasterList = new Promise((resolve, reject) => {
+    const src = "https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js";
+    const existente = document.querySelector(`script[src="${src}"]`);
+
+    if (existente) {
+      existente.addEventListener("load", resolve, { once: true });
+      existente.addEventListener("error", reject, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+
+  return promesaSpiderfierMasterList;
+}
+
+function inicializarSpiderfierMasterList() {
+  if (
+    spiderfierMasterList ||
+    !window.OverlappingMarkerSpiderfier
+  ) {
+    return;
+  }
+
+  spiderfierMasterList = new window.OverlappingMarkerSpiderfier(
+    mapa,
+    {
+      keepSpiderfied: true,
+      nearbyDistance: 28,
+      circleSpiralSwitchover: 9,
+      legWeight: 1.5
+    }
+  );
+
+  spiderfierMasterList.addListener(
+    "click",
+    marcador => {
+      marcador.openPopup();
+    }
+  );
+
+  spiderfierMasterList.addListener(
+    "spiderfy",
+    () => {
+      mapa.closePopup();
+    }
+  );
+}
+
+function limpiarSpiderfierMasterList() {
+  if (!spiderfierMasterList) {
+    return;
+  }
+
+  if (
+    typeof spiderfierMasterList.unspiderfy ===
+    "function"
+  ) {
+    spiderfierMasterList.unspiderfy();
+  }
+
+  if (
+    typeof spiderfierMasterList.clearMarkers ===
+    "function"
+  ) {
+    spiderfierMasterList.clearMarkers();
+  }
+}
+
+function registrarMarcadorSpiderfierMasterList(
+  marcador
+) {
+  if (
+    spiderfierMasterList &&
+    typeof spiderfierMasterList.addMarker ===
+      "function"
+  ) {
+    spiderfierMasterList.addMarker(marcador);
+  }
+}
+
 L.control.layers(
   {
     "Map": capaMapaActual,
@@ -409,6 +507,7 @@ function actualizarLeyenda(sitiosFiltrados) {
 }
 
 function actualizarMapa() {
+  limpiarSpiderfierMasterList();
   capaMarcadores.clearLayers();
   const sitiosFiltrados = sitios.filter(coincideConFiltros);
   const coordenadas = [];
@@ -417,26 +516,50 @@ function actualizarMapa() {
 
   sitiosFiltrados.forEach(sitio => {
     if (tieneTrial(sitio)) {
-      L.marker([sitio.latitudeTrial, sitio.longitudeTrial],{icon: crearIconoTrial(sitio.crop,sitio)})
-        .bindPopup(crearPopupTrial(sitio), { maxWidth: 390, minWidth: 285, maxHeight: 700 })
+      const marcadorTrial = L.marker(
+        [sitio.latitudeTrial, sitio.longitudeTrial],
+        { icon: crearIconoTrial(sitio.crop, sitio) }
+      )
+        .bindPopup(
+          crearPopupTrial(sitio),
+          {
+            maxWidth: 390,
+            minWidth: 285,
+            maxHeight: 700
+          }
+        )
         .addTo(capaMarcadores);
+
+      registrarMarcadorSpiderfierMasterList(
+        marcadorTrial
+      );
       coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
       cantidadTrials += 1;
     }
 
     if (tieneAccess(sitio)) {
       const sitioAccess = { ...sitio, latitude: sitio.latitudeAccess, longitude: sitio.longitudeAccess };
-      L.marker([sitio.latitudeAccess, sitio.longitudeAccess], {
-        icon: crearIconoAccess(sitio),
-        zIndexOffset: 1000
-      })
-        .bindPopup(crearPopupAccess(sitioAccess), {
-          maxWidth: 390,
-          minWidth: 285,
-          maxHeight: 700,
-          sitioAccess
-        })
+      const marcadorAccess = L.marker(
+        [sitio.latitudeAccess, sitio.longitudeAccess],
+        {
+          icon: crearIconoAccess(sitio),
+          zIndexOffset: 1000
+        }
+      )
+        .bindPopup(
+          crearPopupAccess(sitioAccess),
+          {
+            maxWidth: 390,
+            minWidth: 285,
+            maxHeight: 700,
+            sitioAccess
+          }
+        )
         .addTo(capaMarcadores);
+
+      registrarMarcadorSpiderfierMasterList(
+        marcadorAccess
+      );
       coordenadas.push([sitio.latitudeAccess, sitio.longitudeAccess]);
       cantidadAccess += 1;
     }
@@ -649,6 +772,22 @@ limpiarFiltros.addEventListener(
 mapa.on("popupopen", ocultarLeyenda);
 mapa.on("click", ocultarLeyenda);
 agregarLeyendaPremium();
+
+cargarSpiderfierMasterList()
+  .then(() => {
+    inicializarSpiderfierMasterList();
+
+    if (sitios.length) {
+      actualizarMapa();
+    }
+  })
+  .catch(error => {
+    console.warn(
+      "No se pudo cargar el despliegue de marcadores cercanos:",
+      error
+    );
+  });
+
 cargarSitios();
 const syncBtn =
   document.getElementById(
