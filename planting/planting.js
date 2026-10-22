@@ -2383,41 +2383,49 @@ function crearTarjetaPlanning(item) {
 
       </div>
 
-      <div style="
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:5px;
-        margin-top:5px;
-        padding-top:4px;
-        border-top:1px solid ${estado.color}2d;
-      ">
+      <div
+  class="planning-card-footer"
+  style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:5px;
+    margin-top:5px;
+    padding-top:4px;
+    border-top:1px solid ${estado.color}2d;
+  "
+>
 
-        <span style="
-          min-width:0;
-          color:#6a756e;
-          font-size:8px;
-          overflow:hidden;
-          text-overflow:ellipsis;
-          white-space:nowrap;
-        ">
-          ${item.aoiId}
-        </span>
+  <span
+    class="planning-card-aoi"
+    style="
+      min-width:0;
+      color:#6a756e;
+      font-size:8px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    "
+  >
+    ${item.aoiId}
+  </span>
 
-        <span style="
-          color:${estado.color};
-          font-size:8px;
-          font-weight:800;
-          overflow:hidden;
-          text-overflow:ellipsis;
-          white-space:nowrap;
-          text-align:right;
-        ">
-          ${detalleEstado}
-        </span>
+  <span
+    class="planning-card-status"
+    style="
+      color:${estado.color};
+      font-size:8px;
+      font-weight:800;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      text-align:right;
+    "
+  >
+    ${detalleEstado}
+  </span>
 
-      </div>
-
+</div>
     </div>
   `;
 
