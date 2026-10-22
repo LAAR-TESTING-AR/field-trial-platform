@@ -1259,7 +1259,8 @@ text-align: center;
 }
 
 #btnAddPlanning,
-#btnAddSpecialPlanning{
+#btnAddSpecialPlanning,
+  #btnAddNoActivityPlanning{
 
   border:none;
   border-radius:10px;
@@ -1289,12 +1290,14 @@ text-align: center;
 }
 
 #btnAddPlanning:hover,
-#btnAddSpecialPlanning:hover{
+#btnAddSpecialPlanning:hover,
+  #btnAddNoActivityPlanning:hover{
   background:#d9e8dd;
 }
 
 #btnAddPlanning:active,
-#btnAddSpecialPlanning:active{
+#btnAddSpecialPlanning:active,
+  #btnAddNoActivityPlanning:active{
   transform:translateY(1px);
 }
 @media (max-width: 768px) {
