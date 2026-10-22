@@ -2766,13 +2766,34 @@ function activarInteraccionesPlanning() {
             tarjeta.style.opacity =
               "0.55";
 
+            tarjeta.classList.add(
+              "planning-card-dragging"
+            );
+
           }
         );
 
         tarjeta.addEventListener(
           "dragend",
           () => {
+
             tarjeta.style.opacity = "1";
+
+            tarjeta.classList.remove(
+              "planning-card-dragging"
+            );
+
+            document
+              .querySelectorAll(
+                ".planning-drop-zone"
+              )
+              .forEach(
+                zona => {
+                  zona.style.boxShadow = "";
+                  zona.style.borderColor = "";
+                }
+              );
+
           }
         );
 
@@ -2789,9 +2810,36 @@ function activarInteraccionesPlanning() {
         zona.addEventListener(
           "dragover",
           evento => {
+
             evento.preventDefault();
+
             evento.dataTransfer.dropEffect =
               "move";
+
+            zona.style.borderColor =
+              "#7bb695";
+
+            zona.style.boxShadow =
+              "inset 0 0 0 2px rgba(11,107,58,.10)";
+
+          }
+        );
+
+        zona.addEventListener(
+          "dragleave",
+          evento => {
+
+            if (
+              zona.contains(
+                evento.relatedTarget
+              )
+            ) {
+              return;
+            }
+
+            zona.style.borderColor = "";
+            zona.style.boxShadow = "";
+
           }
         );
 
@@ -2800,6 +2848,10 @@ function activarInteraccionesPlanning() {
           evento => {
 
             evento.preventDefault();
+            evento.stopPropagation();
+
+            zona.style.borderColor = "";
+            zona.style.boxShadow = "";
 
             if (!draggedPlanningCard) {
               return;
@@ -2808,13 +2860,22 @@ function activarInteraccionesPlanning() {
             const item =
               planningData.find(
                 actual =>
-                  actual.id ===
-                  draggedPlanningCard.id
+                  Number(actual.id) ===
+                  Number(
+                    draggedPlanningCard.id
+                  )
               );
 
             if (!item) {
+              draggedPlanningCard = null;
               return;
             }
+
+            const planterOrigen =
+              item.planter;
+
+            const weekOrigen =
+              item.week;
 
             const planterDestino =
               zona.dataset.planter;
@@ -2822,32 +2883,246 @@ function activarInteraccionesPlanning() {
             const weekDestino =
               zona.dataset.week;
 
-            const cantidadDestino =
-              planningData.filter(
-                actual =>
-                  actual.id !== item.id &&
-                  actual.planter ===
-                    planterDestino &&
-                  actual.week ===
-                    weekDestino
-              ).length;
+            const estadoAnterior =
+              new Map(
+                planningData.map(
+                  actual => [
+                    String(actual.id),
+                    {
+                      planter: actual.planter,
+                      week: actual.week,
+                      sortOrder:
+                        Number(
+                          actual.sortOrder
+                        ) || 0
+                    }
+                  ]
+                )
+              );
 
-            item.planter = planterDestino;
-            item.week = weekDestino;
-            item.sortOrder = cantidadDestino;
+            const tarjetasDestino =
+              Array.from(
+                zona.querySelectorAll(
+                  ".planning-card"
+                )
+              )
+              .filter(
+                tarjeta =>
+                  Number(
+                    tarjeta.dataset.id
+                  ) !== Number(item.id)
+              );
 
-            registrarCambioPlanning(
-              item,
-              planterDestino,
-              weekDestino,
-              cantidadDestino
+            let indiceInsercion =
+              tarjetasDestino.length;
+
+            for (
+              let indice = 0;
+              indice < tarjetasDestino.length;
+              indice++
+            ) {
+
+              const tarjetaDestino =
+                tarjetasDestino[indice];
+
+              const rect =
+                tarjetaDestino.getBoundingClientRect();
+
+              const centroVertical =
+                rect.top +
+                (rect.height / 2);
+
+              if (
+                evento.clientY <
+                centroVertical
+              ) {
+                indiceInsercion = indice;
+                break;
+              }
+
+            }
+
+            const mismoGrupo =
+              planterOrigen === planterDestino &&
+              weekOrigen === weekDestino;
+
+            const ordenarGrupo =
+              (grupo, planter, week) => {
+
+                grupo.forEach(
+                  (actual, indice) => {
+                    actual.planter = planter;
+                    actual.week = week;
+                    actual.sortOrder = indice;
+                  }
+                );
+
+              };
+
+            let afectados = [];
+
+            if (mismoGrupo) {
+
+              const grupo =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.planter ===
+                        planterDestino &&
+                      actual.week ===
+                        weekDestino &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              indiceInsercion =
+                Math.max(
+                  0,
+                  Math.min(
+                    indiceInsercion,
+                    grupo.length
+                  )
+                );
+
+              grupo.splice(
+                indiceInsercion,
+                0,
+                item
+              );
+
+              ordenarGrupo(
+                grupo,
+                planterDestino,
+                weekDestino
+              );
+
+              afectados = grupo;
+
+            } else {
+
+              const grupoOrigen =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.planter ===
+                        planterOrigen &&
+                      actual.week ===
+                        weekOrigen &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              const grupoDestino =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.planter ===
+                        planterDestino &&
+                      actual.week ===
+                        weekDestino &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              indiceInsercion =
+                Math.max(
+                  0,
+                  Math.min(
+                    indiceInsercion,
+                    grupoDestino.length
+                  )
+                );
+
+              grupoDestino.splice(
+                indiceInsercion,
+                0,
+                item
+              );
+
+              ordenarGrupo(
+                grupoOrigen,
+                planterOrigen,
+                weekOrigen
+              );
+
+              ordenarGrupo(
+                grupoDestino,
+                planterDestino,
+                weekDestino
+              );
+
+              afectados = [
+                ...grupoOrigen,
+                ...grupoDestino
+              ];
+
+            }
+
+            const idsRegistrados =
+              new Set();
+
+            afectados.forEach(
+              actual => {
+
+                const clave =
+                  String(actual.id);
+
+                if (
+                  idsRegistrados.has(clave)
+                ) {
+                  return;
+                }
+
+                idsRegistrados.add(clave);
+
+                const anterior =
+                  estadoAnterior.get(clave);
+
+                const cambioReal =
+                  !anterior ||
+                  anterior.planter !==
+                    actual.planter ||
+                  anterior.week !==
+                    actual.week ||
+                  anterior.sortOrder !==
+                    (Number(
+                      actual.sortOrder
+                    ) || 0);
+
+                if (!cambioReal) {
+                  return;
+                }
+
+                registrarCambioPlanning(
+                  actual,
+                  actual.planter,
+                  actual.week,
+                  Number(
+                    actual.sortOrder
+                  ) || 0
+                );
+
+              }
             );
 
             draggedPlanningCard = null;
 
-            renderPlanningBoard(
-              semanaPlanningVisible
-            );
+            renderPlanningBoard();
 
           }
         );
