@@ -444,7 +444,23 @@ function estaSembrado(sitio) {
     )
   );
 }
+function estaPlanificado(
+  sitio
+) {
 
+  const aoiId =
+    limpiarTexto(
+      sitio["AOI ID"]
+    );
+
+  return planningData.some(
+    item =>
+      limpiarTexto(
+        item.aoiId
+      ) === aoiId
+  );
+
+}
 function coincideConFiltros(
   sitio,
   campoIgnorado = null
