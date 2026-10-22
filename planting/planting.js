@@ -1474,19 +1474,39 @@ if (
   return;
 }
 
-    const drop = esDrop(sitio);
-    const sembrado = estaSembrado(sitio);
+const drop =
+  esDrop(sitio);
 
-    let color = "#d32f2f";
-    let estado = "PENDIENTE";
+const sembrado =
+  estaSembrado(sitio);
 
-    if (drop) {
-      color = "#000000";
-      estado = "DROP";
-    } else if (sembrado) {
-      color = "#2e7d32";
-      estado = "SEMBRADO";
-    }
+const planificado =
+  estaPlanificado(sitio);
+
+let color =
+  "#d32f2f";
+
+let estado =
+  "NO PLANIFICADO";
+
+if (drop) {
+
+  color = "#000000";
+  estado = "DROP";
+
+}
+else if (sembrado) {
+
+  color = "#2e7d32";
+  estado = "SEMBRADO";
+
+}
+else if (planificado) {
+
+  color = "#f4b400";
+  estado = "PLANIFICADO";
+
+}
 
   const marcador = L.circleMarker(
   [lat, lon],
