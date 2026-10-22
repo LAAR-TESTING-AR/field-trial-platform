@@ -3448,6 +3448,16 @@ console.log(
   "PlanningData cargado",
   planningData
 );
+console.table(
+  planningData.map(
+    item => ({
+      aoiId: item.aoiId,
+      location: item.location,
+      crop: item.crop,
+      planningType: item.planningType
+    })
+  )
+);
 
   } catch (error) {
 
