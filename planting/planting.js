@@ -1483,6 +1483,22 @@ const sembrado =
 
 const planificado =
   estaPlanificado(sitio);
+
+if (
+  limpiarTexto(
+    sitio["AOI ID"]
+  ) === "ANCY04NRDLET"
+) {
+
+  console.log(
+    "AOI prueba",
+    sitio["AOI ID"],
+    estaPlanificado(sitio),
+    planningData.length
+  );
+
+}
+    
 if (planificado) {
 
   console.log(
