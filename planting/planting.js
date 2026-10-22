@@ -4617,6 +4617,212 @@ function renderLeyendaEstadoPlanning() {
 
 }
 
+function cargarLibreriaExportPlanning(src, disponible) {
+  if (disponible()) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const existente = document.querySelector(`script[src="${src}"]`);
+    if (existente) {
+      existente.addEventListener("load", resolve, { once: true });
+      existente.addEventListener("error", reject, { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function asegurarLibreriasExportPlanning() {
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+    () => typeof window.html2canvas === "function"
+  );
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
+    () => Boolean(window.jspdf?.jsPDF)
+  );
+}
+
+function nombreArchivoPlanning(texto) {
+  return String(texto || "Planting_Planning")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, "_");
+}
+
+function renderTarjetaExportPlanning(item) {
+  const estado = configuracionEstadoPlanning(item);
+  const cfg = configuracionCultivoPlanning(item.crop);
+  const tipo = item.planningType && item.planningType !== "Master"
+    ? ` · ${item.planningType}` : "";
+  const detalle = item.sembrado
+    ? `${item.plantingDate || "Sembrado"}${item.actualPlanter ? ` · ${item.actualPlanter}` : ""}`
+    : "Planificado";
+
+  return `
+    <div style="margin-top:5px;padding:7px;border-left:5px solid ${estado.color};border-top:1px solid #dde6e0;border-right:1px solid #dde6e0;border-bottom:1px solid #dde6e0;border-radius:8px;background:${estado.fondo};box-sizing:border-box;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+        <span style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${cfg.color}18;border:2px solid ${cfg.color};box-sizing:border-box;flex:0 0 auto;font-size:13px;">${cfg.icono}</span>
+        <div style="min-width:0;">
+          <div style="font-size:11px;font-weight:800;color:#17251d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.location}</div>
+          <div style="margin-top:1px;font-size:8px;color:#526158;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.crop}${tipo}</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:4px;margin-top:5px;padding-top:4px;border-top:1px solid ${estado.color}35;font-size:7px;">
+        <span style="color:#66736b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.aoiId}</span>
+        <span style="color:${estado.color};font-weight:800;white-space:nowrap;">${detalle}</span>
+      </div>
+    </div>`;
+}
+
+function renderSemanaExportPlanning(semana) {
+  const central = semana.posicion === 0;
+  const cantidad = planningData.filter(item => item.week === semana.week).length;
+  const etiqueta = semana.posicion === -1 ? "SEMANA ANTERIOR" : central ? "SEMANA CENTRAL" : "SEMANA SIGUIENTE";
+
+  return `
+    <section style="margin-top:10px;border:2px solid ${central ? "#69ad84" : "#d8e2dc"};border-radius:11px;background:${central ? "#f5fbf7" : "#fbfcfb"};overflow:hidden;box-sizing:border-box;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:9px;padding:6px 10px;background:${central ? "#e4f3e9" : "#f0f4f1"};border-bottom:1px solid #d8e2dc;">
+        <span style="color:${central ? "#0b6b3a" : "#59675f"};font-size:10px;font-weight:800;">${etiqueta}</span>
+        <span style="color:#173f2a;font-size:${central ? "16px" : "14px"};font-weight:900;">${semana.week}</span>
+        <span style="min-width:24px;padding:2px 7px;border:1px solid #cedbd3;border-radius:999px;background:#fff;color:#5d6c63;font-size:9px;font-weight:700;text-align:center;">${cantidad}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;align-items:start;padding:7px;">
+        ${plantingPlanters.map(planter => `
+          <div style="min-height:90px;padding:4px;border:1px dashed #d6e0da;border-radius:8px;background:#fff;box-sizing:border-box;">
+            ${planningData
+              .filter(item => item.planter === planter && item.week === semana.week)
+              .sort((a,b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+              .map(renderTarjetaExportPlanning).join("")}
+          </div>`).join("")}
+      </div>
+    </section>`;
+}
+
+function crearReporteExportPlanning() {
+  const semanas = obtenerSemanasPlanningVisibles();
+  const node = document.createElement("div");
+  node.style.position = "fixed";
+  node.style.left = "-20000px";
+  node.style.top = "0";
+  node.style.width = "1600px";
+  node.style.padding = "24px";
+  node.style.background = "#fff";
+  node.style.color = "#17251d";
+  node.style.fontFamily = "Arial,Helvetica,sans-serif";
+  node.style.boxSizing = "border-box";
+
+  const generado = new Date().toLocaleString("es-AR", {
+    day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"
+  });
+
+  node.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-bottom:12px;border-bottom:2px solid #0b6b3a;">
+      <div>
+        <div style="color:#0b6b3a;font-size:24px;font-weight:900;">Planting Planning</div>
+        <div style="margin-top:4px;color:#66736b;font-size:11px;">Planificación visible de tres semanas</div>
+      </div>
+      <div style="color:#66736b;font-size:10px;text-align:right;line-height:1.5;">Trial Platform 2026-27<br>Generado: ${generado}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:11px;margin:12px 0 9px;">
+      <span style="color:#69766e;font-size:12px;font-weight:700;opacity:.75;">${semanas[0].week}</span>
+      <span style="color:#a7b5ac;">•</span>
+      <span style="padding:5px 14px;border:1px solid #b9ddc5;border-radius:999px;background:#e7f4eb;color:#0b6b3a;font-size:16px;font-weight:900;">${semanas[1].week}</span>
+      <span style="color:#a7b5ac;">•</span>
+      <span style="color:#69766e;font-size:12px;font-weight:700;opacity:.75;">${semanas[2].week}</span>
+    </div>
+    <div style="display:flex;gap:16px;margin:0 5px 8px;color:#536159;font-size:10px;font-weight:700;">
+      <span><b style="color:#f4b400;font-size:16px;">●</b> Planificado</span>
+      <span><b style="color:#2e7d32;font-size:16px;">●</b> Sembrado</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;padding:0 7px;">
+      ${plantingPlanters.map(planter => `<div style="padding:9px 5px;border-radius:8px;background:#eaf3ed;color:#173f2a;font-size:12px;font-weight:900;text-align:center;">${planter}</div>`).join("")}
+    </div>
+    ${semanas.map(renderSemanaExportPlanning).join("")}`;
+
+  document.body.appendChild(node);
+  return { node, semanas };
+}
+
+function descargarPlanningPNG(canvas, nombre) {
+  const link = document.createElement("a");
+  link.download = `${nombre}.png`;
+  link.href = canvas.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function descargarPlanningPDF(canvas, nombre) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:"landscape", unit:"mm", format:"a3", compress:true });
+  const margen = 8;
+  const pw = pdf.internal.pageSize.getWidth();
+  const ph = pdf.internal.pageSize.getHeight();
+  const escala = Math.min((pw - margen*2)/canvas.width, (ph - margen*2)/canvas.height);
+  const w = canvas.width * escala;
+  const h = canvas.height * escala;
+  pdf.addImage(canvas.toDataURL("image/png"), "PNG", (pw-w)/2, (ph-h)/2, w, h, undefined, "FAST");
+  pdf.save(`${nombre}.pdf`);
+}
+
+async function exportarPlanning(formato) {
+  const botones = [document.getElementById("btnExportPlanningPDF"), document.getElementById("btnExportPlanningPNG")].filter(Boolean);
+  const textos = botones.map(b => b.textContent);
+  botones.forEach(b => { b.disabled = true; b.textContent = "Generando..."; });
+  let reporte;
+  try {
+    await asegurarLibreriasExportPlanning();
+    reporte = crearReporteExportPlanning();
+    const canvas = await window.html2canvas(reporte.node, {
+      backgroundColor:"#ffffff", scale:1.35, useCORS:true, logging:false, windowWidth:1650, scrollX:0, scrollY:0
+    });
+    const nombre = nombreArchivoPlanning(`Planting_Planning_${reporte.semanas[0].week}_${reporte.semanas[2].week}`);
+    if (formato === "png") descargarPlanningPNG(canvas, nombre);
+    else descargarPlanningPDF(canvas, nombre);
+  } catch (error) {
+    console.error("Error exportando Planning", error);
+    alert("No se pudo generar el archivo de Planning");
+  } finally {
+    reporte?.node?.remove();
+    botones.forEach((b,i) => { b.disabled = false; b.textContent = textos[i]; });
+  }
+}
+
+function agregarBotonesExportPlanning() {
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar) return;
+  let grupo = document.getElementById("planningExportActions");
+  if (!grupo) {
+    grupo = document.createElement("div");
+    grupo.id = "planningExportActions";
+    grupo.style.display = "flex";
+    grupo.style.alignItems = "center";
+    grupo.style.gap = "8px";
+    grupo.style.marginLeft = "auto";
+    grupo.innerHTML = `
+      <button id="btnExportPlanningPDF" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">📄 Export PDF</button>
+      <button id="btnExportPlanningPNG" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">🖼 Export PNG</button>`;
+    toolbar.style.display = "flex";
+    toolbar.style.alignItems = "center";
+    toolbar.style.gap = "8px";
+    toolbar.style.flexWrap = "wrap";
+    toolbar.appendChild(grupo);
+  }
+  const pdf = document.getElementById("btnExportPlanningPDF");
+  const png = document.getElementById("btnExportPlanningPNG");
+  if (pdf && !pdf.dataset.exportReady) {
+    pdf.dataset.exportReady = "1";
+    pdf.addEventListener("click", () => exportarPlanning("pdf"));
+  }
+  if (png && !png.dataset.exportReady) {
+    png.dataset.exportReady = "1";
+    png.addEventListener("click", () => exportarPlanning("png"));
+  }
+}
+
 function renderPlanningBoard() {
 
   const semanas =
@@ -4842,6 +5048,7 @@ function renderPlanningBoard() {
     </div>
   `;
 
+  agregarBotonesExportPlanning();
   activarInteraccionesPlanning();
 
 }
