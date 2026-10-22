@@ -92,7 +92,80 @@
     );
   };
 
+  let marcadoresCercanosAddon = [];
+  let marcadoresAbiertosAddon = [];
+  let lineasAbiertasAddon = [];
+
+  function normalizarLocalidadAddon(valor) {
+    return String(valor || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function cerrarGrupoAddon() {
+    lineasAbiertasAddon.forEach(linea => {
+      if (capaMarcadores.hasLayer(linea)) capaMarcadores.removeLayer(linea);
+    });
+    lineasAbiertasAddon = [];
+    marcadoresAbiertosAddon.forEach(marcador => {
+      if (marcador._posicionRealAddon) marcador.setLatLng(marcador._posicionRealAddon);
+      marcador._abiertoAddon = false;
+    });
+    marcadoresAbiertosAddon = [];
+  }
+
+  function candidatosAddon(marcador) {
+    const origen = mapa.latLngToContainerPoint(marcador._posicionRealAddon);
+    return marcadoresCercanosAddon.filter(candidato => {
+      if (!capaMarcadores.hasLayer(candidato)) return false;
+      const mismaLocalidad = marcador._localidadAddon && candidato._localidadAddon === marcador._localidadAddon && candidato._tipoAddon === marcador._tipoAddon;
+      const punto = mapa.latLngToContainerPoint(candidato._posicionRealAddon);
+      return mismaLocalidad || origen.distanceTo(punto) <= 90;
+    });
+  }
+
+  function abrirGrupoAddon(grupo) {
+    cerrarGrupoAddon();
+    if (grupo.length < 2) return false;
+    const centroLat = grupo.reduce((s,m) => s + m._posicionRealAddon.lat, 0) / grupo.length;
+    const centroLng = grupo.reduce((s,m) => s + m._posicionRealAddon.lng, 0) / grupo.length;
+    const centro = L.latLng(centroLat, centroLng);
+    const centroPx = mapa.latLngToLayerPoint(centro);
+    const radio = Math.max(60, Math.min(96, 48 + grupo.length * 8));
+    grupo.forEach((marcador, indice) => {
+      const angulo = -Math.PI / 2 + (Math.PI * 2 * indice / grupo.length);
+      const destino = mapa.layerPointToLatLng(L.point(centroPx.x + Math.cos(angulo) * radio, centroPx.y + Math.sin(angulo) * radio));
+      lineasAbiertasAddon.push(L.polyline([marcador._posicionRealAddon, destino], {color:"#526158", weight:1.5, opacity:.8, dashArray:"4 3", interactive:false}).addTo(capaMarcadores));
+      marcador.setLatLng(destino);
+      marcador._abiertoAddon = true;
+      marcador.setZIndexOffset(5000 + indice);
+    });
+    marcadoresAbiertosAddon = grupo;
+    mapa.closePopup();
+    return true;
+  }
+
+  function registrarAddon(marcador, sitio, tipo) {
+    marcador._posicionRealAddon = L.latLng(marcador.getLatLng());
+    marcador._localidadAddon = normalizarLocalidadAddon(sitio.location);
+    marcador._tipoAddon = tipo;
+    marcador._abiertoAddon = false;
+    marcador.off("click");
+    marcador.on("click", evento => {
+      if (evento.originalEvent) L.DomEvent.stop(evento.originalEvent);
+      if (marcador._abiertoAddon) {
+        marcador.openPopup();
+        return;
+      }
+      if (!abrirGrupoAddon(candidatosAddon(marcador))) marcador.openPopup();
+    });
+    marcadoresCercanosAddon.push(marcador);
+  }
+
+  mapa.on("zoomstart movestart", cerrarGrupoAddon);
+  mapa.on("click", cerrarGrupoAddon);
+
   window.actualizarMapa = function () {
+    cerrarGrupoAddon();
+    marcadoresCercanosAddon = [];
     capaMarcadores.clearLayers();
     console.log("DROP actualizarMapa");
     console.log("contadorSitios:", contadorSitios?.innerHTML);
@@ -119,9 +192,9 @@ let accessVerificados = 0;
         modo !== "drop";
 
       if (mostrarTrial) {
-        L.marker(
+        const marcadorTrialAddon = L.marker(
           [sitio.latitudeTrial, sitio.longitudeTrial],
-          { icon: window.crearIconoTrial(sitio.crop, sitio) }
+          { icon: window.crearIconoTrial(sitio.crop, sitio), bubblingMouseEvents: false }
         )
           .bindPopup(window.crearPopupTrial(sitio), {
             maxWidth: 390,
@@ -129,6 +202,8 @@ let accessVerificados = 0;
             maxHeight: 520
           })
           .addTo(capaMarcadores);
+
+        registrarAddon(marcadorTrialAddon, sitio, "trial");
 
         coordenadas.push([sitio.latitudeTrial, sitio.longitudeTrial]);
         cantidadTrials += 1;
@@ -153,9 +228,9 @@ if (
           longitude: sitio.longitudeAccess
         };
 
-        L.marker(
+        const marcadorAccessAddon = L.marker(
           [sitio.latitudeAccess, sitio.longitudeAccess],
-          { icon: crearIconoAccess(sitio), zIndexOffset: 1000 }
+          { icon: crearIconoAccess(sitio), zIndexOffset: 1000, bubblingMouseEvents: false }
         )
           .bindPopup(crearPopupAccess(sitioAccess), {
             maxWidth: 390,
@@ -164,6 +239,8 @@ if (
             sitioAccess
           })
           .addTo(capaMarcadores);
+
+        registrarAddon(marcadorAccessAddon, sitio, "access");
 
         coordenadas.push([sitio.latitudeAccess, sitio.longitudeAccess]);
         cantidadAccess += 1;
