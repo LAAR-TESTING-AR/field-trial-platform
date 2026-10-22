@@ -454,11 +454,30 @@ function estaPlanificado(
       sitio["AOI ID"]
     );
 
-  return planningData.some(
-    item =>
-      limpiarTexto(
-        item.aoiId
-      ) === aoiId
+  const encontrado =
+    planningData.find(
+      item =>
+        limpiarTexto(
+          item.aoiId
+        ) === aoiId
+    );
+
+  if (
+    aoiId ===
+    "ANCY04NRDLET"
+  ) {
+
+    console.log(
+      "BUSCANDO",
+      aoiId,
+      encontrado,
+      planningData
+    );
+
+  }
+
+  return Boolean(
+    encontrado
   );
 
 }
