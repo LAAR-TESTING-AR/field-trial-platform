@@ -2161,22 +2161,6 @@ async function guardarCambiosPlanning() {
     return;
   }
 
-  document.querySelectorAll(".btn-editar-noactivity").forEach(boton => {
-    boton.addEventListener("click", evento => {
-      evento.stopPropagation();
-      const item = planningData.find(x => Number(x.id) === Number(boton.dataset.id));
-      if (item) abrirFormularioNoActivity(item, false);
-    });
-  });
-
-  document.querySelectorAll(".btn-duplicar-noactivity").forEach(boton => {
-    boton.addEventListener("click", evento => {
-      evento.stopPropagation();
-      const item = planningData.find(x => Number(x.id) === Number(boton.dataset.id));
-      if (item) abrirFormularioNoActivity(item, true);
-    });
-  });
-
   const btnGuardarCambios =
     document.getElementById(
       "btnGuardarCambiosPlanning"
@@ -3328,6 +3312,64 @@ function activarInteraccionesPlanning() {
           }
         );
 
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-editar-noactivity"
+    )
+    .forEach(
+      boton => {
+        boton.addEventListener(
+          "click",
+          evento => {
+            evento.preventDefault();
+            evento.stopPropagation();
+
+            const item = planningData.find(
+              actual =>
+                Number(actual.id) ===
+                Number(boton.dataset.id)
+            );
+
+            if (item) {
+              abrirFormularioNoActivity(
+                item,
+                false
+              );
+            }
+          }
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-duplicar-noactivity"
+    )
+    .forEach(
+      boton => {
+        boton.addEventListener(
+          "click",
+          evento => {
+            evento.preventDefault();
+            evento.stopPropagation();
+
+            const item = planningData.find(
+              actual =>
+                Number(actual.id) ===
+                Number(boton.dataset.id)
+            );
+
+            if (item) {
+              abrirFormularioNoActivity(
+                item,
+                true
+              );
+            }
+          }
+        );
       }
     );
 
