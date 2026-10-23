@@ -34,53 +34,71 @@ let marcadoresPlantingMapa = [];
 let marcadoresPlantingDesplegados = [];
 let lineasPlantingDesplegadas = [];
 let cerrandoGrupoPlanting = false;
+let ignorarClickMapaPlanting = false;
 
 function cerrarGrupoMarcadoresPlanting() {
   if (cerrandoGrupoPlanting) return;
   if (!marcadoresPlantingDesplegados.length && !lineasPlantingDesplegadas.length) return;
+
   cerrandoGrupoPlanting = true;
+
   try {
     mapa.closePopup();
+
     lineasPlantingDesplegadas.forEach(linea => {
-      if (capaMarcadores.hasLayer(linea)) capaMarcadores.removeLayer(linea);
+      if (capaMarcadores.hasLayer(linea)) {
+        capaMarcadores.removeLayer(linea);
+      }
     });
+
     lineasPlantingDesplegadas = [];
+
     marcadoresPlantingDesplegados.forEach(marcador => {
       marcador._plantingDesplegado = false;
-      if (marcador._plantingPosicionReal) marcador.setLatLng(marcador._plantingPosicionReal);
+
+      if (marcador._plantingPosicionReal) {
+        marcador.setLatLng(marcador._plantingPosicionReal);
+      }
     });
+
     marcadoresPlantingDesplegados = [];
   } finally {
     cerrandoGrupoPlanting = false;
   }
 }
 
-function obtenerMarcadoresCercanosPlanting(marcador, distanciaMaxima = 46) {
+function obtenerMarcadoresCercanosPlanting(marcador) {
   const origen = mapa.latLngToContainerPoint(
     marcador._plantingPosicionReal || marcador.getLatLng()
   );
+
   return marcadoresPlantingMapa.filter(candidato => {
     if (!capaMarcadores.hasLayer(candidato)) return false;
+
     const punto = mapa.latLngToContainerPoint(
       candidato._plantingPosicionReal || candidato.getLatLng()
     );
-    return origen.distanceTo(punto) <= distanciaMaxima;
+
+    return origen.distanceTo(punto) <= 90;
   });
 }
 
 function desplegarMarcadoresPlanting(grupo) {
   cerrarGrupoMarcadoresPlanting();
+
   if (grupo.length < 2) return false;
 
   const posiciones = grupo.map(
     marcador => marcador._plantingPosicionReal || marcador.getLatLng()
   );
+
   const centro = L.latLng(
     posiciones.reduce((suma, pos) => suma + pos.lat, 0) / posiciones.length,
     posiciones.reduce((suma, pos) => suma + pos.lng, 0) / posiciones.length
   );
+
   const centroPx = mapa.latLngToLayerPoint(centro);
-  const radio = Math.max(42, Math.min(82, 34 + grupo.length * 7));
+  const radio = Math.max(54, Math.min(92, 42 + grupo.length * 7));
 
   grupo.forEach((marcador, indice) => {
     const angulo = -Math.PI / 2 + ((Math.PI * 2 * indice) / grupo.length);
@@ -94,9 +112,9 @@ function desplegarMarcadoresPlanting(grupo) {
     const linea = L.polyline(
       [origen, destino],
       {
-        color: '#ffffff',
+        color: '#526158',
         weight: 1.5,
-        opacity: 0.88,
+        opacity: 0.82,
         dashArray: '4 3',
         interactive: false
       }
@@ -105,11 +123,13 @@ function desplegarMarcadoresPlanting(grupo) {
     lineasPlantingDesplegadas.push(linea);
     marcador.setLatLng(destino);
     marcador._plantingDesplegado = true;
-    if (typeof marcador.bringToFront === 'function') marcador.bringToFront();
+    marcador.bringToFront();
   });
 
   marcadoresPlantingDesplegados = grupo;
+  ignorarClickMapaPlanting = true;
   mapa.closePopup();
+
   return true;
 }
 
@@ -118,26 +138,38 @@ function registrarMarcadorPlanting(marcador) {
   marcador._plantingDesplegado = false;
 
   marcador.off('click');
+
   marcador.on('click', evento => {
     if (evento.originalEvent) {
-      L.DomEvent.stopPropagation(evento.originalEvent);
-      L.DomEvent.preventDefault(evento.originalEvent);
+      L.DomEvent.stop(evento.originalEvent);
     }
 
     if (marcador._plantingDesplegado) {
+      ignorarClickMapaPlanting = true;
       window.setTimeout(() => marcador.openPopup(), 0);
       return;
     }
 
     const cercanos = obtenerMarcadoresCercanosPlanting(marcador);
-    if (!desplegarMarcadoresPlanting(cercanos)) marcador.openPopup();
+
+    if (!desplegarMarcadoresPlanting(cercanos)) {
+      ignorarClickMapaPlanting = true;
+      window.setTimeout(() => marcador.openPopup(), 0);
+    }
   });
 
   marcadoresPlantingMapa.push(marcador);
 }
 
 mapa.on('zoomstart', cerrarGrupoMarcadoresPlanting);
-mapa.on('click', cerrarGrupoMarcadoresPlanting);
+mapa.on('click', () => {
+  if (ignorarClickMapaPlanting) {
+    ignorarClickMapaPlanting = false;
+    return;
+  }
+
+  cerrarGrupoMarcadoresPlanting();
+});
 
 L.control.layers(
   {
@@ -1652,7 +1684,8 @@ else if (planificado) {
     color: "#ffffff",
     weight: 2,
     opacity: 1,
-    fillOpacity: 0.95
+    fillOpacity: 0.95,
+    bubblingMouseEvents: false
   }
 );
 marcador.bindPopup(
