@@ -29,6 +29,24 @@ const mapa = L.map("mapa", {
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
+let harvestingMarkers=[], harvestingOpen=[], harvestingLines=[];
+function closeHarvestingSpider(){
+  harvestingLines.forEach(x=>capaMarcadores.hasLayer(x)&&capaMarcadores.removeLayer(x)); harvestingLines=[];
+  harvestingOpen.forEach(m=>{m._hsOpen=false;if(m._hsReal)m.setLatLng(m._hsReal)}); harvestingOpen=[];
+}
+function addHarvestingSpider(marker){
+  marker._hsReal=L.latLng(marker.getLatLng()); marker._hsOpen=false; marker.off("click");
+  marker.on("click",e=>{
+    if(e.originalEvent)L.DomEvent.stop(e.originalEvent);
+    if(marker._hsOpen){setTimeout(()=>marker.openPopup(),0);return}
+    const base=mapa.latLngToContainerPoint(marker._hsReal);
+    const group=harvestingMarkers.filter(m=>capaMarcadores.hasLayer(m)&&base.distanceTo(mapa.latLngToContainerPoint(m._hsReal))<=90);
+    if(group.length<2){setTimeout(()=>marker.openPopup(),0);return}
+    closeHarvestingSpider(); const c=L.latLng(group.reduce((a,m)=>a+m._hsReal.lat,0)/group.length,group.reduce((a,m)=>a+m._hsReal.lng,0)/group.length); const cp=mapa.latLngToLayerPoint(c); const r=Math.max(54,Math.min(92,42+group.length*7));
+    group.forEach((m,i)=>{const a=-Math.PI/2+2*Math.PI*i/group.length;const d=mapa.layerPointToLatLng(L.point(cp.x+Math.cos(a)*r,cp.y+Math.sin(a)*r));harvestingLines.push(L.polyline([m._hsReal,d],{color:"#526158",weight:1.5,opacity:.82,dashArray:"4 3",interactive:false}).addTo(capaMarcadores));m.setLatLng(d);m._hsOpen=true;m.bringToFront()}); harvestingOpen=group; mapa.closePopup();
+  }); harvestingMarkers.push(marker);
+}
+mapa.on("zoomstart",closeHarvestingSpider); mapa.on("click",closeHarvestingSpider);
 L.control.layers(
   {
     "Map": capaMapaActual,
@@ -1416,6 +1434,7 @@ else if (estado === "COSECHADO") {
 
 
 function actualizarMapa(sitiosFiltrados) {
+  closeHarvestingSpider(); harvestingMarkers=[];
   capaMarcadores.clearLayers();
 
   const coordenadas = [];
@@ -1473,7 +1492,8 @@ if (drop) {
     color: "#ffffff",
     weight: 2,
     opacity: 1,
-    fillOpacity: 0.95
+    fillOpacity: 0.95,
+      bubblingMouseEvents: false
   }
 );
 marcador.bindPopup(
@@ -1520,6 +1540,7 @@ if (
 );
 
 marcador.addTo(capaMarcadores);
+addHarvestingSpider(marcador);
 
     coordenadas.push([lat, lon]);
   });
