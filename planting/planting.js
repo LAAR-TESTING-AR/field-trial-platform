@@ -39,7 +39,149 @@ let etiquetasMapaPlantingActivas = false;
 const marcadoresEtiquetasPlanting = [];
 function escaparHtmlEtiquetaPlanting(valor){return String(valor??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 function crearContenidoEtiquetaPlanting(sitio){const localidad=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Location));const crop=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Crop));const laar=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio["LAAR Status 2026-2027"]));return `<div style="font-size:11px;line-height:1.18;white-space:nowrap;"><div style="font-weight:800;color:#173f2a;">${localidad||"Sin localidad"}</div><div style="margin-top:1px;color:#45564c;font-weight:600;">${crop||"Sin cultivo"}</div><div style="margin-top:1px;color:#6b786f;font-size:10px;">${laar||"Sin LAAR Status"}</div></div>`;}
-function aplicarEstadoEtiquetasPlanting(){marcadoresEtiquetasPlanting.forEach(m=>{if(!m.getTooltip?.())return;etiquetasMapaPlantingActivas?m.openTooltip():m.closeTooltip();});const b=document.getElementById("btnEtiquetasMapaPlanting");if(b){b.innerHTML=etiquetasMapaPlantingActivas?"🏷 Etiquetas ✓":"🏷 Etiquetas";b.style.background=etiquetasMapaPlantingActivas?"#e8f4ec":"#fff";b.style.color=etiquetasMapaPlantingActivas?"#0b6b3a":"#45564c";}}
+const ZOOM_MINIMO_ETIQUETAS_PLANTING = 7;
+
+function rectangulosSePisanPlanting(a, b, margen = 4) {
+  return !(
+    a.right + margen <= b.left ||
+    a.left >= b.right + margen ||
+    a.bottom + margen <= b.top ||
+    a.top >= b.bottom + margen
+  );
+}
+
+function estimarRectEtiquetaPlanting(marcador, posicion) {
+  const sitio = marcador._sitioEtiquetaPlanting || {};
+  const textos = [
+    limpiarTexto(sitio.Location),
+    limpiarTexto(sitio.Crop),
+    limpiarTexto(sitio["LAAR Status 2026-2027"])
+  ];
+  const caracteres = Math.max(10, ...textos.map(texto => texto.length));
+  const ancho = Math.min(210, Math.max(92, (caracteres * 6.15) + 18));
+  const alto = 52;
+  const punto = mapa.latLngToContainerPoint(marcador.getLatLng());
+  const separacion = 17;
+  let left = punto.x + separacion;
+  let top = punto.y - (alto / 2);
+
+  if (posicion === "left") {
+    left = punto.x - ancho - separacion;
+  } else if (posicion === "top") {
+    left = punto.x - (ancho / 2);
+    top = punto.y - alto - separacion;
+  } else if (posicion === "bottom") {
+    left = punto.x - (ancho / 2);
+    top = punto.y + separacion;
+  } else if (posicion === "top-right") {
+    left = punto.x + 13;
+    top = punto.y - alto - 13;
+  } else if (posicion === "bottom-right") {
+    left = punto.x + 13;
+    top = punto.y + 13;
+  } else if (posicion === "top-left") {
+    left = punto.x - ancho - 13;
+    top = punto.y - alto - 13;
+  } else if (posicion === "bottom-left") {
+    left = punto.x - ancho - 13;
+    top = punto.y + 13;
+  }
+
+  return { left, top, right: left + ancho, bottom: top + alto };
+}
+
+function offsetEtiquetaPlanting(posicion) {
+  const offsets = {
+    right: [15, 0],
+    left: [-15, 0],
+    top: [0, -15],
+    bottom: [0, 15],
+    "top-right": [14, -14],
+    "bottom-right": [14, 14],
+    "top-left": [-14, -14],
+    "bottom-left": [-14, 14]
+  };
+  return offsets[posicion] || offsets.right;
+}
+
+function direccionTooltipPlanting(posicion) {
+  if (posicion.includes("left")) return "left";
+  if (posicion.includes("right")) return "right";
+  if (posicion === "top") return "top";
+  if (posicion === "bottom") return "bottom";
+  return "right";
+}
+
+function distribuirEtiquetasPlanting() {
+  if (!etiquetasMapaPlantingActivas) return;
+
+  const zoom = mapa.getZoom();
+  const boton = document.getElementById("btnEtiquetasMapaPlanting");
+
+  if (zoom < ZOOM_MINIMO_ETIQUETAS_PLANTING) {
+    marcadoresEtiquetasPlanting.forEach(marcador => marcador.closeTooltip());
+    if (boton) boton.title = `Acerque el mapa a zoom ${ZOOM_MINIMO_ETIQUETAS_PLANTING} o superior para mostrar las etiquetas`;
+    return;
+  }
+
+  if (boton) boton.title = "Mostrar u ocultar Localidad, Crop y LAAR Status";
+
+  const posiciones = [
+    "right", "left", "top", "bottom",
+    "top-right", "bottom-right", "top-left", "bottom-left"
+  ];
+  const ocupados = [];
+  const limitesMapa = mapa.getContainer().getBoundingClientRect();
+
+  const marcadoresOrdenados = [...marcadoresEtiquetasPlanting].sort((a, b) => {
+    const pa = mapa.latLngToContainerPoint(a.getLatLng());
+    const pb = mapa.latLngToContainerPoint(b.getLatLng());
+    return pa.y - pb.y || pa.x - pb.x;
+  });
+
+  marcadoresOrdenados.forEach(marcador => {
+    const tooltip = marcador.getTooltip?.();
+    if (!tooltip) return;
+
+    let seleccion = posiciones[0];
+    let rectSeleccionado = estimarRectEtiquetaPlanting(marcador, seleccion);
+
+    for (const posicion of posiciones) {
+      const rect = estimarRectEtiquetaPlanting(marcador, posicion);
+      const fuera = rect.left < 2 || rect.top < 2 || rect.right > limitesMapa.width - 2 || rect.bottom > limitesMapa.height - 2;
+      const colision = ocupados.some(ocupado => rectangulosSePisanPlanting(rect, ocupado));
+      if (!fuera && !colision) {
+        seleccion = posicion;
+        rectSeleccionado = rect;
+        break;
+      }
+    }
+
+    tooltip.options.direction = direccionTooltipPlanting(seleccion);
+    tooltip.options.offset = L.point(offsetEtiquetaPlanting(seleccion));
+    marcador.closeTooltip();
+    marcador.openTooltip();
+    ocupados.push(rectSeleccionado);
+  });
+}
+
+function aplicarEstadoEtiquetasPlanting() {
+  const boton = document.getElementById("btnEtiquetasMapaPlanting");
+
+  if (!etiquetasMapaPlantingActivas) {
+    marcadoresEtiquetasPlanting.forEach(marcador => marcador.closeTooltip());
+  } else {
+    distribuirEtiquetasPlanting();
+  }
+
+  if (boton) {
+    boton.innerHTML = etiquetasMapaPlantingActivas ? "🏷 Etiquetas ✓" : "🏷 Etiquetas";
+    boton.setAttribute("aria-pressed", String(etiquetasMapaPlantingActivas));
+    boton.style.background = etiquetasMapaPlantingActivas ? "#e8f4ec" : "#ffffff";
+    boton.style.color = etiquetasMapaPlantingActivas ? "#0b6b3a" : "#45564c";
+  }
+}
+
 function crearBotonEtiquetasPlanting() {
   if (document.getElementById("btnEtiquetasMapaPlanting")) return;
 
@@ -47,7 +189,7 @@ function crearBotonEtiquetasPlanting() {
   contenedor.id = "contenedorEtiquetasMapaPlanting";
   contenedor.style.position = "absolute";
   contenedor.style.right = "18px";
-  contenedor.style.bottom = "86px";
+  contenedor.style.top = "14px";
   contenedor.style.zIndex = "10000";
   contenedor.style.pointerEvents = "auto";
 
@@ -58,43 +200,34 @@ function crearBotonEtiquetasPlanting() {
   boton.setAttribute("aria-pressed", "false");
   boton.innerHTML = "🏷 Etiquetas";
   boton.style.cssText = [
-    "display:flex",
-    "align-items:center",
-    "justify-content:center",
-    "gap:5px",
-    "min-width:112px",
-    "height:38px",
-    "padding:0 13px",
-    "border:2px solid #0b6b3a",
-    "border-radius:10px",
-    "background:#ffffff",
-    "color:#0b6b3a",
-    "font-size:12px",
-    "font-weight:900",
-    "cursor:pointer",
-    "box-shadow:0 4px 14px rgba(0,0,0,.22)"
+    "display:flex", "align-items:center", "justify-content:center", "gap:6px",
+    "min-width:126px", "height:42px", "padding:0 15px",
+    "border:2px solid #0b6b3a", "border-radius:11px",
+    "background:#ffffff", "color:#0b6b3a", "font-size:13px",
+    "font-weight:900", "cursor:pointer", "box-shadow:0 5px 16px rgba(0,0,0,.25)"
   ].join(";");
 
   boton.addEventListener("click", evento => {
     evento.preventDefault();
     evento.stopPropagation();
     etiquetasMapaPlantingActivas = !etiquetasMapaPlantingActivas;
-    boton.setAttribute("aria-pressed", String(etiquetasMapaPlantingActivas));
     aplicarEstadoEtiquetasPlanting();
   });
 
   contenedor.appendChild(boton);
-
   const mapaElemento = document.getElementById("mapa");
   if (!mapaElemento) return;
-
-  if (getComputedStyle(mapaElemento).position === "static") {
-    mapaElemento.style.position = "relative";
-  }
-
+  if (getComputedStyle(mapaElemento).position === "static") mapaElemento.style.position = "relative";
   mapaElemento.appendChild(contenedor);
   aplicarEstadoEtiquetasPlanting();
 }
+
+mapa.on("zoomend moveend", () => {
+  if (etiquetasMapaPlantingActivas) {
+    window.requestAnimationFrame(distribuirEtiquetasPlanting);
+  }
+});
+
 function cerrarGrupoMarcadoresPlanting() {
   if (cerrandoGrupoPlanting) return;
   if (!marcadoresPlantingDesplegados.length && !lineasPlantingDesplegadas.length) return;
@@ -1751,6 +1884,7 @@ else if (planificado) {
 marcador.bindPopup(
   crearPopup(sitio, estado)
 );
+marcador._sitioEtiquetaPlanting = sitio;
 marcador.bindTooltip(crearContenidoEtiquetaPlanting(sitio),{permanent:true,direction:"right",offset:[12,0],opacity:.96,className:"planting-map-label",interactive:false});
 marcador.closeTooltip();
 marcadoresEtiquetasPlanting.push(marcador);
@@ -1834,11 +1968,7 @@ if (
 
 marcador.addTo(capaMarcadores);
 registrarMarcadorPlanting(marcador);
-if (etiquetasMapaPlantingActivas) {
-  marcador.openTooltip();
-} else {
-  marcador.closeTooltip();
-}
+marcador.closeTooltip();
 
     coordenadas.push([lat, lon]);
   });
