@@ -35,6 +35,13 @@ let marcadoresPlantingDesplegados = [];
 let lineasPlantingDesplegadas = [];
 let cerrandoGrupoPlanting = false;
 let ignorarClickMapaPlanting = false;
+let etiquetasMapaPlantingActivas = false;
+const marcadoresEtiquetasPlanting = [];
+function escaparHtmlEtiquetaPlanting(valor){return String(valor??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function crearContenidoEtiquetaPlanting(sitio){const localidad=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Location));const crop=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Crop));const laar=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio["LAAR Status 2026-2027"]));return `<div style="font-size:11px;line-height:1.18;white-space:nowrap;"><div style="font-weight:800;color:#173f2a;">${localidad||"Sin localidad"}</div><div style="margin-top:1px;color:#45564c;font-weight:600;">${crop||"Sin cultivo"}</div><div style="margin-top:1px;color:#6b786f;font-size:10px;">${laar||"Sin LAAR Status"}</div></div>`;}
+function aplicarEstadoEtiquetasPlanting(){marcadoresEtiquetasPlanting.forEach(m=>{if(!m.getTooltip?.())return;etiquetasMapaPlantingActivas?m.openTooltip():m.closeTooltip();});const b=document.getElementById("btnEtiquetasMapaPlanting");if(b){b.innerHTML=etiquetasMapaPlantingActivas?"🏷 Etiquetas ✓":"🏷 Etiquetas";b.style.background=etiquetasMapaPlantingActivas?"#e8f4ec":"#fff";b.style.color=etiquetasMapaPlantingActivas?"#0b6b3a":"#45564c";}}
+function crearBotonEtiquetasPlanting(){if(document.getElementById("btnEtiquetasMapaPlanting"))return;const c=L.control({position:"bottomright"});c.onAdd=function(){const w=L.DomUtil.create("div","leaflet-bar");const b=L.DomUtil.create("button","",w);b.id="btnEtiquetasMapaPlanting";b.type="button";b.title="Mostrar u ocultar Localidad, Crop y LAAR Status";b.innerHTML="🏷 Etiquetas";b.style.cssText="width:auto;min-width:94px;height:34px;padding:0 10px;border:1px solid #c8d4cc;border-radius:7px;background:#fff;color:#45564c;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.12)";L.DomEvent.disableClickPropagation(w);L.DomEvent.disableScrollPropagation(w);L.DomEvent.on(b,"click",e=>{L.DomEvent.stop(e);etiquetasMapaPlantingActivas=!etiquetasMapaPlantingActivas;aplicarEstadoEtiquetasPlanting();});return w;};c.addTo(mapa);}
+
 
 function cerrarGrupoMarcadoresPlanting() {
   if (cerrandoGrupoPlanting) return;
@@ -1592,6 +1599,7 @@ if (
 function actualizarMapa(sitiosFiltrados) {
   cerrarGrupoMarcadoresPlanting();
   marcadoresPlantingMapa = [];
+  marcadoresEtiquetasPlanting.length = 0;
   capaMarcadores.clearLayers();
 
   const coordenadas = [];
@@ -1691,6 +1699,9 @@ else if (planificado) {
 marcador.bindPopup(
   crearPopup(sitio, estado)
 );
+marcador.bindTooltip(crearContenidoEtiquetaPlanting(sitio),{permanent:true,direction:"right",offset:[12,0],opacity:.96,className:"planting-map-label",interactive:false});
+marcador.closeTooltip();
+marcadoresEtiquetasPlanting.push(marcador);
 
 marcador.on(
   "popupopen",
@@ -1771,6 +1782,7 @@ if (
 
 marcador.addTo(capaMarcadores);
 registrarMarcadorPlanting(marcador);
+if(etiquetasMapaPlantingActivas) marcador.openTooltip();
 
     coordenadas.push([lat, lon]);
   });
@@ -1957,6 +1969,7 @@ botonLeyenda.addEventListener(
     panelLeyenda.classList.toggle("visible");
   }
 );
+crearBotonEtiquetasPlanting();
 let aoiPendienteSiembra = null;
 
 function abrirModalSiembra(
