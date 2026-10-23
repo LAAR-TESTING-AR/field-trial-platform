@@ -2066,6 +2066,10 @@ let semanaPlanningVisible =
 
 let planningWeekOffset = 0;
 let planningReferenceStart = null;
+function esPlanningViewer() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("mode") === "viewer" || window.FIELD_TRIAL_FORCE_VIEWER === true || Boolean(window.FieldTrialAppMode?.isViewer);
+}
 const plantingPlanters = [
   "BE19182",
   "BE19183",
@@ -2079,6 +2083,7 @@ const plantingPlanters = [
 async function eliminarPlanning(
   id
 ) {
+    if (esPlanningViewer()) return;
 
   try {
 
@@ -2133,6 +2138,7 @@ function registrarCambioPlanning(
   week,
   sortOrder = 0
 ) {
+    if (esPlanningViewer()) return;
 
   const cambio = {
     id: item.id,
@@ -2156,6 +2162,7 @@ function registrarCambioPlanning(
 }
 
 async function guardarCambiosPlanning() {
+    if (esPlanningViewer()) return;
 
   if (planningChanges.length === 0) {
     return;
@@ -2497,7 +2504,7 @@ function configuracionEstadoPlanning(
     return `
       <div
         class="planning-card"
-        draggable="true"
+        draggable="${esPlanningViewer() ? "false" : "true"}"
         data-id="${item.id}"
         data-planter="${item.planter}"
         data-week="${item.week}"
@@ -2638,7 +2645,7 @@ function crearTarjetaNoActivityPlanning(item) {
   const icono = iconos[motivo] || "⏸";
   const esMobile = window.matchMedia("(max-width: 1100px), (pointer: coarse)").matches;
   return `
-    <div class="planning-card planning-card-noactivity" draggable="true"
+    <div class="planning-card planning-card-noactivity" draggable="${esPlanningViewer() ? "false" : "true"}"
       data-id="${item.id}" data-planter="${item.planter}" data-week="${item.week}" data-sembrado="false"
       title="${motivo}${comentario ? ` · ${comentario}` : ""}"
       style="background:#f5f7f8;border-left:5px solid #64748b;border-top:1px solid #dfe4e8;border-right:1px solid #dfe4e8;border-bottom:1px solid #dfe4e8;border-radius:9px;padding:${esMobile ? "5px 4px" : "6px 7px"};margin-top:5px;cursor:grab;box-sizing:border-box;overflow:hidden;">
@@ -2648,9 +2655,9 @@ function crearTarjetaNoActivityPlanning(item) {
           ${comentario ? `<div style="margin-top:3px;font-size:${esMobile ? "8px" : "9px"};color:#64748b;line-height:1.2;overflow:hidden;text-overflow:ellipsis;${esMobile ? "white-space:nowrap;" : "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"}">${comentario}</div>` : ""}
         </div>
         <div style="display:flex;gap:2px;flex:0 0 auto;">
-          <button type="button" class="btn-editar-noactivity" data-id="${item.id}" title="Editar" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">✏️</button>
-          <button type="button" class="btn-duplicar-noactivity" data-id="${item.id}" title="Duplicar a otra semana" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">📋</button>
-          <button type="button" class="btn-eliminar-planning" data-id="${item.id}" title="Eliminar" style="border:none;background:none;cursor:pointer;color:#b73b3b;padding:0;font-size:${esMobile ? "10px" : "12px"};">🗑</button>
+          <button type="button" class="btn-editar-noactivity" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Editar" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">✏️</button>
+          <button type="button" class="btn-duplicar-noactivity" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Duplicar a otra semana" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">📋</button>
+          <button type="button" class="btn-eliminar-planning" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Eliminar" style="border:none;background:none;cursor:pointer;color:#b73b3b;padding:0;font-size:${esMobile ? "10px" : "12px"};">🗑</button>
         </div>
       </div>
     </div>`;
@@ -2915,6 +2922,14 @@ function renderBloqueSemanaPlanning(
 }
 
 function activarInteraccionesPlanning() {
+    if (esPlanningViewer()) {
+      document.querySelectorAll(".planning-card").forEach(t => { t.setAttribute("draggable","false"); t.style.cursor="default"; });
+      document.getElementById("btnPlanningAnterior")?.addEventListener("click",()=>{planningWeekOffset-=1;renderPlanningBoard();});
+      document.getElementById("btnPlanningSiguiente")?.addEventListener("click",()=>{planningWeekOffset+=1;renderPlanningBoard();});
+      document.getElementById("btnPlanningHoy")?.addEventListener("click",()=>{planningWeekOffset=0;renderPlanningBoard();});
+      document.getElementById("planningWeekNavigator")?.addEventListener("wheel",evento=>{if(Math.abs(evento.deltaX)<=Math.abs(evento.deltaY))return;evento.preventDefault();planningWeekOffset+=evento.deltaX>0?1:-1;renderPlanningBoard();},{passive:false});
+      return;
+    }
 
   document
     .querySelectorAll(
@@ -3572,6 +3587,7 @@ function crearFormularioNoActivityPlanning() {
 }
 
 function abrirFormularioNoActivity(item = null, duplicate = false) {
+    if (esPlanningViewer()) return;
   crearFormularioNoActivityPlanning();
   const form = document.getElementById("noActivityPlanningForm");
   planningForm.hidden = true;
@@ -3599,6 +3615,7 @@ function abrirFormularioNoActivity(item = null, duplicate = false) {
 }
 
 async function guardarNoActivityPlanning() {
+    if (esPlanningViewer()) return;
   const form = document.getElementById("noActivityPlanningForm");
   const reason = limpiarTexto(document.getElementById("noActivityReason")?.value);
   const planter = limpiarTexto(document.getElementById("noActivityPlanter")?.value);
@@ -3626,6 +3643,7 @@ async function guardarNoActivityPlanning() {
 }
 
 function asegurarBotonNoActivityPlanning() {
+    if (esPlanningViewer()) { document.getElementById("btnAddNoActivityPlanning")?.remove(); return; }
   const toolbar = document.getElementById("planningToolbar");
   if (!toolbar || document.getElementById("btnAddNoActivityPlanning")) return;
   const btn = document.createElement("button");
@@ -3788,6 +3806,7 @@ function crearFormularioSpecialPlanning() {
 }
 
 function prepararFormularioSpecialPlanning() {
+    if (esPlanningViewer()) return;
 
   crearFormularioSpecialPlanning();
 
@@ -3857,6 +3876,7 @@ function prepararFormularioSpecialPlanning() {
 }
 
 async function guardarSpecialPlanning() {
+    if (esPlanningViewer()) return;
 
   const type =
     limpiarTexto(
@@ -5611,6 +5631,7 @@ function agregarBotonesExportPlanning() {
 }
 
 function renderPlanningBoard() {
+    const esViewerPlanning = esPlanningViewer();
 
   const semanas =
     obtenerSemanasPlanningVisibles();
@@ -5755,7 +5776,7 @@ function renderPlanningBoard() {
       ">
         ${renderLeyendaEstadoPlanning()}
         <span style="color:#7a867f;font-size:11px;line-height:1;">
-          Las tarjetas sembradas pueden moverse o eliminarse.
+          ${esViewerPlanning ? "Modo Viewer · Solo lectura" : "Las tarjetas sembradas pueden moverse o eliminarse."}
         </span>
       </div>
 
@@ -5837,7 +5858,15 @@ function renderPlanningBoard() {
 
   asegurarBotonNoActivityPlanning();
   agregarBotonesExportPlanning();
-  activarInteraccionesPlanning();
+    if (esViewerPlanning) {
+      if (btnAddPlanning) btnAddPlanning.style.display = "none";
+      if (btnAddSpecialPlanning) btnAddSpecialPlanning.style.display = "none";
+      if (planningForm) planningForm.hidden = true;
+      document.getElementById("specialPlanningForm")?.setAttribute("hidden", "");
+      document.getElementById("noActivityPlanningForm")?.setAttribute("hidden", "");
+      planningChanges = [];
+    }
+    activarInteraccionesPlanning();
 
 }
 
@@ -6058,6 +6087,7 @@ btnPlanning.addEventListener(
 btnAddPlanning?.addEventListener(
   "click",
   () => {
+      if (esPlanningViewer()) return;
 
     estilizarFormularioMasterPlanning();
     cargarLocalidadesPlanning();
@@ -6095,6 +6125,7 @@ btnCancelarPlanning?.addEventListener(
 btnGuardarPlanning?.addEventListener(
   "click",
   async () => {
+      if (esPlanningViewer()) return;
 
     const locality =
       document.getElementById(
