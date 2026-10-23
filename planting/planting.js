@@ -40,9 +40,61 @@ const marcadoresEtiquetasPlanting = [];
 function escaparHtmlEtiquetaPlanting(valor){return String(valor??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
 function crearContenidoEtiquetaPlanting(sitio){const localidad=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Location));const crop=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio.Crop));const laar=escaparHtmlEtiquetaPlanting(limpiarTexto(sitio["LAAR Status 2026-2027"]));return `<div style="font-size:11px;line-height:1.18;white-space:nowrap;"><div style="font-weight:800;color:#173f2a;">${localidad||"Sin localidad"}</div><div style="margin-top:1px;color:#45564c;font-weight:600;">${crop||"Sin cultivo"}</div><div style="margin-top:1px;color:#6b786f;font-size:10px;">${laar||"Sin LAAR Status"}</div></div>`;}
 function aplicarEstadoEtiquetasPlanting(){marcadoresEtiquetasPlanting.forEach(m=>{if(!m.getTooltip?.())return;etiquetasMapaPlantingActivas?m.openTooltip():m.closeTooltip();});const b=document.getElementById("btnEtiquetasMapaPlanting");if(b){b.innerHTML=etiquetasMapaPlantingActivas?"🏷 Etiquetas ✓":"🏷 Etiquetas";b.style.background=etiquetasMapaPlantingActivas?"#e8f4ec":"#fff";b.style.color=etiquetasMapaPlantingActivas?"#0b6b3a":"#45564c";}}
-function crearBotonEtiquetasPlanting(){if(document.getElementById("btnEtiquetasMapaPlanting"))return;const c=L.control({position:"bottomright"});c.onAdd=function(){const w=L.DomUtil.create("div","leaflet-bar");const b=L.DomUtil.create("button","",w);b.id="btnEtiquetasMapaPlanting";b.type="button";b.title="Mostrar u ocultar Localidad, Crop y LAAR Status";b.innerHTML="🏷 Etiquetas";b.style.cssText="width:auto;min-width:94px;height:34px;padding:0 10px;border:1px solid #c8d4cc;border-radius:7px;background:#fff;color:#45564c;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 2px 7px rgba(0,0,0,.12)";L.DomEvent.disableClickPropagation(w);L.DomEvent.disableScrollPropagation(w);L.DomEvent.on(b,"click",e=>{L.DomEvent.stop(e);etiquetasMapaPlantingActivas=!etiquetasMapaPlantingActivas;aplicarEstadoEtiquetasPlanting();});return w;};c.addTo(mapa);}
+function crearBotonEtiquetasPlanting() {
+  if (document.getElementById("btnEtiquetasMapaPlanting")) return;
 
+  const contenedor = document.createElement("div");
+  contenedor.id = "contenedorEtiquetasMapaPlanting";
+  contenedor.style.position = "absolute";
+  contenedor.style.right = "18px";
+  contenedor.style.bottom = "86px";
+  contenedor.style.zIndex = "10000";
+  contenedor.style.pointerEvents = "auto";
 
+  const boton = document.createElement("button");
+  boton.id = "btnEtiquetasMapaPlanting";
+  boton.type = "button";
+  boton.title = "Mostrar u ocultar Localidad, Crop y LAAR Status";
+  boton.setAttribute("aria-pressed", "false");
+  boton.innerHTML = "🏷 Etiquetas";
+  boton.style.cssText = [
+    "display:flex",
+    "align-items:center",
+    "justify-content:center",
+    "gap:5px",
+    "min-width:112px",
+    "height:38px",
+    "padding:0 13px",
+    "border:2px solid #0b6b3a",
+    "border-radius:10px",
+    "background:#ffffff",
+    "color:#0b6b3a",
+    "font-size:12px",
+    "font-weight:900",
+    "cursor:pointer",
+    "box-shadow:0 4px 14px rgba(0,0,0,.22)"
+  ].join(";");
+
+  boton.addEventListener("click", evento => {
+    evento.preventDefault();
+    evento.stopPropagation();
+    etiquetasMapaPlantingActivas = !etiquetasMapaPlantingActivas;
+    boton.setAttribute("aria-pressed", String(etiquetasMapaPlantingActivas));
+    aplicarEstadoEtiquetasPlanting();
+  });
+
+  contenedor.appendChild(boton);
+
+  const mapaElemento = document.getElementById("mapa");
+  if (!mapaElemento) return;
+
+  if (getComputedStyle(mapaElemento).position === "static") {
+    mapaElemento.style.position = "relative";
+  }
+
+  mapaElemento.appendChild(contenedor);
+  aplicarEstadoEtiquetasPlanting();
+}
 function cerrarGrupoMarcadoresPlanting() {
   if (cerrandoGrupoPlanting) return;
   if (!marcadoresPlantingDesplegados.length && !lineasPlantingDesplegadas.length) return;
@@ -1782,7 +1834,11 @@ if (
 
 marcador.addTo(capaMarcadores);
 registrarMarcadorPlanting(marcador);
-if(etiquetasMapaPlantingActivas) marcador.openTooltip();
+if (etiquetasMapaPlantingActivas) {
+  marcador.openTooltip();
+} else {
+  marcador.closeTooltip();
+}
 
     coordenadas.push([lat, lon]);
   });
