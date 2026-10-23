@@ -268,7 +268,7 @@ ANCY04NVILER,Vilelas TCD,SPD-TCD,Corn - Regulated,NA,Late,AN,Santiago Del Estero
 ANCY04NGANCR,La Paloma TCD (ex Gancedo),SPD-TCD,Corn - Regulated,NA,Late,AN,Chaco,NEA,-27.602041,-61.746403,,,,,,,D1 - 55000,Completar,0.4,Lourdes Suarez,NA,,REFERENCE,,REFERENCE,
 AACY04FRAN1R,Rancagua TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-34.00625,-60.50839,,,10/06/2026,PP23191,,,D4 - 88000,Completar,0.5,Mailen Riveira,NA,,REFERENCE,,REFERENCE,
 AACY04FPER1R,Estación Pergamino TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-33.859926,-60.659315,,,,,,,Densidad variable,Completar,0.64,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
-AACB02FPER1R,Estación Pergamino TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-33.859926,-60.659315,,,,,,,D4 - 88000,Completar,0.05,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
+AACB02FPER1R,Estación Pergamino TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-33.859926,-60.659315,,,10/19/2026,,,,D4 - 88000,Completar,0.05,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
 AACY04FFER1R,Ferre TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-34.118701,-61.204203,,,10/05/2026,PP23191,,,D4 - 88000,Completar,0.47,Mailen Riveira,NA,,REFERENCE,,REFERENCE,
 AACB02FFER1R,Ferre TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-34.118701,-61.204203,,,10/05/2026,PP23191,,,D4 - 88000,Completar,0.05,Mailen Riveira,NA,,REFERENCE,,REFERENCE,
 AACY04NAME1R,America TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Oeste,-35.648676,-63.092277,,,10/14/2026,BE19182,,,D3 - 75000,Completar,0.6,Yésica Chazarreta,NA,,REFERENCE,,REFERENCE,
