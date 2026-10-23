@@ -79,7 +79,7 @@ function obtenerMarcadoresCercanosPlanting(marcador) {
       candidato._plantingPosicionReal || candidato.getLatLng()
     );
 
-    return origen.distanceTo(punto) <= 90;
+    return origen.distanceTo(punto) <= 32;
   });
 }
 
