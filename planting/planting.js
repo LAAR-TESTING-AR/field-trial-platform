@@ -2451,19 +2451,16 @@ function configuracionEstadoPlanning(
               margin-top:3px;
               display:flex;
               align-items:center;
-              gap:3px;
+              gap:5px;
               min-width:0;
               color:#526158;
               font-size:8px;
               line-height:1.15;
             ">
-              <span style="
-                flex:0 0 auto;
-                font-size:12px;
-                line-height:1;
-              ">
-                ${cfgCultivo.icono}
-              </span>
+              ${renderIconoCultivoPlanning(
+                item.crop,
+                20
+              )}
               <span style="
                 min-width:0;
                 overflow:hidden;
