@@ -271,7 +271,7 @@ AACY04FPER1R,Estación Pergamino TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos
 AACB02FPER1R,Estación Pergamino TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-33.859926,-60.659315,,,,,,,D4 - 88000,Completar,0.05,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
 AACY04FFER1R,Ferre TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-34.118701,-61.204203,,,10/05/2026,PP23191,,,D4 - 88000,Completar,0.47,Mailen Riveira,NA,,REFERENCE,,REFERENCE,
 AACB02FFER1R,Ferre TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Nucleo,-34.118701,-61.204203,,,10/05/2026,PP23191,,,D4 - 88000,Completar,0.05,Mailen Riveira,NA,,REFERENCE,,REFERENCE,
-AACY04NAME1R,America TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Oeste,-35.648676,-63.092277,,,,,,,D3 - 75000,Completar,0.6,Yésica Chazarreta,NA,,REFERENCE,,REFERENCE,
+AACY04NAME1R,America TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Buenos Aires,Oeste,-35.648676,-63.092277,,,10/14/2026,,,,D3 - 75000,Completar,0.6,Yésica Chazarreta,NA,,REFERENCE,,REFERENCE,
 AACY04FSED1R,San Eduardo 1 TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Santa Fe,Nucleo,-33.849841,-62.052843,,,,,,,Densidad variable,Completar,0.8,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
 AACB02FSED1R,San Eduardo 1 TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Santa Fe,Nucleo,-33.849841,-62.052843,,,,,,,D4 - 88000,Completar,0.07,Mailen Riveira,NA,Densidad variable,REFERENCE,,REFERENCE,
 AACY04NMJU1R,Marcos Juarez TCD,SPD-TCD,Corn - Regulated,NA,Early,AA,Córdoba,Nucleo,-33.116622,-62.198076,,,,,,,D4 - 88000,Completar,0.47,Paula Colla,NA,,REFERENCE,,REFERENCE,
