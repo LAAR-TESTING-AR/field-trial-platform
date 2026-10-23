@@ -2066,6 +2066,13 @@ let semanaPlanningVisible =
 
 let planningWeekOffset = 0;
 let planningReferenceStart = null;
+
+function esPlanningViewer() {
+  return Boolean(
+    window.FieldTrialAppMode &&
+    window.FieldTrialAppMode.isViewer
+  );
+}
 const plantingPlanters = [
   "BE19182",
   "BE19183",
@@ -2497,7 +2504,7 @@ function configuracionEstadoPlanning(
     return `
       <div
         class="planning-card"
-        draggable="true"
+        draggable="${esPlanningViewer() ? "false" : "true"}"
         data-id="${item.id}"
         data-planter="${item.planter}"
         data-week="${item.week}"
@@ -2557,6 +2564,7 @@ function configuracionEstadoPlanning(
                 `
                 : ""
             }
+            ${esPlanningViewer() ? "" : `
             <button
               type="button"
               class="btn-eliminar-planning"
@@ -2574,6 +2582,7 @@ function configuracionEstadoPlanning(
             >
               🗑
             </button>
+            `}
           </div>
         </div>
         ${
@@ -2638,7 +2647,7 @@ function crearTarjetaNoActivityPlanning(item) {
   const icono = iconos[motivo] || "⏸";
   const esMobile = window.matchMedia("(max-width: 1100px), (pointer: coarse)").matches;
   return `
-    <div class="planning-card planning-card-noactivity" draggable="true"
+    <div class="planning-card planning-card-noactivity" draggable="${esPlanningViewer() ? "false" : "true"}"
       data-id="${item.id}" data-planter="${item.planter}" data-week="${item.week}" data-sembrado="false"
       title="${motivo}${comentario ? ` · ${comentario}` : ""}"
       style="background:#f5f7f8;border-left:5px solid #64748b;border-top:1px solid #dfe4e8;border-right:1px solid #dfe4e8;border-bottom:1px solid #dfe4e8;border-radius:9px;padding:${esMobile ? "5px 4px" : "6px 7px"};margin-top:5px;cursor:grab;box-sizing:border-box;overflow:hidden;">
@@ -2647,11 +2656,13 @@ function crearTarjetaNoActivityPlanning(item) {
           <div style="font-size:${esMobile ? "9px" : "11px"};font-weight:800;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icono} ${motivo}</div>
           ${comentario ? `<div style="margin-top:3px;font-size:${esMobile ? "8px" : "9px"};color:#64748b;line-height:1.2;overflow:hidden;text-overflow:ellipsis;${esMobile ? "white-space:nowrap;" : "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"}">${comentario}</div>` : ""}
         </div>
+        ${esPlanningViewer() ? "" : `
         <div style="display:flex;gap:2px;flex:0 0 auto;">
           <button type="button" class="btn-editar-noactivity" data-id="${item.id}" title="Editar" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">✏️</button>
           <button type="button" class="btn-duplicar-noactivity" data-id="${item.id}" title="Duplicar a otra semana" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">📋</button>
           <button type="button" class="btn-eliminar-planning" data-id="${item.id}" title="Eliminar" style="border:none;background:none;cursor:pointer;color:#b73b3b;padding:0;font-size:${esMobile ? "10px" : "12px"};">🗑</button>
         </div>
+        `}
       </div>
     </div>`;
 }
@@ -2915,6 +2926,14 @@ function renderBloqueSemanaPlanning(
 }
 
 function activarInteraccionesPlanning() {
+  if (esPlanningViewer()) {
+    document
+      .querySelectorAll(".planning-card")
+      .forEach(tarjeta => {
+        tarjeta.setAttribute("draggable", "false");
+        tarjeta.style.cursor = "default";
+      });
+  } else {
 
   document
     .querySelectorAll(
@@ -3409,6 +3428,8 @@ function activarInteraccionesPlanning() {
     guardarCambiosPlanning
   );
 
+  }
+
   document
     .getElementById("btnPlanningAnterior")
     ?.addEventListener(
@@ -3572,6 +3593,7 @@ function crearFormularioNoActivityPlanning() {
 }
 
 function abrirFormularioNoActivity(item = null, duplicate = false) {
+  if (esPlanningViewer()) return;
   crearFormularioNoActivityPlanning();
   const form = document.getElementById("noActivityPlanningForm");
   planningForm.hidden = true;
@@ -3599,6 +3621,7 @@ function abrirFormularioNoActivity(item = null, duplicate = false) {
 }
 
 async function guardarNoActivityPlanning() {
+  if (esPlanningViewer()) return;
   const form = document.getElementById("noActivityPlanningForm");
   const reason = limpiarTexto(document.getElementById("noActivityReason")?.value);
   const planter = limpiarTexto(document.getElementById("noActivityPlanter")?.value);
@@ -3626,6 +3649,10 @@ async function guardarNoActivityPlanning() {
 }
 
 function asegurarBotonNoActivityPlanning() {
+  if (esPlanningViewer()) {
+    document.getElementById("btnAddNoActivityPlanning")?.remove();
+    return;
+  }
   const toolbar = document.getElementById("planningToolbar");
   if (!toolbar || document.getElementById("btnAddNoActivityPlanning")) return;
   const btn = document.createElement("button");
@@ -5755,7 +5782,7 @@ function renderPlanningBoard() {
       ">
         ${renderLeyendaEstadoPlanning()}
         <span style="color:#7a867f;font-size:11px;line-height:1;">
-          Las tarjetas sembradas pueden moverse o eliminarse.
+          ${esViewerPlanning ? "Modo Viewer · Solo lectura" : "Las tarjetas sembradas pueden moverse o eliminarse."}
         </span>
       </div>
 
@@ -5792,6 +5819,7 @@ function renderPlanningBoard() {
         </div>
       </div>
 
+${esViewerPlanning ? "" : `
 <div
   class="planning-save-container"
   style="
@@ -5831,12 +5859,26 @@ function renderPlanningBoard() {
           }
         </button>
       </div>
+`}
 
     </div>
   `;
 
   asegurarBotonNoActivityPlanning();
   agregarBotonesExportPlanning();
+
+  if (esViewerPlanning) {
+    [btnAddPlanning, btnAddSpecialPlanning].forEach(boton => {
+      if (boton) boton.style.display = "none";
+    });
+    if (planningForm) planningForm.hidden = true;
+    const specialForm = document.getElementById("specialPlanningForm");
+    if (specialForm) specialForm.hidden = true;
+    const noActivityForm = document.getElementById("noActivityPlanningForm");
+    if (noActivityForm) noActivityForm.hidden = true;
+    planningChanges = [];
+  }
+
   activarInteraccionesPlanning();
 
 }
