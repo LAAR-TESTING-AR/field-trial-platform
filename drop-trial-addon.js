@@ -139,12 +139,20 @@
   }
 
   function candidatosAddon(marcador) {
-    const origen = mapa.latLngToContainerPoint(marcador._posicionRealAddon);
+    const origen = mapa.latLngToContainerPoint(
+      marcador._posicionRealAddon
+    );
+
     return marcadoresCercanosAddon.filter(candidato => {
-      if (!capaMarcadores.hasLayer(candidato)) return false;
-      const mismaLocalidad = marcador._localidadAddon && candidato._localidadAddon === marcador._localidadAddon && candidato._tipoAddon === marcador._tipoAddon;
-      const punto = mapa.latLngToContainerPoint(candidato._posicionRealAddon);
-      return mismaLocalidad || origen.distanceTo(punto) <= 90;
+      if (!capaMarcadores.hasLayer(candidato)) {
+        return false;
+      }
+
+      const punto = mapa.latLngToContainerPoint(
+        candidato._posicionRealAddon
+      );
+
+      return origen.distanceTo(punto) <= 32;
     });
   }
 
