@@ -30,6 +30,115 @@ const mapa = L.map("mapa", {
 });
 
 const capaMarcadores = L.layerGroup().addTo(mapa);
+let marcadoresPlantingMapa = [];
+let marcadoresPlantingDesplegados = [];
+let lineasPlantingDesplegadas = [];
+let cerrandoGrupoPlanting = false;
+
+function cerrarGrupoMarcadoresPlanting() {
+  if (cerrandoGrupoPlanting) return;
+  if (!marcadoresPlantingDesplegados.length && !lineasPlantingDesplegadas.length) return;
+  cerrandoGrupoPlanting = true;
+  try {
+    mapa.closePopup();
+    lineasPlantingDesplegadas.forEach(linea => {
+      if (capaMarcadores.hasLayer(linea)) capaMarcadores.removeLayer(linea);
+    });
+    lineasPlantingDesplegadas = [];
+    marcadoresPlantingDesplegados.forEach(marcador => {
+      marcador._plantingDesplegado = false;
+      if (marcador._plantingPosicionReal) marcador.setLatLng(marcador._plantingPosicionReal);
+    });
+    marcadoresPlantingDesplegados = [];
+  } finally {
+    cerrandoGrupoPlanting = false;
+  }
+}
+
+function obtenerMarcadoresCercanosPlanting(marcador, distanciaMaxima = 46) {
+  const origen = mapa.latLngToContainerPoint(
+    marcador._plantingPosicionReal || marcador.getLatLng()
+  );
+  return marcadoresPlantingMapa.filter(candidato => {
+    if (!capaMarcadores.hasLayer(candidato)) return false;
+    const punto = mapa.latLngToContainerPoint(
+      candidato._plantingPosicionReal || candidato.getLatLng()
+    );
+    return origen.distanceTo(punto) <= distanciaMaxima;
+  });
+}
+
+function desplegarMarcadoresPlanting(grupo) {
+  cerrarGrupoMarcadoresPlanting();
+  if (grupo.length < 2) return false;
+
+  const posiciones = grupo.map(
+    marcador => marcador._plantingPosicionReal || marcador.getLatLng()
+  );
+  const centro = L.latLng(
+    posiciones.reduce((suma, pos) => suma + pos.lat, 0) / posiciones.length,
+    posiciones.reduce((suma, pos) => suma + pos.lng, 0) / posiciones.length
+  );
+  const centroPx = mapa.latLngToLayerPoint(centro);
+  const radio = Math.max(42, Math.min(82, 34 + grupo.length * 7));
+
+  grupo.forEach((marcador, indice) => {
+    const angulo = -Math.PI / 2 + ((Math.PI * 2 * indice) / grupo.length);
+    const destinoPx = L.point(
+      centroPx.x + Math.cos(angulo) * radio,
+      centroPx.y + Math.sin(angulo) * radio
+    );
+    const destino = mapa.layerPointToLatLng(destinoPx);
+    const origen = marcador._plantingPosicionReal || marcador.getLatLng();
+
+    const linea = L.polyline(
+      [origen, destino],
+      {
+        color: '#ffffff',
+        weight: 1.5,
+        opacity: 0.88,
+        dashArray: '4 3',
+        interactive: false
+      }
+    ).addTo(capaMarcadores);
+
+    lineasPlantingDesplegadas.push(linea);
+    marcador.setLatLng(destino);
+    marcador._plantingDesplegado = true;
+    if (typeof marcador.bringToFront === 'function') marcador.bringToFront();
+  });
+
+  marcadoresPlantingDesplegados = grupo;
+  mapa.closePopup();
+  return true;
+}
+
+function registrarMarcadorPlanting(marcador) {
+  marcador._plantingPosicionReal = L.latLng(marcador.getLatLng());
+  marcador._plantingDesplegado = false;
+
+  marcador.off('click');
+  marcador.on('click', evento => {
+    if (evento.originalEvent) {
+      L.DomEvent.stopPropagation(evento.originalEvent);
+      L.DomEvent.preventDefault(evento.originalEvent);
+    }
+
+    if (marcador._plantingDesplegado) {
+      window.setTimeout(() => marcador.openPopup(), 0);
+      return;
+    }
+
+    const cercanos = obtenerMarcadoresCercanosPlanting(marcador);
+    if (!desplegarMarcadoresPlanting(cercanos)) marcador.openPopup();
+  });
+
+  marcadoresPlantingMapa.push(marcador);
+}
+
+mapa.on('zoomstart', cerrarGrupoMarcadoresPlanting);
+mapa.on('click', cerrarGrupoMarcadoresPlanting);
+
 L.control.layers(
   {
     "Map": capaMapaActual,
@@ -1449,6 +1558,8 @@ if (
 
 
 function actualizarMapa(sitiosFiltrados) {
+  cerrarGrupoMarcadoresPlanting();
+  marcadoresPlantingMapa = [];
   capaMarcadores.clearLayers();
 
   const coordenadas = [];
@@ -1626,6 +1737,7 @@ if (
 );
 
 marcador.addTo(capaMarcadores);
+registrarMarcadorPlanting(marcador);
 
     coordenadas.push([lat, lon]);
   });
