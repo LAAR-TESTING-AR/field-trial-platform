@@ -3120,9 +3120,31 @@ function renderBloqueSemanaPlanning(
 
 }
 
+
+function cerrarDetallePlanning() {
+  document.getElementById("planningCardDetailOverlay")?.remove();
+  document.body.style.overflow = "";
+}
+function escapeDetallePlanning(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function abrirDetallePlanning(item) {
+  if(!item)return;
+  cerrarDetallePlanning();
+  const noAct=item.planningType==="NoActivity";
+  const estado=noAct?null:configuracionEstadoPlanning(item);
+  const color=noAct?"#64748b":estado.color;
+  const fila=(k,v)=>v?`<div style="padding:10px 0;border-bottom:1px solid #edf1ee"><div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#7a887f">${k}</div><div style="margin-top:3px;font-size:14px;font-weight:700;color:#24362c;overflow-wrap:anywhere">${escapeDetallePlanning(v)}</div></div>`:"";
+  const acciones=(!esPlanningViewer()&&noAct)?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button data-da="edit" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">✏️ Editar</button><button data-da="dup" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">📋 Duplicar</button><button data-da="del" type="button" style="flex:1;padding:10px;border:1px solid #e2bcbc;border-radius:9px;background:#fff7f7;color:#a52f2f;font-weight:800;cursor:pointer">🗑 Eliminar</button></div>`:"";
+  const ov=document.createElement("div");ov.id="planningCardDetailOverlay";ov.style.cssText="position:fixed;inset:0;z-index:30000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;backdrop-filter:blur(2px)";
+  const panel=document.createElement("div");panel.style.cssText="width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid #d9e4dd;box-shadow:0 24px 70px rgba(0,0,0,.3);transform:scale(.94);opacity:0;transition:.16s ease;box-sizing:border-box";
+  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila("AOI ID",item.aoiId)}${fila("Week",item.week)}${fila("Planter",item.planter)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.sembrado?fila("Planting Date",item.plantingDate):""}${!noAct&&item.sembrado?fila("Actual Planter",item.actualPlanter):""}</div>${acciones}</div>`;
+  ov.appendChild(panel);document.body.appendChild(ov);document.body.style.overflow="hidden";requestAnimationFrame(()=>{panel.style.transform="scale(1)";panel.style.opacity="1"});
+  ov.addEventListener("click",e=>{if(e.target===ov)cerrarDetallePlanning()});panel.querySelector('[data-da="close"]')?.addEventListener("click",cerrarDetallePlanning);panel.querySelector('[data-da="edit"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,false)});panel.querySelector('[data-da="dup"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,true)});panel.querySelector('[data-da="del"]')?.addEventListener("click",async()=>{cerrarDetallePlanning();await eliminarPlanning(Number(item.id))});
+}
+if(!window.__planningDetailEscReady){window.__planningDetailEscReady=true;document.addEventListener("keydown",e=>{if(e.key==="Escape")cerrarDetallePlanning()})}
+
 function activarInteraccionesPlanning() {
     if (esPlanningViewer()) {
-      document.querySelectorAll(".planning-card").forEach(t => { t.setAttribute("draggable","false"); t.style.cursor="default"; });
+      document.querySelectorAll(".planning-card").forEach(t => { t.setAttribute("draggable","false"); t.style.cursor="pointer"; t.addEventListener("click",e=>{if(e.target.closest("button"))return;abrirDetallePlanning(planningData.find(x=>Number(x.id)===Number(t.dataset.id)))}); });
       document.getElementById("btnPlanningAnterior")?.addEventListener("click",()=>{planningWeekOffset-=1;renderPlanningBoard();});
       document.getElementById("btnPlanningSiguiente")?.addEventListener("click",()=>{planningWeekOffset+=1;renderPlanningBoard();});
       document.getElementById("btnPlanningHoy")?.addEventListener("click",()=>{planningWeekOffset=0;renderPlanningBoard();});
@@ -3136,10 +3158,17 @@ function activarInteraccionesPlanning() {
     )
     .forEach(
       tarjeta => {
+        let detalleBloqueadoPorDrag = false;
+        tarjeta.addEventListener("click", e => {
+          if(detalleBloqueadoPorDrag){detalleBloqueadoPorDrag=false;return;}
+          if(e.target.closest("button"))return;
+          abrirDetallePlanning(planningData.find(x=>Number(x.id)===Number(tarjeta.dataset.id)));
+        });
 
         tarjeta.addEventListener(
           "dragstart",
           evento => {
+            detalleBloqueadoPorDrag = true;
 
             const id =
               Number(
@@ -3177,6 +3206,7 @@ function activarInteraccionesPlanning() {
           () => {
 
             tarjeta.style.opacity = "1";
+            window.setTimeout(()=>{detalleBloqueadoPorDrag=false;},100);
 
             tarjeta.classList.remove(
               "planning-card-dragging"
