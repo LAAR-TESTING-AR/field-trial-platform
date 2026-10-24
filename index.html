@@ -96,11 +96,19 @@
   </header>
 
   <section class="panel">
-    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad,Trial, Access, Drop, descripción, cultivo, región, provincia, FTS, SPA u operación">
+    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA">
     <button id="limpiarFiltros" type="button">Limpiar filtros</button>
 
     <select id="filtroCultivo">
       <option value="">Todos los cultivos</option>
+    </select>
+
+    <select id="filtroSeason">
+      <option value="">Todas las seasons</option>
+    </select>
+
+    <select id="filtroOperations">
+      <option value="">Todas las operaciones</option>
     </select>
 
 <select id="filtroStation">
