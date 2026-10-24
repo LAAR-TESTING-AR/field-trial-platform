@@ -1556,6 +1556,12 @@ if (
 marcador.addTo(capaMarcadores);
 addHarvestingSpider(marcador);
 
+if (etiquetasMapaHarvestingActivas) {
+  marcador.openTooltip();
+} else {
+  marcador.closeTooltip();
+}
+
     coordenadas.push([lat, lon]);
   });
 
@@ -1568,6 +1574,10 @@ addHarvestingSpider(marcador);
       }
     );
   }
+
+  window.setTimeout(() => {
+    aplicarEtiquetasHarvesting();
+  }, 0);
 }
 
 function actualizarVista() {
