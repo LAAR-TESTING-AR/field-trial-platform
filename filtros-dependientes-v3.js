@@ -2,6 +2,8 @@
   "use strict";
 
   const ftsSeleccionados = new Set();
+    const filtroSeason = document.getElementById("filtroSeason");
+    const filtroOperations = document.getElementById("filtroOperations");
   let contenedorMultiFTS = null;
   let botonMultiFTS = null;
   let panelMultiFTS = null;
@@ -179,8 +181,10 @@ function reemplazarFiltroPrincipal() {
         !filtroCultivo.value ||
         sitio.crop === filtroCultivo.value
       )
-      && (
-        !filtroStation.value ||
+      && (!filtroSeason || !filtroSeason.value || sitio.season === filtroSeason.value)
+        && (!filtroOperations || !filtroOperations.value || sitio.operations === filtroOperations.value)
+        && (
+          !filtroStation.value ||
         sitio.station === filtroStation.value
       )
       && (
@@ -211,7 +215,9 @@ function coincideExcepto(
     return false;
   }
 
-  if (
+  if (campoExcluido !== "season" && filtroSeason && filtroSeason.value && sitio.season !== filtroSeason.value) return false;
+    if (campoExcluido !== "operations" && filtroOperations && filtroOperations.value && sitio.operations !== filtroOperations.value) return false;
+    if (
     campoExcluido !== "station" &&
     filtroStation.value &&
     sitio.station !== filtroStation.value
@@ -426,7 +432,9 @@ function actualizarFiltrosDependientes() {
     "Todos los cultivos"
   );
 
-  reconstruirSelect(
+  if (filtroSeason) reconstruirSelect(filtroSeason, "season", "Todas las seasons");
+    if (filtroOperations) reconstruirSelect(filtroOperations, "operations", "Todas las operaciones");
+    reconstruirSelect(
     filtroStation,
     "station",
     "Todas las estaciones"
@@ -446,6 +454,8 @@ function actualizarFiltrosDependientes() {
       "Todos los cultivos"
     );
 
+    if (filtroSeason) reconstruirSelect(filtroSeason, "season", "Todas las seasons");
+    if (filtroOperations) reconstruirSelect(filtroOperations, "operations", "Todas las operaciones");
     reconstruirSelect(
       filtroStation,
       "station",
@@ -478,7 +488,7 @@ function actualizarFiltrosDependientes() {
   filtroCultivo,
   filtroStation,
   filtroLocalidad
-].forEach(control => {
+].filter(Boolean).forEach(control => {
 
   control.addEventListener(
     "change",
