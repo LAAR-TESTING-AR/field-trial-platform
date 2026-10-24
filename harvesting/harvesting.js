@@ -49,92 +49,10 @@ function addHarvestingSpider(marker){
 mapa.on("zoomstart",closeHarvestingSpider); mapa.on("click",closeHarvestingSpider);
   let etiquetasMapaHarvestingActivas=false; const marcadoresEtiquetasHarvesting=[]; const ZOOM_MINIMO_ETIQUETAS_HARVESTING=7;
   function contenidoH(x){const e=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");return `<div style="font-size:11px;line-height:1.18;white-space:nowrap"><div style="font-weight:800;color:#173f2a">${e(limpiarTexto(x.Location))}</div><div style="color:#45564c;font-weight:600">${e(limpiarTexto(x.Crop))}</div><div style="color:#6b786f;font-size:10px">${e(limpiarTexto(x["LAAR Status 2026-2027"]))}</div></div>`}
-  function pisaH(a, b, margen = 12) {
-    return !(a.right + margen <= b.left || a.left >= b.right + margen || a.bottom + margen <= b.top || a.top >= b.bottom + margen);
-  }
-
-  function medidasH(m) {
-    const x = m._sitioEtiquetaH || {};
-    const textos = [x.Location, x.Crop, x["LAAR Status 2026-2027"]].map(limpiarTexto);
-    const caracteres = Math.max(10, ...textos.map(v => v.length));
-    return { w: Math.min(220, Math.max(98, caracteres * 6.4 + 20)), h: 54 };
-  }
-
-  function circuloProteccionPuntoH(marcador, radio = 42) {
-    const p = mapa.latLngToContainerPoint(marcador.getLatLng());
-    return { left:p.x-radio, top:p.y-radio, right:p.x+radio, bottom:p.y+radio };
-  }
-
-  function candidatosH(m) {
-    const p = mapa.latLngToContainerPoint(m.getLatLng());
-    const { w, h } = medidasH(m);
-    const ds = [46, 82, 122, 166, 214];
-    const resultado = [];
-    const add = (direction, offset, left, top) => resultado.push({ direction, offset:L.point(offset), rect:{left,top,right:left+w,bottom:top+h} });
-    ds.forEach(d => {
-      add("right", [d,0], p.x+d, p.y-h/2);
-      add("left", [-d,0], p.x-w-d, p.y-h/2);
-      add("top", [0,-d], p.x-w/2, p.y-h-d);
-      add("bottom", [0,d], p.x-w/2, p.y+d);
-      add("right", [d,-d], p.x+d, p.y-h-d);
-      add("right", [d,d], p.x+d, p.y+d);
-      add("left", [-d,-d], p.x-w-d, p.y-h-d);
-      add("left", [-d,d], p.x-w-d, p.y+d);
-    });
-    return resultado;
-  }
-
-  function distribuirEtiquetasHarvesting() {
-    if (!etiquetasMapaHarvestingActivas) return;
-    if (mapa.getZoom() < ZOOM_MINIMO_ETIQUETAS_HARVESTING) {
-      marcadoresEtiquetasHarvesting.forEach(m => m.closeTooltip());
-      return;
-    }
-
-    const visibles = marcadoresEtiquetasHarvesting.filter(m => capaMarcadores.hasLayer(m));
-    const puntosProtegidos = visibles.map(m => circuloProteccionPuntoH(m, 42));
-    const ocupados = [];
-    const ancho = mapa.getContainer().clientWidth;
-    const alto = mapa.getContainer().clientHeight;
-
-    visibles
-      .sort((a,b) => {
-        const pa=mapa.latLngToContainerPoint(a.getLatLng());
-        const pb=mapa.latLngToContainerPoint(b.getLatLng());
-        return pa.y-pb.y || pa.x-pb.x;
-      })
-      .forEach(m => {
-        const tt = m.getTooltip?.();
-        if (!tt) return;
-
-        const puntoPropio = circuloProteccionPuntoH(m, 42);
-        let elegido = null;
-
-        for (const c of candidatosH(m)) {
-          const r = c.rect;
-          const fuera = r.left < 8 || r.top < 8 || r.right > ancho-8 || r.bottom > alto-8;
-          const pisaEtiqueta = ocupados.some(o => pisaH(r,o,12));
-          const pisaPuntoAjeno = puntosProtegidos.some(p => p !== puntoPropio && pisaH(r,p,6));
-
-          if (!fuera && !pisaEtiqueta && !pisaPuntoAjeno) {
-            elegido = c;
-            break;
-          }
-        }
-
-        if (!elegido) {
-          m.closeTooltip();
-          return;
-        }
-
-        tt.options.direction = elegido.direction;
-        tt.options.offset = elegido.offset;
-        m.closeTooltip();
-        m.openTooltip();
-        ocupados.push(elegido.rect);
-      });
-  }
-
+  function pisaH(a,b,m=12){return !(a.right+m<=b.left||a.left>=b.right+m||a.bottom+m<=b.top||a.top>=b.bottom+m)}
+  function medidasH(m){const x=m._sitioEtiquetaH||{},t=[x.Location,x.Crop,x["LAAR Status 2026-2027"]].map(limpiarTexto),n=Math.max(10,...t.map(v=>v.length));return{w:Math.min(220,Math.max(98,n*6.4+20)),h:54}}
+  function candidatosH(m){const p=mapa.latLngToContainerPoint(m.getLatLng()),{w,h}=medidasH(m),radios=[64,96,132,174,220,272,330],r=[];radios.forEach(rad=>{for(let g=0;g<360;g+=30){const a=g*Math.PI/180,cx=p.x+Math.cos(a)*rad,cy=p.y+Math.sin(a)*rad,co=Math.cos(a),si=Math.sin(a),dir=Math.abs(co)>=Math.abs(si)?(co>=0?"right":"left"):(si>=0?"bottom":"top");r.push({direction:dir,offset:L.point(cx-p.x,cy-p.y),rect:{left:cx-w/2,top:cy-h/2,right:cx+w/2,bottom:cy+h/2}})}});return r}
+  function distribuirEtiquetasHarvesting(){if(!etiquetasMapaHarvestingActivas)return;if(mapa.getZoom()<ZOOM_MINIMO_ETIQUETAS_HARVESTING){marcadoresEtiquetasHarvesting.forEach(m=>m.closeTooltip());return}const vis=marcadoresEtiquetasHarvesting.filter(m=>capaMarcadores.hasLayer(m)),zonas=vis.map(m=>{const p=mapa.latLngToContainerPoint(m.getLatLng());return{m,rect:{left:p.x-36,top:p.y-36,right:p.x+36,bottom:p.y+36}}}),ocup=[],ancho=mapa.getContainer().clientWidth,alto=mapa.getContainer().clientHeight;vis.sort((a,b)=>{const pa=mapa.latLngToContainerPoint(a.getLatLng()),pb=mapa.latLngToContainerPoint(b.getLatLng());return pa.y-pb.y||pa.x-pb.x}).forEach(m=>{const tt=m.getTooltip?.();if(!tt)return;let e=null;for(const c of candidatosH(m)){const r=c.rect,fuera=r.left<8||r.top<8||r.right>ancho-8||r.bottom>alto-8,col=ocup.some(o=>pisaH(r,o,14))||zonas.some(z=>z.m!==m&&pisaH(r,z.rect,8));if(!fuera&&!col){e=c;break}}if(!e){const p=mapa.latLngToContainerPoint(m.getLatLng()),{w,h}=medidasH(m);for(let fila=1;fila<=18&&!e;fila++){for(const signo of[-1,1]){const cx=p.x+signo*Math.min(390,120+fila*18),cy=p.y+((fila%2? -1:1)*Math.ceil(fila/2)*(h+18)),r={left:cx-w/2,top:cy-h/2,right:cx+w/2,bottom:cy+h/2},fuera=r.left<8||r.top<8||r.right>ancho-8||r.bottom>alto-8,col=ocup.some(o=>pisaH(r,o,14))||zonas.some(z=>z.m!==m&&pisaH(r,z.rect,8));if(!fuera&&!col){e={direction:signo<0?"left":"right",offset:L.point(cx-p.x,cy-p.y),rect:r};break}}}}if(!e){m.closeTooltip();return}tt.options.direction=e.direction;tt.options.offset=e.offset;m.closeTooltip();m.openTooltip();ocup.push(e.rect)})}
   function aplicarEtiquetasHarvesting(){if(etiquetasMapaHarvestingActivas)distribuirEtiquetasHarvesting();else marcadoresEtiquetasHarvesting.forEach(m=>m.closeTooltip());const b=document.getElementById("btnEtiquetasMapaHarvesting");if(b){b.innerHTML=etiquetasMapaHarvestingActivas?"🏷 Etiquetas ✓":"🏷 Etiquetas";b.style.background=etiquetasMapaHarvestingActivas?"#e8f4ec":"#fff";b.style.color=etiquetasMapaHarvestingActivas?"#0b6b3a":"#45564c"}}
   function crearBotonEtiquetasHarvesting(){if(document.getElementById("btnEtiquetasMapaHarvesting"))return;const box=document.createElement("div"),b=document.createElement("button");box.style.cssText="position:absolute;right:18px;top:14px;z-index:10000;pointer-events:auto";b.id="btnEtiquetasMapaHarvesting";b.type="button";b.innerHTML="🏷 Etiquetas";b.title="Mostrar u ocultar Localidad, Crop y LAAR Status";b.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;min-width:126px;height:42px;padding:0 15px;border:2px solid #0b6b3a;border-radius:11px;background:#fff;color:#0b6b3a;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.25)";b.onclick=e=>{e.preventDefault();e.stopPropagation();etiquetasMapaHarvestingActivas=!etiquetasMapaHarvestingActivas;aplicarEtiquetasHarvesting()};box.appendChild(b);const m=document.getElementById("mapa");if(m){if(getComputedStyle(m).position==="static")m.style.position="relative";m.appendChild(box)}}
   mapa.on("zoomend moveend",()=>{if(etiquetasMapaHarvestingActivas)requestAnimationFrame(distribuirEtiquetasHarvesting)});
