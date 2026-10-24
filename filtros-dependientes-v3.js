@@ -474,7 +474,11 @@ function actualizarFiltrosDependientes() {
 
   reconstruirOpcionesFTS();
   actualizarTextoBoton();
-  actualizarMapa();
+  if (typeof actualizarVista === "function") {
+    actualizarVista();
+  } else {
+    actualizarMapa();
+  }
 }
 
   function iniciar() {
@@ -486,6 +490,8 @@ function actualizarFiltrosDependientes() {
 
  [
   filtroCultivo,
+  filtroSeason,
+  filtroOperations,
   filtroStation,
   filtroLocalidad
 ].filter(Boolean).forEach(control => {
@@ -501,6 +507,8 @@ function actualizarFiltrosDependientes() {
 
     limpiarFiltros.addEventListener("click", () => {
       ftsSeleccionados.clear();
+      if (filtroSeason) filtroSeason.value = "";
+      if (filtroOperations) filtroOperations.value = "";
       window.setTimeout(actualizarFiltrosDependientes, 0);
     });
 
