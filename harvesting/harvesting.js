@@ -47,6 +47,17 @@ function addHarvestingSpider(marker){
   }); harvestingMarkers.push(marker);
 }
 mapa.on("zoomstart",closeHarvestingSpider); mapa.on("click",closeHarvestingSpider);
+  let etiquetasMapaHarvestingActivas=false; const marcadoresEtiquetasHarvesting=[]; const ZOOM_MINIMO_ETIQUETAS_HARVESTING=7;
+  function contenidoH(x){const e=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");return `<div style="font-size:11px;line-height:1.18;white-space:nowrap"><div style="font-weight:800;color:#173f2a">${e(limpiarTexto(x.Location))}</div><div style="color:#45564c;font-weight:600">${e(limpiarTexto(x.Crop))}</div><div style="color:#6b786f;font-size:10px">${e(limpiarTexto(x["LAAR Status 2026-2027"]))}</div></div>`}
+  function pisaH(a,b,m=4){return !(a.right+m<=b.left||a.left>=b.right+m||a.bottom+m<=b.top||a.top>=b.bottom+m)}
+  function cajaH(m,pos){const x=m._sitioEtiquetaH||{},t=[x.Location,x.Crop,x["LAAR Status 2026-2027"]].map(limpiarTexto),n=Math.max(10,...t.map(v=>v.length)),w=Math.min(210,Math.max(92,n*6.15+18)),h=52,p=mapa.latLngToContainerPoint(m.getLatLng()),d=17;let l=p.x+d,y=p.y-h/2;if(pos==="left")l=p.x-w-d;else if(pos==="top"){l=p.x-w/2;y=p.y-h-d}else if(pos==="bottom"){l=p.x-w/2;y=p.y+d}else if(pos==="tr"){l=p.x+13;y=p.y-h-13}else if(pos==="br"){l=p.x+13;y=p.y+13}else if(pos==="tl"){l=p.x-w-13;y=p.y-h-13}else if(pos==="bl"){l=p.x-w-13;y=p.y+13}return{left:l,top:y,right:l+w,bottom:y+h}}
+  function dirH(p){return p==="left"||p==="tl"||p==="bl"?"left":p==="top"?"top":p==="bottom"?"bottom":"right"}
+  function offH(p){return L.point({right:[15,0],left:[-15,0],top:[0,-15],bottom:[0,15],tr:[14,-14],br:[14,14],tl:[-14,-14],bl:[-14,14]}[p]||[15,0])}
+  function distribuirEtiquetasHarvesting(){if(!etiquetasMapaHarvestingActivas)return;if(mapa.getZoom()<ZOOM_MINIMO_ETIQUETAS_HARVESTING){marcadoresEtiquetasHarvesting.forEach(m=>m.closeTooltip());return}const posiciones=["right","left","top","bottom","tr","br","tl","bl"],ocup=[],lim=mapa.getContainer().getBoundingClientRect();[...marcadoresEtiquetasHarvesting].sort((a,b)=>{const pa=mapa.latLngToContainerPoint(a.getLatLng()),pb=mapa.latLngToContainerPoint(b.getLatLng());return pa.y-pb.y||pa.x-pb.x}).forEach(m=>{const tt=m.getTooltip?.();if(!tt)return;let sel=posiciones[0],csel=cajaH(m,sel);for(const pos of posiciones){const c=cajaH(m,pos),fuera=c.left<2||c.top<2||c.right>lim.width-2||c.bottom>lim.height-2,col=ocup.some(o=>pisaH(c,o));if(!fuera&&!col){sel=pos;csel=c;break}}tt.options.direction=dirH(sel);tt.options.offset=offH(sel);m.closeTooltip();m.openTooltip();ocup.push(csel)})}
+  function aplicarEtiquetasHarvesting(){if(etiquetasMapaHarvestingActivas)distribuirEtiquetasHarvesting();else marcadoresEtiquetasHarvesting.forEach(m=>m.closeTooltip());const b=document.getElementById("btnEtiquetasMapaHarvesting");if(b){b.innerHTML=etiquetasMapaHarvestingActivas?"🏷 Etiquetas ✓":"🏷 Etiquetas";b.style.background=etiquetasMapaHarvestingActivas?"#e8f4ec":"#fff";b.style.color=etiquetasMapaHarvestingActivas?"#0b6b3a":"#45564c"}}
+  function crearBotonEtiquetasHarvesting(){if(document.getElementById("btnEtiquetasMapaHarvesting"))return;const box=document.createElement("div"),b=document.createElement("button");box.style.cssText="position:absolute;right:18px;top:14px;z-index:10000;pointer-events:auto";b.id="btnEtiquetasMapaHarvesting";b.type="button";b.innerHTML="🏷 Etiquetas";b.title="Mostrar u ocultar Localidad, Crop y LAAR Status";b.style.cssText="display:flex;align-items:center;justify-content:center;gap:6px;min-width:126px;height:42px;padding:0 15px;border:2px solid #0b6b3a;border-radius:11px;background:#fff;color:#0b6b3a;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.25)";b.onclick=e=>{e.preventDefault();e.stopPropagation();etiquetasMapaHarvestingActivas=!etiquetasMapaHarvestingActivas;aplicarEtiquetasHarvesting()};box.appendChild(b);const m=document.getElementById("mapa");if(m){if(getComputedStyle(m).position==="static")m.style.position="relative";m.appendChild(box)}}
+  mapa.on("zoomend moveend",()=>{if(etiquetasMapaHarvestingActivas)requestAnimationFrame(distribuirEtiquetasHarvesting)});
+
 L.control.layers(
   {
     "Map": capaMapaActual,
@@ -1434,7 +1445,7 @@ else if (estado === "COSECHADO") {
 
 
 function actualizarMapa(sitiosFiltrados) {
-  closeHarvestingSpider(); harvestingMarkers=[];
+  closeHarvestingSpider(); harvestingMarkers=[]; marcadoresEtiquetasHarvesting.length=0;
   capaMarcadores.clearLayers();
 
   const coordenadas = [];
@@ -1499,6 +1510,10 @@ if (drop) {
 marcador.bindPopup(
   crearPopup(sitio, estado)
 );
+  marcador._sitioEtiquetaH=sitio;
+  marcador.bindTooltip(contenidoH(sitio),{permanent:true,direction:"right",offset:[12,0],opacity:.96,className:"harvesting-map-label",interactive:false});
+  marcador.closeTooltip();
+  marcadoresEtiquetasHarvesting.push(marcador);
 
 marcador.on(
   "popupopen",
@@ -1724,7 +1739,8 @@ botonLeyenda.addEventListener(
     panelLeyenda.classList.toggle("visible");
   }
 );
-let aoiPendienteCosecha = null;
+crearBotonEtiquetasHarvesting();
+  let aoiPendienteCosecha = null;
 
 function abrirModalCosecha(
   aoiId
