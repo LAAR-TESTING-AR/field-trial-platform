@@ -3126,6 +3126,55 @@ function cerrarDetallePlanning() {
   document.body.style.overflow = "";
 }
 function escapeDetallePlanning(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+async function actualizarEstadoSpecialPlanning(item, estadoNuevo, fechaNueva = "") {
+  if (esPlanningViewer()) return false;
+  if (!item || !["Nursery", "Special"].includes(item.planningType)) return false;
+  try {
+    const response = await fetch(URL_FLOW_PLANNING_UPDATE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ID: Number(item.id),
+        PlantingStatus: estadoNuevo,
+        PlantingDate: fechaNueva || ""
+      })
+    });
+    if (!response.ok) throw new Error("Error actualizando estado Nursery / Special");
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+    return true;
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo actualizar el estado de Nursery / Special");
+    return false;
+  }
+}
+
+function pedirFechaSpecialPlanning(item) {
+  cerrarDetallePlanning();
+  const overlay = document.createElement("div");
+  overlay.id = "specialPlantingDateOverlay";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:31000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+  const panel = document.createElement("div");
+  const hoy = new Date().toISOString().split("T")[0];
+  panel.style.cssText = "width:min(390px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.28);border:1px solid #d9e4dd";
+  panel.innerHTML = `<div style="font-size:18px;font-weight:900;color:#173f2a">Marcar como sembrado</div><div style="margin-top:5px;color:#617067;font-size:12px">${escapeDetallePlanning(item.location)} · ${escapeDetallePlanning(item.crop)}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800;color:#536159">Fecha de siembra</label><input id="specialPlantingDateInput" type="date" value="${item.plantingDate || hoy}" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;box-sizing:border-box;font-size:14px"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-sp="cancel" type="button" style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;color:#536159;font-weight:800;cursor:pointer">Cancelar</button><button data-sp="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900;cursor:pointer">Confirmar siembra</button></div>`;
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  const cerrar = () => overlay.remove();
+  overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+  panel.querySelector('[data-sp="cancel"]')?.addEventListener("click", cerrar);
+  panel.querySelector('[data-sp="save"]')?.addEventListener("click", async e => {
+    const fecha = panel.querySelector("#specialPlantingDateInput")?.value || "";
+    if (!fecha) { alert("Seleccione una fecha de siembra"); return; }
+    e.currentTarget.disabled = true;
+    e.currentTarget.textContent = "Guardando...";
+    const ok = await actualizarEstadoSpecialPlanning(item, "Planted", fecha);
+    cerrar();
+    if (ok) alert("Nursery / Special marcado como sembrado");
+  });
+}
+
 function abrirDetallePlanning(item) {
   if(!item)return;
   cerrarDetallePlanning();
@@ -3134,11 +3183,13 @@ function abrirDetallePlanning(item) {
   const color=noAct?"#64748b":estado.color;
   const fila=(k,v)=>v?`<div style="padding:10px 0;border-bottom:1px solid #edf1ee"><div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#7a887f">${k}</div><div style="margin-top:3px;font-size:14px;font-weight:700;color:#24362c;overflow-wrap:anywhere">${escapeDetallePlanning(v)}</div></div>`:"";
   const acciones=(!esPlanningViewer()&&noAct)?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button data-da="edit" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">✏️ Editar</button><button data-da="dup" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">📋 Duplicar</button><button data-da="del" type="button" style="flex:1;padding:10px;border:1px solid #e2bcbc;border-radius:9px;background:#fff7f7;color:#a52f2f;font-weight:800;cursor:pointer">🗑 Eliminar</button></div>`:"";
+  const esSpecial = ["Nursery", "Special"].includes(item.planningType);
+  const accionesSpecial = (!esPlanningViewer() && esSpecial) ? (item.sembrado ? `<div style="margin-top:16px"><button data-da="planned" type="button" style="width:100%;padding:11px;border:1px solid #e0b95a;border-radius:9px;background:#fffaf0;color:#8a6410;font-weight:900;cursor:pointer">↩ Volver a planificado</button></div>` : `<div style="margin-top:16px"><button data-da="planted" type="button" style="width:100%;padding:11px;border:none;border-radius:9px;background:#2e7d32;color:#fff;font-weight:900;cursor:pointer">✓ Marcar como sembrado</button></div>`) : "";
   const ov=document.createElement("div");ov.id="planningCardDetailOverlay";ov.style.cssText="position:fixed;inset:0;z-index:30000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;backdrop-filter:blur(2px)";
   const panel=document.createElement("div");panel.style.cssText="width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid #d9e4dd;box-shadow:0 24px 70px rgba(0,0,0,.3);transform:scale(.94);opacity:0;transition:.16s ease;box-sizing:border-box";
-  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila("AOI ID",item.aoiId)}${fila("Week",item.week)}${fila("Planter",item.planter)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.sembrado?fila("Planting Date",item.plantingDate):""}${!noAct&&item.sembrado?fila("Actual Planter",item.actualPlanter):""}</div>${acciones}</div>`;
+  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila("AOI ID",item.aoiId)}${fila("Week",item.week)}${fila("Planter",item.planter)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.sembrado?fila("Planting Date",item.plantingDate):""}${!noAct&&item.sembrado?fila("Actual Planter",item.actualPlanter):""}</div>${acciones}${accionesSpecial}</div>`;
   ov.appendChild(panel);document.body.appendChild(ov);document.body.style.overflow="hidden";requestAnimationFrame(()=>{panel.style.transform="scale(1)";panel.style.opacity="1"});
-  ov.addEventListener("click",e=>{if(e.target===ov)cerrarDetallePlanning()});panel.querySelector('[data-da="close"]')?.addEventListener("click",cerrarDetallePlanning);panel.querySelector('[data-da="edit"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,false)});panel.querySelector('[data-da="dup"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,true)});panel.querySelector('[data-da="del"]')?.addEventListener("click",async()=>{cerrarDetallePlanning();await eliminarPlanning(Number(item.id))});
+  ov.addEventListener("click",e=>{if(e.target===ov)cerrarDetallePlanning()});panel.querySelector('[data-da="close"]')?.addEventListener("click",cerrarDetallePlanning);panel.querySelector('[data-da="edit"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,false)});panel.querySelector('[data-da="dup"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,true)});panel.querySelector('[data-da="del"]')?.addEventListener("click",async()=>{cerrarDetallePlanning();await eliminarPlanning(Number(item.id))});panel.querySelector('[data-da="planted"]')?.addEventListener("click",()=>pedirFechaSpecialPlanning(item));panel.querySelector('[data-da="planned"]')?.addEventListener("click",async()=>{if(!confirm("¿Volver esta tarjeta a Planificado y quitar la fecha de siembra?"))return;cerrarDetallePlanning();const ok=await actualizarEstadoSpecialPlanning(item,"Planned","");if(ok)alert("Nursery / Special volvió a Planificado")});
 }
 if(!window.__planningDetailEscReady){window.__planningDetailEscReady=true;document.addEventListener("keydown",e=>{if(e.key==="Escape")cerrarDetallePlanning()})}
 
@@ -4212,7 +4263,9 @@ async function guardarSpecialPlanning() {
             PlanningType: type,
             Week: week,
             Planter: planter,
-            SortOrder: sortOrder
+            SortOrder: sortOrder,
+            PlantingStatus: "Planned",
+            PlantingDate: ""
           })
         }
       );
@@ -4334,19 +4387,22 @@ planningData = data.map(
                 "Planting Date (MM/DD/YYYY)"
               ]
             )
-          : "",
+          : limpiarTexto(item.PlantingDate).split("T")[0],
+
+      plantingStatus:
+        limpiarTexto(item.PlantingStatus?.Value || item.PlantingStatus) || "Planned",
 
       sembrado:
         sitio
           ? estaSembrado(sitio)
-          : false,
+          : limpiarTexto(item.PlantingStatus?.Value || item.PlantingStatus).toLowerCase() === "planted",
 
       actualPlanter:
         sitio
           ? limpiarTexto(
               sitio.Planter
             )
-          : "",
+          : (limpiarTexto(item.PlantingStatus?.Value || item.PlantingStatus).toLowerCase() === "planted" ? limpiarTexto(item.Planter) : ""),
 
       downtimeReason:
         limpiarTexto(item.DowntimeReason),
