@@ -3135,6 +3135,11 @@ async function actualizarEstadoSpecialPlanning(item, estadoNuevo, fechaNueva = "
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ID: Number(item.id),
+        Week: item.week || "",
+        Planter: item.planter || "",
+        SortOrder: Number(item.sortOrder) || 0,
+        DowntimeReason: item.downtimeReason || "",
+        Comment: item.comment || "",
         PlantingStatus: estadoNuevo,
         PlantingDate: fechaNueva || ""
       })
