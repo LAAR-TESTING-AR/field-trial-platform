@@ -184,6 +184,9 @@ agregarCosechaPendiente(
   combine
 );
 
+// El Planning debe mostrar la fecha/semana y la cosechadora realmente utilizadas.
+sincronizarPlanningConCosechaReal(aoiId, fecha, combine);
+
     /*
      * Actualización visual inmediata.
      */
@@ -1894,6 +1897,66 @@ function normalizarCombinePlanning(valor) {
   const clave = normalizarTexto(bruto).replace(/[\s_-]+/g, "");
   return harvestingCombines.find(c => normalizarTexto(c).replace(/[\s_-]+/g, "") === clave) || bruto;
 }
+function obtenerSemanaPlanningDesdeFecha(fechaISO) {
+  if (!fechaISO) return "";
+  const partes = String(fechaISO).split("-").map(Number);
+  if (partes.length !== 3 || partes.some(Number.isNaN)) return "";
+  const fechaLocal = new Date(partes[0], partes[1] - 1, partes[2], 12, 0, 0);
+  return formatearRangoPlanning(obtenerInicioSemana(fechaLocal));
+}
+
+async function sincronizarPlanningConCosechaReal(aoiId, fecha, combine) {
+  const item = planningData.find(actual =>
+    normalizarTexto(actual.aoiId) === normalizarTexto(aoiId) &&
+    (actual.planningType === "Master" || !actual.planningType)
+  );
+
+  if (!item?.id) return false;
+
+  const week = obtenerSemanaPlanningDesdeFecha(fecha) || item.week;
+  const combineReal = normalizarCombinePlanning(combine);
+  const sortOrder = planningData.filter(actual =>
+    actual.id !== item.id && actual.week === week &&
+    obtenerCombineVisualPlanning(actual) === combineReal
+  ).length;
+
+  // Reflejo inmediato en pantalla: semana y cosechadora reales.
+  item.week = week;
+  item.combine = combineReal;
+  item.actualCombine = combineReal;
+  item.harvestingDate = fecha;
+  item.harvestingStatus = "Harvested";
+  item.cosechado = true;
+  item.sortOrder = sortOrder;
+
+  if (document.getElementById("modalPlanning")?.classList.contains("visible")) {
+    renderPlanningBoard();
+  }
+
+  try {
+    const response = await fetch(URL_FLOW_PLANNING_UPDATE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        PlanningModule: "Harvesting",
+        ID: Number(item.id),
+        Week: week,
+        Combine: combineReal,
+        SortOrder: sortOrder,
+        DowntimeReason: item.downtimeReason || "",
+        Comment: item.comment || "",
+        HarvestingStatus: "Harvested",
+        HarvestingDate: fecha
+      })
+    });
+    if (!response.ok) throw new Error(`Error actualizando Planning ID ${item.id}`);
+    return true;
+  } catch (error) {
+    console.error("No se pudo sincronizar la cosecha real con Planning", error);
+    return false;
+  }
+}
+
 async function eliminarPlanning(
   id
 ) {
@@ -2725,7 +2788,7 @@ function renderBloqueSemanaPlanning(
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(${obtenerCombinesPlanningVisibles().length}, minmax(0, 1fr));
+        grid-template-columns:repeat(8, minmax(0, 1fr));
         gap:8px;
         align-items:stretch;
         padding:8px;
@@ -2792,7 +2855,7 @@ function pedirFechaSpecialPlanning(item) {
   const panel = document.createElement("div");
   const hoy = new Date().toISOString().split("T")[0];
   panel.style.cssText = "width:min(390px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.28);border:1px solid #d9e4dd";
-  panel.innerHTML = `<div style="font-size:18px;font-weight:900;color:#173f2a">Marcar como cosechado</div><div style="margin-top:5px;color:#617067;font-size:12px">${escapeDetallePlanning(item.location)} · ${escapeDetallePlanning(item.crop)}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800;color:#536159">Fecha de cosecha</label><input id="specialHarvestingDateInput" type="date" value="${item.harvestingDate || hoy}" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;box-sizing:border-box;font-size:14px"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-sp="cancel" type="button" style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;color:#536159;font-weight:800;cursor:pointer">Cancelar</button><button data-sp="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900;cursor:pointer">Confirmar siembra</button></div>`;
+  panel.innerHTML = `<div style="font-size:18px;font-weight:900;color:#173f2a">Marcar como cosechado</div><div style="margin-top:5px;color:#617067;font-size:12px">${escapeDetallePlanning(item.location)} · ${escapeDetallePlanning(item.crop)}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800;color:#536159">Fecha de cosecha</label><input id="specialHarvestingDateInput" type="date" value="${item.harvestingDate || hoy}" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;box-sizing:border-box;font-size:14px"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-sp="cancel" type="button" style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;color:#536159;font-weight:800;cursor:pointer">Cancelar</button><button data-sp="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900;cursor:pointer">Confirmar cosecha</button></div>`;
   overlay.appendChild(panel);
   document.body.appendChild(overlay);
   const cerrar = () => overlay.remove();
@@ -5005,7 +5068,7 @@ function renderPlanningBoard() {
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(${obtenerCombinesPlanningVisibles().length}, minmax(0, 1fr));
+        grid-template-columns:repeat(8, minmax(0, 1fr));
         gap:8px;
         padding:0 8px 5px;
         background:white;
