@@ -90,6 +90,15 @@ let sitios = [];
 const URL_FLOW_HARVESTING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
 
+const URL_FLOW_PLANNING =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
+const URL_FLOW_PLANNING_GET =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/24/workflows/af587c26aece442f80e564de5760ef4c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pLrdlfm9Ppj7utl9RMcw8iR_ZoL5h75LICgKvIykcPE";
+const URL_FLOW_PLANNING_DELETE =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/29/workflows/bf37955d8b4e4564ace52d7d377ea427/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIeyWIwFS9mFfY6Jj4x0iXPPdNZFhfdgYtLeTHrRMhw";
+const URL_FLOW_PLANNING_UPDATE =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bf43c54ef2f844cb97c4cc1025ec47e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=28XOoj6pFx3-AUyCvx2RYqr6rCJa_WhpPyrjIi93DpY";
+
 let modalCosecha;
 let modalFechaCosecha;
 let modalCombine;
@@ -1806,6 +1815,3661 @@ const modalTimeline =
 
 const cerrarTimeline =
   document.getElementById("cerrarTimeline");
+
+function asegurarPlanningHarvestingUI() {
+  if (document.getElementById("modalPlanning")) return;
+  const acciones = document.querySelector(".dashboard-botones");
+  if (acciones && !document.getElementById("btnPlanning")) {
+    const btn=document.createElement("button"); btn.id="btnPlanning"; btn.innerHTML='<span class="icono-timeline">📅</span> Planning'; acciones.appendChild(btn);
+  }
+  const modal=document.createElement("div"); modal.id="modalPlanning"; modal.className="modal-timeline";
+  modal.innerHTML=`<div class="modal-timeline-contenido" style="width:min(98vw,1700px);max-width:none;"><div class="modal-timeline-header"><h3>Harvesting Planning</h3><button id="cerrarPlanning">✕</button></div><div id="planningToolbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;"><button id="btnAddPlanning" type="button">＋ Add Planning</button><button id="btnAddSpecialPlanning" type="button">🌱 Nursery / Special</button></div><div id="planningForm" hidden><div class="planning-form-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;"><div><label>Location</label><select id="planningLocality"><option value="">Seleccionar localidad</option></select></div><div><label>Crop</label><select id="planningCrop" disabled><option value="">Seleccionar cultivo</option></select></div><div><label>Week</label><select id="planningWeek"></select></div><div><label>Combine</label><select id="planningCombine"><option value="">Seleccionar cosechadora</option>${["Contractor","CR5.85AA","CR5.85AC","CR6080","Hege","JD1470","JD1550_1","JD1550_2","JD1550_3","SPSC40","TR87","TR88","TR89","Wintersteiger"].map(x=>`<option value="${x}">${x}</option>`).join("")}</select></div><div style="grid-column:span 2"><label>AOI disponibles</label><div id="planningAoiPreview">Seleccione localidad y cultivo</div></div></div><div class="planning-form-actions"><button id="btnCancelarPlanning" type="button">Cancelar</button><button id="btnGuardarPlanning" type="button">Agregar al Planning</button></div></div><div id="planningGrid"></div></div>`;
+  document.body.appendChild(modal);
+}
+asegurarPlanningHarvestingUI();
+
+const btnPlanning =
+  document.getElementById(
+    "btnPlanning"
+  );
+
+const modalPlanning =
+  document.getElementById(
+    "modalPlanning"
+  );
+const btnAddPlanning =
+  document.getElementById(
+    "btnAddPlanning"
+  );
+
+const btnAddSpecialPlanning =
+  document.getElementById(
+    "btnAddSpecialPlanning"
+  );
+const btnAddNoActivityPlanning =
+  document.getElementById(
+    "btnAddNoActivityPlanning"
+  );
+
+const planningForm =
+  document.getElementById(
+    "planningForm"
+  );
+
+const btnCancelarPlanning =
+  document.getElementById(
+    "btnCancelarPlanning"
+  );
+const btnGuardarPlanning =
+  document.getElementById(
+    "btnGuardarPlanning"
+  );
+const cerrarPlanning =
+  document.getElementById(
+    "cerrarPlanning"
+  );
+
+let planningData = [];
+let planningChanges = [];
+
+let draggedPlanningCard =
+  null;
+
+let semanaPlanningVisible =
+  null;
+
+let planningWeekOffset = 0;
+let planningReferenceStart = null;
+function esPlanningViewer() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("mode") === "viewer" || window.FIELD_TRIAL_FORCE_VIEWER === true || Boolean(window.FieldTrialAppMode?.isViewer);
+}
+const harvestingCombines = [
+  "Contractor", "CR5.85AA", "CR5.85AC", "CR6080", "Hege", "JD1470",
+  "JD1550_1", "JD1550_2", "JD1550_3", "SPSC40", "TR87", "TR88", "TR89", "Wintersteiger"
+];
+async function eliminarPlanning(
+  id
+) {
+    if (esPlanningViewer()) return;
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING_DELETE,
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            ID: id
+          })
+        }
+      );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "Error eliminando Planning"
+      );
+
+    }
+
+    planningChanges = planningChanges.filter(
+      cambio => cambio.id !== id
+    );
+
+    await cargarPlanningDesdeSharePoint();
+
+    renderPlanningBoard();
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error eliminando Planning"
+    );
+
+  }
+
+}
+
+function registrarCambioPlanning(
+  item,
+  combine,
+  week,
+  sortOrder = 0
+) {
+    if (esPlanningViewer()) return;
+
+  const cambio = {
+    id: item.id,
+    week,
+    combine,
+    sortOrder
+  };
+
+  const indiceExistente =
+    planningChanges.findIndex(
+      actual => actual.id === item.id
+    );
+
+  if (indiceExistente >= 0) {
+    planningChanges[indiceExistente] =
+      cambio;
+  } else {
+    planningChanges.push(cambio);
+  }
+
+}
+
+async function guardarCambiosPlanning() {
+    if (esPlanningViewer()) return;
+
+  if (planningChanges.length === 0) {
+    return;
+  }
+
+  const btnGuardarCambios =
+    document.getElementById(
+      "btnGuardarCambiosPlanning"
+    );
+
+  if (btnGuardarCambios) {
+    btnGuardarCambios.disabled = true;
+    btnGuardarCambios.textContent =
+      "Guardando...";
+  }
+
+  try {
+
+    for (const cambio of planningChanges) {
+
+      const response =
+        await fetch(
+          URL_FLOW_PLANNING_UPDATE,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              PlanningModule: "Harvesting",
+              ID: cambio.id,
+              Week: cambio.week,
+              Combine: cambio.combine,
+              SortOrder: cambio.sortOrder,
+              DowntimeReason: cambio.downtimeReason || "",
+              Comment: cambio.comment || ""
+            })
+          }
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          `Error actualizando Planning ID ${cambio.id}`
+        );
+      }
+
+    }
+
+    planningChanges = [];
+
+    await cargarPlanningDesdeSharePoint();
+
+    renderPlanningBoard();
+
+    alert(
+      "Cambios guardados correctamente"
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error guardando los cambios del Planning"
+    );
+
+    renderPlanningBoard();
+
+  }
+
+}
+
+function configuracionCultivoPlanning(
+  cultivo
+) {
+
+  const nombre =
+    limpiarTexto(cultivo)
+      .toLowerCase();
+
+  const parent =
+    nombre.includes("parent chr");
+
+  const stewarded =
+    nombre.includes("stewarded");
+
+  const regulated =
+    nombre.includes("regulated");
+
+  let tipo = "otro";
+  let icono = "📍";
+  let color = "#64748b";
+
+  if (nombre.startsWith("canola")) {
+    tipo = "canola";
+    icono = "🌼";
+    color = "#2563eb";
+  } else if (nombre.startsWith("corn")) {
+    tipo = "corn";
+    icono = "🌽";
+    color = "#c2410c";
+  } else if (nombre.startsWith("mustard")) {
+    tipo = "mustard";
+    icono = "🌿";
+    color = "#312e81";
+  } else if (nombre.startsWith("soybean")) {
+    tipo = "soybean";
+    icono = "🌱";
+    color = "#7c4a1d";
+  } else if (nombre.startsWith("sunflower")) {
+    tipo = "sunflower";
+    icono = "🌻";
+    color = "#d4a017";
+  }
+
+  if (parent) {
+    color = "#f97316";
+  }
+
+  if (stewarded) {
+    color = "#7e22ce";
+  }
+
+  if (regulated) {
+    color = "#166534";
+  }
+
+  return {
+    tipo,
+    icono,
+    color,
+    parent,
+    stewarded,
+    regulated
+  };
+
+}
+
+function renderIconoCultivoPlanning(
+  cultivo,
+  size = 26
+) {
+
+  const cfg =
+    configuracionCultivoPlanning(
+      cultivo
+    );
+
+  const insignia =
+    cfg.parent
+      ? "PC"
+      : cfg.stewarded
+      ? "S"
+      : cfg.regulated
+      ? "R"
+      : "";
+
+  return `
+    <span
+      title="${cultivo}"
+      style="
+        position:relative;
+        width:${size}px;
+        height:${size}px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:50%;
+        background:${cfg.color}18;
+        border:2px solid ${cfg.color};
+        box-sizing:border-box;
+        flex:0 0 auto;
+        font-size:${Math.max(13, size - 10)}px;
+        line-height:1;
+      "
+    >
+      ${cfg.icono}
+      ${
+        insignia
+          ? `
+            <span style="
+              position:absolute;
+              right:-5px;
+              bottom:-5px;
+              min-width:14px;
+              height:14px;
+              padding:0 2px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              border-radius:8px;
+              background:${cfg.color};
+              color:white;
+              border:2px solid white;
+              box-sizing:border-box;
+              font-size:7px;
+              font-weight:900;
+              letter-spacing:-.2px;
+            ">
+              ${insignia}
+            </span>
+          `
+          : ""
+      }
+    </span>
+  `;
+
+}
+
+function configuracionEstadoPlanning(
+  item
+) {
+
+  if (item.cosechado) {
+    return {
+      clave: "cosechado",
+      etiqueta: "Cosechado",
+      color: "#2e7d32",
+      fondo: "#f3faf4",
+      indicador: "✓"
+    };
+  }
+
+  return {
+    clave: "planificado",
+    etiqueta: "Planificado",
+    color: "#f4b400",
+    fondo: "#fffdf5",
+    indicador: ""
+  };
+
+}
+
+  function crearTarjetaPlanningBase(item) {
+    const estado =
+      configuracionEstadoPlanning(item);
+    const detalleEstado =
+      item.cosechado
+        ? `${item.harvestingDate || "Fecha registrada"}${
+            item.actualCombine
+              ? ` · ${item.actualCombine}`
+              : ""
+          }`
+        : estado.etiqueta;
+    const esMobilePlanning =
+      window.matchMedia(
+        "(max-width: 1100px), (pointer: coarse)"
+      ).matches;
+    const cfgCultivo =
+      configuracionCultivoPlanning(
+        item.crop
+      );
+    const tipoPlanning =
+      item.planningType &&
+      item.planningType !== "Master"
+        ? ` · ${item.planningType}`
+        : "";
+    const contenidoPrincipal =
+      esMobilePlanning
+        ? `
+          <div style="
+            min-width:0;
+            flex:1 1 auto;
+          ">
+            <div style="
+              font-weight:800;
+              font-size:10px;
+              color:#17251d;
+              overflow:hidden;
+              text-overflow:ellipsis;
+              white-space:nowrap;
+              line-height:1.2;
+            ">
+              ${item.location}
+            </div>
+            <div style="
+              margin-top:3px;
+              display:flex;
+              align-items:center;
+              gap:5px;
+              min-width:0;
+              color:#526158;
+              font-size:8px;
+              line-height:1.15;
+            ">
+              ${renderIconoCultivoPlanning(
+                item.crop,
+                20
+              )}
+              <span style="
+                min-width:0;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+              ">
+                ${item.crop}${tipoPlanning}
+              </span>
+            </div>
+          </div>
+        `
+        : `
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:6px;
+            min-width:0;
+            flex:1 1 auto;
+          ">
+            ${renderIconoCultivoPlanning(
+              item.crop,
+              23
+            )}
+            <div style="min-width:0;">
+              <div style="
+                font-weight:800;
+                font-size:11px;
+                color:#17251d;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+                line-height:1.15;
+              ">
+                ${item.location}
+              </div>
+              <div style="
+                margin-top:1px;
+                font-size:9px;
+                color:#526158;
+                overflow:hidden;
+                text-overflow:ellipsis;
+                white-space:nowrap;
+                line-height:1.15;
+              ">
+                ${item.crop}${tipoPlanning}
+              </div>
+            </div>
+          </div>
+        `;
+    return `
+      <div
+        class="planning-card"
+        draggable="${esPlanningViewer() ? "false" : "true"}"
+        data-id="${item.id}"
+        data-combine="${item.combine}"
+        data-week="${item.week}"
+        data-cosechado="${item.cosechado}"
+        title="${item.location} · ${item.crop} · ${item.aoiId} · ${detalleEstado}"
+        style="
+          background:${estado.fondo};
+          border-left:5px solid ${estado.color};
+          border-top:1px solid #e2e8e4;
+          border-right:1px solid #e2e8e4;
+          border-bottom:1px solid #e2e8e4;
+          border-radius:9px;
+          padding:${esMobilePlanning ? "5px 4px" : "6px 7px"};
+          text-align:left;
+          font-size:11px;
+          margin-top:5px;
+          cursor:grab;
+          box-shadow:0 1px 2px rgba(20,45,30,.05);
+          box-sizing:border-box;
+          overflow:hidden;
+        "
+      >
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap:${esMobilePlanning ? "2px" : "5px"};
+          min-width:0;
+        ">
+          ${contenidoPrincipal}
+          <div style="
+            display:flex;
+            align-items:center;
+            gap:${esMobilePlanning ? "1px" : "4px"};
+            flex:0 0 auto;
+          ">
+            ${
+              item.cosechado
+                ? `
+                  <span
+                    title="Cosechado"
+                    style="
+                      width:${esMobilePlanning ? "14px" : "17px"};
+                      height:${esMobilePlanning ? "14px" : "17px"};
+                      display:flex;
+                      align-items:center;
+                      justify-content:center;
+                      border-radius:50%;
+                      background:#2e7d32;
+                      color:white;
+                      font-size:${esMobilePlanning ? "8px" : "10px"};
+                      font-weight:900;
+                    "
+                  >
+                    ✓
+                  </span>
+                `
+                : ""
+            }
+            <button
+              type="button"
+              class="btn-eliminar-planning"
+              data-id="${item.id}"
+              title="Eliminar del Planning"
+              style="
+                border:none;
+                background:none;
+                cursor:pointer;
+                color:#b73b3b;
+                font-size:${esMobilePlanning ? "10px" : "12px"};
+                padding:0;
+                opacity:.75;
+              "
+            >
+              🗑
+            </button>
+          </div>
+        </div>
+        ${
+          esMobilePlanning
+            ? ""
+            : `
+              <div
+                class="planning-card-footer"
+                style="
+                  display:flex;
+                  justify-content:space-between;
+                  align-items:center;
+                  gap:5px;
+                  margin-top:5px;
+                  padding-top:4px;
+                  border-top:1px solid ${estado.color}2d;
+                "
+              >
+                <span
+                  class="planning-card-aoi"
+                  style="
+                    min-width:0;
+                    color:#6a756e;
+                    font-size:8px;
+                    overflow:hidden;
+                    text-overflow:ellipsis;
+                    white-space:nowrap;
+                  "
+                >
+                  ${item.aoiId}
+                </span>
+                <span
+                  class="planning-card-status"
+                  style="
+                    color:${estado.color};
+                    font-size:8px;
+                    font-weight:800;
+                    overflow:hidden;
+                    text-overflow:ellipsis;
+                    white-space:nowrap;
+                    text-align:right;
+                  "
+                >
+                  ${detalleEstado}
+                </span>
+              </div>
+            `
+        }
+      </div>
+    `;
+  }
+function crearTarjetaNoActivityPlanning(item) {
+  const motivo = limpiarTexto(item.downtimeReason) || "No Activity";
+  const comentario = limpiarTexto(item.comment);
+  const iconos = {
+    "No Activity": "⏸",
+    "Repair / Maintenance": "🔧",
+    "Rain / Weather": "🌧️",
+    "Logistics": "🚚",
+    "Other": "⚠️"
+  };
+  const icono = iconos[motivo] || "⏸";
+  const esMobile = window.matchMedia("(max-width: 1100px), (pointer: coarse)").matches;
+  return `
+    <div class="planning-card planning-card-noactivity" draggable="${esPlanningViewer() ? "false" : "true"}"
+      data-id="${item.id}" data-combine="${item.combine}" data-week="${item.week}" data-cosechado="false"
+      title="${motivo}${comentario ? ` · ${comentario}` : ""}"
+      style="background:#f5f7f8;border-left:5px solid #64748b;border-top:1px solid #dfe4e8;border-right:1px solid #dfe4e8;border-bottom:1px solid #dfe4e8;border-radius:9px;padding:${esMobile ? "5px 4px" : "6px 7px"};margin-top:5px;cursor:grab;box-sizing:border-box;overflow:hidden;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px;min-width:0;">
+        <div style="min-width:0;flex:1 1 auto;">
+          <div style="font-size:${esMobile ? "9px" : "11px"};font-weight:800;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icono} ${motivo}</div>
+          ${comentario ? `<div style="margin-top:3px;font-size:${esMobile ? "8px" : "9px"};color:#64748b;line-height:1.2;overflow:hidden;text-overflow:ellipsis;${esMobile ? "white-space:nowrap;" : "display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"}">${comentario}</div>` : ""}
+        </div>
+        <div style="display:flex;gap:2px;flex:0 0 auto;">
+          <button type="button" class="btn-editar-noactivity" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Editar" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">✏️</button>
+          <button type="button" class="btn-duplicar-noactivity" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Duplicar a otra semana" style="border:none;background:none;cursor:pointer;padding:0;font-size:${esMobile ? "10px" : "12px"};">📋</button>
+          <button type="button" class="btn-eliminar-planning" ${esPlanningViewer() ? "hidden" : ""} data-id="${item.id}" title="Eliminar" style="border:none;background:none;cursor:pointer;color:#b73b3b;padding:0;font-size:${esMobile ? "10px" : "12px"};">🗑</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function crearTarjetaPlanning(item) {
+  return item.planningType === "NoActivity"
+    ? crearTarjetaNoActivityPlanning(item)
+    : crearTarjetaPlanningBase(item);
+}
+
+function renderTarjetasCombine(
+  combine,
+  week
+) {
+
+  return planningData
+    .filter(
+      item =>
+        item.combine === combine &&
+        item.week === week
+    )
+    .sort(
+      (a, b) =>
+        (a.sortOrder || 0) -
+        (b.sortOrder || 0)
+    )
+    .map(
+      item =>
+        crearTarjetaPlanning(item)
+    )
+    .join("");
+
+}
+
+function renderColumnaCombine(
+  combine,
+  week
+) {
+
+  return `
+    <div
+      class="planning-drop-zone"
+      data-combine="${combine}"
+      data-week="${week}"
+      style="
+        min-height:112px;
+        border:1px dashed #d6e0da;
+        border-radius:10px;
+        background:#ffffff;
+        padding:6px;
+        box-sizing:border-box;
+      "
+    >
+      ${renderTarjetasCombine(
+        combine,
+        week
+      )}
+    </div>
+  `;
+
+}
+
+function formatearRangoPlanning(
+  inicio
+) {
+
+  const fin = new Date(inicio);
+  fin.setDate(fin.getDate() + 6);
+
+  const inicioTxt =
+    inicio.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  const finTxt =
+    fin.toLocaleDateString(
+      "es-AR",
+      {
+        day: "2-digit",
+        month: "2-digit"
+      }
+    );
+
+  return `${inicioTxt} - ${finTxt}`;
+
+}
+
+function obtenerSemanasPlanningVisibles() {
+
+  if (!planningReferenceStart) {
+    planningReferenceStart =
+      obtenerInicioSemana(new Date());
+  }
+
+  return [-1, 0, 1].map(
+    posicion => {
+
+      const inicio =
+        new Date(planningReferenceStart);
+
+      inicio.setDate(
+        inicio.getDate() +
+        ((planningWeekOffset + posicion) * 7)
+      );
+
+      return {
+        posicion,
+        inicio,
+        week: formatearRangoPlanning(inicio),
+        etiqueta:
+          posicion === -1
+            ? "Semana anterior"
+            : posicion === 0
+            ? "Semana central"
+            : "Semana siguiente"
+      };
+
+    }
+  );
+
+}
+
+function renderEncabezadoCombines() {
+
+  return harvestingCombines
+    .map(
+      combine => `
+        <div style="
+          background:#edf5ee;
+          padding:9px 6px;
+          border-radius:9px;
+          font-weight:700;
+          text-align:center;
+          white-space:nowrap;
+          box-sizing:border-box;
+        ">
+          ${combine}
+        </div>
+      `
+    )
+    .join("");
+
+}
+
+function renderBloqueSemanaPlanning(
+  semana
+) {
+
+  const esSemanaActual =
+    semana.week ===
+    formatearRangoPlanning(
+      obtenerInicioSemana(new Date())
+    );
+
+  const cantidad =
+    planningData.filter(
+      item => item.week === semana.week
+    ).length;
+
+  return `
+    <section style="
+      border:1px solid ${
+        esSemanaActual
+          ? "#7bb695"
+          : "#dce5df"
+      };
+      border-radius:12px;
+      background:${
+        esSemanaActual
+          ? "#f7fbf8"
+          : "#fbfcfb"
+      };
+      overflow:hidden;
+      box-sizing:border-box;
+    ">
+
+      <div style="
+        min-height:34px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        gap:9px;
+        padding:5px 12px;
+        background:${
+          esSemanaActual
+            ? "#e5f2e9"
+            : "#f1f5f2"
+        };
+        border-bottom:1px solid #dce5df;
+        box-sizing:border-box;
+      ">
+
+        <span style="
+          font-size:12px;
+          font-weight:700;
+          color:${
+            esSemanaActual
+              ? "#0b6b3a"
+              : "#52645a"
+          };
+          text-transform:uppercase;
+          letter-spacing:.3px;
+        ">
+          ${
+            esSemanaActual
+              ? "Semana actual"
+              : semana.etiqueta
+          }
+        </span>
+
+        <span style="
+          font-size:15px;
+          font-weight:800;
+          color:#173f2a;
+        ">
+          ${semana.week}
+        </span>
+
+        <span style="
+          min-width:22px;
+          padding:2px 7px;
+          border-radius:999px;
+          background:white;
+          border:1px solid #d5dfd9;
+          color:#5d6c63;
+          font-size:11px;
+          font-weight:700;
+        ">
+          ${cantidad}
+        </span>
+
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(8, minmax(0, 1fr));
+        gap:8px;
+        align-items:stretch;
+        padding:8px;
+        min-height:128px;
+        box-sizing:border-box;
+      ">
+        ${harvestingCombines
+          .map(
+            combine =>
+              renderColumnaCombine(
+                combine,
+                semana.week
+              )
+          )
+          .join("")}
+      </div>
+
+    </section>
+  `;
+
+}
+
+
+function cerrarDetallePlanning() {
+  document.getElementById("planningCardDetailOverlay")?.remove();
+  document.body.style.overflow = "";
+}
+function escapeDetallePlanning(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+async function actualizarEstadoSpecialPlanning(item, estadoNuevo, fechaNueva = "") {
+  if (esPlanningViewer()) return false;
+  if (!item || !["Nursery", "Special"].includes(item.planningType)) return false;
+  try {
+    const response = await fetch(URL_FLOW_PLANNING_UPDATE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        PlanningModule: "Harvesting",
+        ID: Number(item.id),
+        Week: item.week || "",
+        Combine: item.combine || "",
+        SortOrder: Number(item.sortOrder) || 0,
+        DowntimeReason: item.downtimeReason || "",
+        Comment: item.comment || "",
+        HarvestingStatus: estadoNuevo,
+        HarvestingDate: fechaNueva || ""
+      })
+    });
+    if (!response.ok) throw new Error("Error actualizando estado Nursery / Special");
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+    return true;
+  } catch (error) {
+    console.error(error);
+    alert("No se pudo actualizar el estado de Nursery / Special");
+    return false;
+  }
+}
+
+function pedirFechaSpecialPlanning(item) {
+  cerrarDetallePlanning();
+  const overlay = document.createElement("div");
+  overlay.id = "specialHarvestingDateOverlay";
+  overlay.style.cssText = "position:fixed;inset:0;z-index:31000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+  const panel = document.createElement("div");
+  const hoy = new Date().toISOString().split("T")[0];
+  panel.style.cssText = "width:min(390px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.28);border:1px solid #d9e4dd";
+  panel.innerHTML = `<div style="font-size:18px;font-weight:900;color:#173f2a">Marcar como cosechado</div><div style="margin-top:5px;color:#617067;font-size:12px">${escapeDetallePlanning(item.location)} · ${escapeDetallePlanning(item.crop)}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800;color:#536159">Fecha de cosecha</label><input id="specialHarvestingDateInput" type="date" value="${item.harvestingDate || hoy}" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;box-sizing:border-box;font-size:14px"><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-sp="cancel" type="button" style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;color:#536159;font-weight:800;cursor:pointer">Cancelar</button><button data-sp="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900;cursor:pointer">Confirmar siembra</button></div>`;
+  overlay.appendChild(panel);
+  document.body.appendChild(overlay);
+  const cerrar = () => overlay.remove();
+  overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+  panel.querySelector('[data-sp="cancel"]')?.addEventListener("click", cerrar);
+  panel.querySelector('[data-sp="save"]')?.addEventListener("click", async e => {
+    const fecha = panel.querySelector("#specialHarvestingDateInput")?.value || "";
+    if (!fecha) { alert("Seleccione una fecha de cosecha"); return; }
+    e.currentTarget.disabled = true;
+    e.currentTarget.textContent = "Guardando...";
+    const ok = await actualizarEstadoSpecialPlanning(item, "Harvested", fecha);
+    cerrar();
+    if (ok) alert("Nursery / Special marcado como cosechado");
+  });
+}
+
+function abrirDetallePlanning(item) {
+  if(!item)return;
+  cerrarDetallePlanning();
+  const noAct=item.planningType==="NoActivity";
+  const estado=noAct?null:configuracionEstadoPlanning(item);
+  const color=noAct?"#64748b":estado.color;
+  const fila=(k,v)=>v?`<div style="padding:10px 0;border-bottom:1px solid #edf1ee"><div style="font-size:10px;font-weight:800;text-transform:uppercase;color:#7a887f">${k}</div><div style="margin-top:3px;font-size:14px;font-weight:700;color:#24362c;overflow-wrap:anywhere">${escapeDetallePlanning(v)}</div></div>`:"";
+  const acciones=(!esPlanningViewer()&&noAct)?`<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap"><button data-da="edit" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">✏️ Editar</button><button data-da="dup" type="button" style="flex:1;padding:10px;border:1px solid #cbd7cf;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">📋 Duplicar</button><button data-da="del" type="button" style="flex:1;padding:10px;border:1px solid #e2bcbc;border-radius:9px;background:#fff7f7;color:#a52f2f;font-weight:800;cursor:pointer">🗑 Eliminar</button></div>`:"";
+  const esSpecial = ["Nursery", "Special"].includes(item.planningType);
+  const accionesSpecial = (!esPlanningViewer() && esSpecial) ? (item.cosechado ? `<div style="margin-top:16px"><button data-da="planned" type="button" style="width:100%;padding:11px;border:1px solid #e0b95a;border-radius:9px;background:#fffaf0;color:#8a6410;font-weight:900;cursor:pointer">↩ Volver a planificado</button></div>` : `<div style="margin-top:16px"><button data-da="harvested" type="button" style="width:100%;padding:11px;border:none;border-radius:9px;background:#2e7d32;color:#fff;font-weight:900;cursor:pointer">✓ Marcar como cosechado</button></div>`) : "";
+  const ov=document.createElement("div");ov.id="planningCardDetailOverlay";ov.style.cssText="position:fixed;inset:0;z-index:30000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;backdrop-filter:blur(2px)";
+  const panel=document.createElement("div");panel.style.cssText="width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid #d9e4dd;box-shadow:0 24px 70px rgba(0,0,0,.3);transform:scale(.94);opacity:0;transition:.16s ease;box-sizing:border-box";
+  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila("AOI ID",item.aoiId)}${fila("Week",item.week)}${fila("Combine",item.combine)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.cosechado?fila("Planting Date",item.harvestingDate):""}${!noAct&&item.cosechado?fila("Actual Combine",item.actualCombine):""}</div>${acciones}${accionesSpecial}</div>`;
+  ov.appendChild(panel);document.body.appendChild(ov);document.body.style.overflow="hidden";requestAnimationFrame(()=>{panel.style.transform="scale(1)";panel.style.opacity="1"});
+  ov.addEventListener("click",e=>{if(e.target===ov)cerrarDetallePlanning()});panel.querySelector('[data-da="close"]')?.addEventListener("click",cerrarDetallePlanning);panel.querySelector('[data-da="edit"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,false)});panel.querySelector('[data-da="dup"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,true)});panel.querySelector('[data-da="del"]')?.addEventListener("click",async()=>{cerrarDetallePlanning();await eliminarPlanning(Number(item.id))});panel.querySelector('[data-da="harvested"]')?.addEventListener("click",()=>pedirFechaSpecialPlanning(item));panel.querySelector('[data-da="planned"]')?.addEventListener("click",async()=>{if(!confirm("¿Volver esta tarjeta a Planificado y quitar la fecha de cosecha?"))return;cerrarDetallePlanning();const ok=await actualizarEstadoSpecialPlanning(item,"Planned","");if(ok)alert("Nursery / Special volvió a Planificado")});
+}
+if(!window.__planningDetailEscReady){window.__planningDetailEscReady=true;document.addEventListener("keydown",e=>{if(e.key==="Escape")cerrarDetallePlanning()})}
+
+function activarInteraccionesPlanning() {
+    if (esPlanningViewer()) {
+      document.querySelectorAll(".planning-card").forEach(t => { t.setAttribute("draggable","false"); t.style.cursor="pointer"; t.addEventListener("click",e=>{if(e.target.closest("button"))return;abrirDetallePlanning(planningData.find(x=>Number(x.id)===Number(t.dataset.id)))}); });
+      document.getElementById("btnPlanningAnterior")?.addEventListener("click",()=>{planningWeekOffset-=1;renderPlanningBoard();});
+      document.getElementById("btnPlanningSiguiente")?.addEventListener("click",()=>{planningWeekOffset+=1;renderPlanningBoard();});
+      document.getElementById("btnPlanningHoy")?.addEventListener("click",()=>{planningWeekOffset=0;renderPlanningBoard();});
+      document.getElementById("planningWeekNavigator")?.addEventListener("wheel",evento=>{if(Math.abs(evento.deltaX)<=Math.abs(evento.deltaY))return;evento.preventDefault();planningWeekOffset+=evento.deltaX>0?1:-1;renderPlanningBoard();},{passive:false});
+      return;
+    }
+
+  document
+    .querySelectorAll(
+      ".planning-card"
+    )
+    .forEach(
+      tarjeta => {
+        let detalleBloqueadoPorDrag = false;
+        tarjeta.addEventListener("click", e => {
+          if(detalleBloqueadoPorDrag){detalleBloqueadoPorDrag=false;return;}
+          if(e.target.closest("button"))return;
+          abrirDetallePlanning(planningData.find(x=>Number(x.id)===Number(tarjeta.dataset.id)));
+        });
+
+        tarjeta.addEventListener(
+          "dragstart",
+          evento => {
+            detalleBloqueadoPorDrag = true;
+
+            const id =
+              Number(
+                tarjeta.dataset.id
+              );
+
+            draggedPlanningCard = {
+              id,
+              combine:
+                tarjeta.dataset.combine,
+              week:
+                tarjeta.dataset.week
+            };
+
+            evento.dataTransfer.effectAllowed =
+              "move";
+
+            evento.dataTransfer.setData(
+              "text/plain",
+              String(id)
+            );
+
+            tarjeta.style.opacity =
+              "0.55";
+
+            tarjeta.classList.add(
+              "planning-card-dragging"
+            );
+
+          }
+        );
+
+        tarjeta.addEventListener(
+          "dragend",
+          () => {
+
+            tarjeta.style.opacity = "1";
+            window.setTimeout(()=>{detalleBloqueadoPorDrag=false;},100);
+
+            tarjeta.classList.remove(
+              "planning-card-dragging"
+            );
+
+            document
+              .querySelectorAll(
+                ".planning-drop-zone"
+              )
+              .forEach(
+                zona => {
+                  zona.style.boxShadow = "";
+                  zona.style.borderColor = "";
+                }
+              );
+
+          }
+        );
+
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".planning-drop-zone"
+    )
+    .forEach(
+      zona => {
+
+        zona.addEventListener(
+          "dragover",
+          evento => {
+
+            evento.preventDefault();
+
+            evento.dataTransfer.dropEffect =
+              "move";
+
+            zona.style.borderColor =
+              "#7bb695";
+
+            zona.style.boxShadow =
+              "inset 0 0 0 2px rgba(11,107,58,.10)";
+
+          }
+        );
+
+        zona.addEventListener(
+          "dragleave",
+          evento => {
+
+            if (
+              zona.contains(
+                evento.relatedTarget
+              )
+            ) {
+              return;
+            }
+
+            zona.style.borderColor = "";
+            zona.style.boxShadow = "";
+
+          }
+        );
+
+        zona.addEventListener(
+          "drop",
+          evento => {
+
+            evento.preventDefault();
+            evento.stopPropagation();
+
+            zona.style.borderColor = "";
+            zona.style.boxShadow = "";
+
+            if (!draggedPlanningCard) {
+              return;
+            }
+
+            const item =
+              planningData.find(
+                actual =>
+                  Number(actual.id) ===
+                  Number(
+                    draggedPlanningCard.id
+                  )
+              );
+
+            if (!item) {
+              draggedPlanningCard = null;
+              return;
+            }
+
+            const combineOrigen =
+              item.combine;
+
+            const weekOrigen =
+              item.week;
+
+            const combineDestino =
+              zona.dataset.combine;
+
+            const weekDestino =
+              zona.dataset.week;
+
+            const estadoAnterior =
+              new Map(
+                planningData.map(
+                  actual => [
+                    String(actual.id),
+                    {
+                      combine: actual.combine,
+                      week: actual.week,
+                      sortOrder:
+                        Number(
+                          actual.sortOrder
+                        ) || 0
+                    }
+                  ]
+                )
+              );
+
+            const tarjetasDestino =
+              Array.from(
+                zona.querySelectorAll(
+                  ".planning-card"
+                )
+              )
+              .filter(
+                tarjeta =>
+                  Number(
+                    tarjeta.dataset.id
+                  ) !== Number(item.id)
+              );
+
+            let indiceInsercion =
+              tarjetasDestino.length;
+
+            for (
+              let indice = 0;
+              indice < tarjetasDestino.length;
+              indice++
+            ) {
+
+              const tarjetaDestino =
+                tarjetasDestino[indice];
+
+              const rect =
+                tarjetaDestino.getBoundingClientRect();
+
+              const centroVertical =
+                rect.top +
+                (rect.height / 2);
+
+              if (
+                evento.clientY <
+                centroVertical
+              ) {
+                indiceInsercion = indice;
+                break;
+              }
+
+            }
+
+            const mismoGrupo =
+              combineOrigen === combineDestino &&
+              weekOrigen === weekDestino;
+
+            const ordenarGrupo =
+              (grupo, combine, week) => {
+
+                grupo.forEach(
+                  (actual, indice) => {
+                    actual.combine = combine;
+                    actual.week = week;
+                    actual.sortOrder = indice;
+                  }
+                );
+
+              };
+
+            let afectados = [];
+
+            if (mismoGrupo) {
+
+              const grupo =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.combine ===
+                        combineDestino &&
+                      actual.week ===
+                        weekDestino &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              indiceInsercion =
+                Math.max(
+                  0,
+                  Math.min(
+                    indiceInsercion,
+                    grupo.length
+                  )
+                );
+
+              grupo.splice(
+                indiceInsercion,
+                0,
+                item
+              );
+
+              ordenarGrupo(
+                grupo,
+                combineDestino,
+                weekDestino
+              );
+
+              afectados = grupo;
+
+            } else {
+
+              const grupoOrigen =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.combine ===
+                        combineOrigen &&
+                      actual.week ===
+                        weekOrigen &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              const grupoDestino =
+                planningData
+                  .filter(
+                    actual =>
+                      actual.combine ===
+                        combineDestino &&
+                      actual.week ===
+                        weekDestino &&
+                      Number(actual.id) !==
+                        Number(item.id)
+                  )
+                  .sort(
+                    (a, b) =>
+                      (Number(a.sortOrder) || 0) -
+                      (Number(b.sortOrder) || 0)
+                  );
+
+              indiceInsercion =
+                Math.max(
+                  0,
+                  Math.min(
+                    indiceInsercion,
+                    grupoDestino.length
+                  )
+                );
+
+              grupoDestino.splice(
+                indiceInsercion,
+                0,
+                item
+              );
+
+              ordenarGrupo(
+                grupoOrigen,
+                combineOrigen,
+                weekOrigen
+              );
+
+              ordenarGrupo(
+                grupoDestino,
+                combineDestino,
+                weekDestino
+              );
+
+              afectados = [
+                ...grupoOrigen,
+                ...grupoDestino
+              ];
+
+            }
+
+            const idsRegistrados =
+              new Set();
+
+            afectados.forEach(
+              actual => {
+
+                const clave =
+                  String(actual.id);
+
+                if (
+                  idsRegistrados.has(clave)
+                ) {
+                  return;
+                }
+
+                idsRegistrados.add(clave);
+
+                const anterior =
+                  estadoAnterior.get(clave);
+
+                const cambioReal =
+                  !anterior ||
+                  anterior.combine !==
+                    actual.combine ||
+                  anterior.week !==
+                    actual.week ||
+                  anterior.sortOrder !==
+                    (Number(
+                      actual.sortOrder
+                    ) || 0);
+
+                if (!cambioReal) {
+                  return;
+                }
+
+                registrarCambioPlanning(
+                  actual,
+                  actual.combine,
+                  actual.week,
+                  Number(
+                    actual.sortOrder
+                  ) || 0
+                );
+
+              }
+            );
+
+            draggedPlanningCard = null;
+
+            renderPlanningBoard();
+
+          }
+        );
+
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-editar-noactivity"
+    )
+    .forEach(
+      boton => {
+        boton.addEventListener(
+          "click",
+          evento => {
+            evento.preventDefault();
+            evento.stopPropagation();
+
+            const item = planningData.find(
+              actual =>
+                Number(actual.id) ===
+                Number(boton.dataset.id)
+            );
+
+            if (item) {
+              abrirFormularioNoActivity(
+                item,
+                false
+              );
+            }
+          }
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-duplicar-noactivity"
+    )
+    .forEach(
+      boton => {
+        boton.addEventListener(
+          "click",
+          evento => {
+            evento.preventDefault();
+            evento.stopPropagation();
+
+            const item = planningData.find(
+              actual =>
+                Number(actual.id) ===
+                Number(boton.dataset.id)
+            );
+
+            if (item) {
+              abrirFormularioNoActivity(
+                item,
+                true
+              );
+            }
+          }
+        );
+      }
+    );
+
+  document
+    .querySelectorAll(
+      ".btn-eliminar-planning"
+    )
+    .forEach(
+      boton => {
+
+        boton.addEventListener(
+          "click",
+          async evento => {
+
+            evento.stopPropagation();
+
+            const id =
+              Number(
+                boton.dataset.id
+              );
+
+            await eliminarPlanning(id);
+
+          }
+        );
+
+      }
+    );
+
+  const btnGuardarCambios =
+    document.getElementById(
+      "btnGuardarCambiosPlanning"
+    );
+
+  btnGuardarCambios?.addEventListener(
+    "click",
+    guardarCambiosPlanning
+  );
+
+  document
+    .getElementById("btnPlanningAnterior")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset -= 1;
+        renderPlanningBoard();
+      }
+    );
+
+  document
+    .getElementById("btnPlanningSiguiente")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset += 1;
+        renderPlanningBoard();
+      }
+    );
+
+  document
+    .getElementById("btnPlanningHoy")
+    ?.addEventListener(
+      "click",
+      () => {
+        planningWeekOffset = 0;
+        renderPlanningBoard();
+      }
+    );
+
+  const navegadorSemanas =
+    document.getElementById(
+      "planningWeekNavigator"
+    );
+
+  navegadorSemanas?.addEventListener(
+    "wheel",
+    evento => {
+
+      if (
+        Math.abs(evento.deltaX) <=
+        Math.abs(evento.deltaY)
+      ) {
+        return;
+      }
+
+      evento.preventDefault();
+
+      planningWeekOffset +=
+        evento.deltaX > 0 ? 1 : -1;
+
+      renderPlanningBoard();
+
+    },
+    { passive: false }
+  );
+
+}
+
+function obtenerCultivosPlanningManual() {
+
+  return [
+    ...new Set(
+      sitios
+        .map(
+          sitio =>
+            limpiarTexto(sitio.Crop)
+        )
+        .filter(Boolean)
+    )
+  ].sort(
+    (a, b) =>
+      a.localeCompare(
+        b,
+        "es",
+        { sensitivity: "base" }
+      )
+  );
+
+}
+
+function poblarSemanasPlanningManual(
+  select
+) {
+
+  if (!select) {
+    return;
+  }
+
+  select.innerHTML = "";
+
+  const hoy = new Date();
+
+  for (let i = -8; i < 20; i++) {
+
+    const inicio =
+      obtenerInicioSemana(
+        new Date(
+          hoy.getFullYear(),
+          hoy.getMonth(),
+          hoy.getDate() + (i * 7)
+        )
+      );
+
+    const semana =
+      formatearRangoPlanning(inicio);
+
+    const option =
+      document.createElement("option");
+
+    option.value = semana;
+    option.textContent = semana;
+
+    if (i === 0) {
+      option.selected = true;
+    }
+
+    select.appendChild(option);
+
+  }
+
+}
+
+function siguienteSemanaPlanning(week) {
+  const partes = String(week || "").split(" - ");
+  if (!partes[0]) return formatearRangoPlanning(obtenerInicioSemana(new Date()));
+  const md = partes[0].split("/").map(Number);
+  const hoy = new Date();
+  let anio = hoy.getFullYear();
+  let inicio = new Date(anio, md[1] - 1, md[0]);
+  if (Math.abs(inicio - hoy) > 180 * 86400000) {
+    anio += inicio < hoy ? 1 : -1;
+    inicio = new Date(anio, md[1] - 1, md[0]);
+  }
+  inicio.setDate(inicio.getDate() + 7);
+  return formatearRangoPlanning(inicio);
+}
+
+function crearFormularioNoActivityPlanning() {
+  if (document.getElementById("noActivityPlanningForm")) return;
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar) return;
+  const form = document.createElement("div");
+  form.id = "noActivityPlanningForm";
+  form.hidden = true;
+  form.innerHTML = `
+    <div style="margin:10px 0 12px;padding:12px;border:1px solid #d9e3dc;border-radius:10px;background:#f8fbf9;">
+      <div id="noActivityFormTitle" style="margin-bottom:10px;color:#173f2a;font-size:14px;font-weight:800;">No Activity / Downtime</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Reason</label><select id="noActivityReason" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"><option>No Activity</option><option>Repair / Maintenance</option><option>Rain / Weather</option><option>Logistics</option><option>Other</option></select></div>
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Combine</label><select id="noActivityCombine" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"><option value="">Seleccionar cosechadora</option>${harvestingCombines.map(p => `<option value="${p}">${p}</option>`).join("")}</select></div>
+        <div><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Week</label><select id="noActivityWeek" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;"></select></div>
+        <div style="grid-column:1/-1;"><label style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">Comment</label><textarea id="noActivityComment" rows="3" placeholder="Motivo o detalle libre" style="width:100%;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;box-sizing:border-box;resize:vertical;"></textarea></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;"><button id="btnCancelarNoActivity" type="button" style="padding:8px 12px;border:1px solid #bfc7c1;border-radius:8px;background:white;color:#536159;font-weight:700;cursor:pointer;">Cancelar</button><button id="btnGuardarNoActivity" type="button" style="padding:8px 12px;border:none;border-radius:8px;background:#475569;color:white;font-weight:800;cursor:pointer;">Agregar al Planning</button></div>
+    </div>`;
+  toolbar.insertAdjacentElement("afterend", form);
+  form.dataset.editId = "";
+  document.getElementById("btnCancelarNoActivity")?.addEventListener("click", () => form.hidden = true);
+  document.getElementById("btnGuardarNoActivity")?.addEventListener("click", guardarNoActivityPlanning);
+}
+
+function abrirFormularioNoActivity(item = null, duplicate = false) {
+    if (esPlanningViewer()) return;
+  crearFormularioNoActivityPlanning();
+  const form = document.getElementById("noActivityPlanningForm");
+  planningForm.hidden = true;
+  const special = document.getElementById("specialPlanningForm");
+  if (special) special.hidden = true;
+  poblarSemanasPlanningManual(document.getElementById("noActivityWeek"));
+  const reason = document.getElementById("noActivityReason");
+  const combine = document.getElementById("noActivityCombine");
+  const week = document.getElementById("noActivityWeek");
+  const comment = document.getElementById("noActivityComment");
+  reason.value = item?.downtimeReason || "No Activity";
+  combine.value = item?.combine || "";
+  comment.value = item?.comment || "";
+  if (item) {
+    const targetWeek = duplicate ? siguienteSemanaPlanning(item.week) : item.week;
+    if (![...week.options].some(o => o.value === targetWeek)) {
+      const o = document.createElement("option"); o.value = targetWeek; o.textContent = targetWeek; week.appendChild(o);
+    }
+    week.value = targetWeek;
+  }
+  form.dataset.editId = item && !duplicate ? String(item.id) : "";
+  document.getElementById("noActivityFormTitle").textContent = duplicate ? "Duplicate No Activity / Downtime" : item ? "Edit No Activity / Downtime" : "No Activity / Downtime";
+  document.getElementById("btnGuardarNoActivity").textContent = duplicate ? "Duplicar" : item ? "Guardar cambios" : "Agregar al Planning";
+  form.hidden = false;
+}
+
+async function guardarNoActivityPlanning() {
+    if (esPlanningViewer()) return;
+  const form = document.getElementById("noActivityPlanningForm");
+  const reason = limpiarTexto(document.getElementById("noActivityReason")?.value);
+  const combine = limpiarTexto(document.getElementById("noActivityCombine")?.value);
+  const week = limpiarTexto(document.getElementById("noActivityWeek")?.value);
+  const comment = limpiarTexto(document.getElementById("noActivityComment")?.value);
+  if (!reason || !combine || !week) { alert("Complete Reason, Combine y Week"); return; }
+  const editId = Number(form?.dataset.editId || 0);
+  const boton = document.getElementById("btnGuardarNoActivity");
+  if (boton) { boton.disabled = true; boton.textContent = "Guardando..."; }
+  try {
+    if (editId) {
+      const item = planningData.find(x => Number(x.id) === editId);
+      const response = await fetch(URL_FLOW_PLANNING_UPDATE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ PlanningModule:"Harvesting", ID:editId, Week:week, Combine:combine, SortOrder:Number(item?.sortOrder)||0, DowntimeReason:reason, Comment:comment }) });
+      if (!response.ok) throw new Error("Error actualizando No Activity");
+    } else {
+      const sortOrder = planningData.filter(x => x.week === week && x.combine === combine).length;
+      const response = await fetch(URL_FLOW_PLANNING, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ PlanningModule:"Harvesting", AOI_ID:"", Location:"", Crop:"", PlanningType:"NoActivity", Week:week, Combine:combine, SortOrder:sortOrder, DowntimeReason:reason, Comment:comment }) });
+      if (!response.ok) throw new Error("Error creando No Activity");
+    }
+    form.hidden = true;
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+  } catch(error) { console.error(error); alert("Error guardando No Activity / Downtime"); }
+  finally { if (boton) { boton.disabled = false; boton.textContent = "Agregar al Planning"; } }
+}
+
+function asegurarBotonNoActivityPlanning() {
+    if (esPlanningViewer()) { document.getElementById("btnAddNoActivityPlanning")?.remove(); return; }
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar || document.getElementById("btnAddNoActivityPlanning")) return;
+  const btn = document.createElement("button");
+  btn.id = "btnAddNoActivityPlanning";
+  btn.type = "button";
+  btn.innerHTML = "⏸ Add No Activity";
+  const referencia = document.getElementById("btnAddSpecialPlanning");
+  if (referencia) referencia.insertAdjacentElement("afterend", btn); else toolbar.prepend(btn);
+  btn.addEventListener("click", () => abrirFormularioNoActivity());
+}
+
+function crearFormularioSpecialPlanning() {
+
+  if (
+    document.getElementById(
+      "specialPlanningForm"
+    )
+  ) {
+    return;
+  }
+
+  const toolbar =
+    document.getElementById(
+      "planningToolbar"
+    );
+
+  if (!toolbar) {
+    return;
+  }
+
+  const form =
+    document.createElement("div");
+
+  form.id = "specialPlanningForm";
+  form.hidden = true;
+
+  form.innerHTML = `
+    <div style="
+      margin:10px 0 12px;
+      padding:12px;
+      border:1px solid #d9e3dc;
+      border-radius:10px;
+      background:#f8fbf9;
+    ">
+
+      <div style="
+        margin-bottom:10px;
+        color:#173f2a;
+        font-size:14px;
+        font-weight:800;
+      ">
+        Nursery / Special Planning
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:10px;
+      ">
+
+        <div>
+          <label for="specialPlanningType" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Type
+          </label>
+          <select id="specialPlanningType" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="Nursery">Nursery</option>
+            <option value="Special">Special</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="specialPlanningLocation" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Location
+          </label>
+          <input id="specialPlanningLocation" type="text" autocomplete="off" placeholder="Escribir localidad" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+        </div>
+
+        <div>
+          <label for="specialPlanningCrop" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Crop
+          </label>
+          <select id="specialPlanningCrop" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="">Seleccionar cultivo</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="specialPlanningIdentifier" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Identifier / AOI Name
+          </label>
+          <input id="specialPlanningIdentifier" type="text" autocomplete="off" placeholder="Ej. NURSERY-01" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+        </div>
+
+        <div>
+          <label for="specialPlanningWeek" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Week
+          </label>
+          <select id="specialPlanningWeek" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;"></select>
+        </div>
+
+        <div>
+          <label for="specialPlanningCombine" style="display:block;margin-bottom:4px;font-size:11px;font-weight:700;color:#536159;">
+            Combine
+          </label>
+          <select id="specialPlanningCombine" style="width:100%;box-sizing:border-box;padding:9px;border:1px solid #bfc7c1;border-radius:8px;background:white;">
+            <option value="">Seleccionar cosechadora</option>
+            ${harvestingCombines
+              .map(
+                combine =>
+                  `<option value="${combine}">${combine}</option>`
+              )
+              .join("")}
+          </select>
+        </div>
+
+      </div>
+
+      <div style="
+        display:flex;
+        justify-content:flex-end;
+        gap:8px;
+        margin-top:12px;
+      ">
+        <button id="btnCancelarSpecialPlanning" type="button" style="padding:8px 12px;border:1px solid #bfc7c1;border-radius:8px;background:white;color:#536159;font-weight:700;cursor:pointer;">
+          Cancelar
+        </button>
+        <button id="btnGuardarSpecialPlanning" type="button" style="padding:8px 12px;border:none;border-radius:8px;background:#0b6b3a;color:white;font-weight:800;cursor:pointer;">
+          Agregar al Planning
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  toolbar.insertAdjacentElement(
+    "afterend",
+    form
+  );
+
+  document
+    .getElementById(
+      "btnCancelarSpecialPlanning"
+    )
+    ?.addEventListener(
+      "click",
+      () => {
+        form.hidden = true;
+      }
+    );
+
+  document
+    .getElementById(
+      "btnGuardarSpecialPlanning"
+    )
+    ?.addEventListener(
+      "click",
+      guardarSpecialPlanning
+    );
+
+}
+
+function prepararFormularioSpecialPlanning() {
+    if (esPlanningViewer()) return;
+
+  crearFormularioSpecialPlanning();
+
+  const form =
+    document.getElementById(
+      "specialPlanningForm"
+    );
+
+  const cropSelect =
+    document.getElementById(
+      "specialPlanningCrop"
+    );
+
+  const weekSelect =
+    document.getElementById(
+      "specialPlanningWeek"
+    );
+
+  if (!form || !cropSelect) {
+    return;
+  }
+
+  cropSelect.innerHTML = `
+    <option value="">
+      Seleccionar cultivo
+    </option>
+  `;
+
+  obtenerCultivosPlanningManual()
+    .forEach(
+      cultivo => {
+        const option =
+          document.createElement("option");
+        option.value = cultivo;
+        option.textContent = cultivo;
+        cropSelect.appendChild(option);
+      }
+    );
+
+  poblarSemanasPlanningManual(
+    weekSelect
+  );
+
+  document.getElementById(
+    "specialPlanningType"
+  ).value = "Nursery";
+
+  document.getElementById(
+    "specialPlanningLocation"
+  ).value = "";
+
+  document.getElementById(
+    "specialPlanningIdentifier"
+  ).value = "";
+
+  document.getElementById(
+    "specialPlanningCombine"
+  ).value = "";
+
+  planningForm.hidden = true;
+  form.hidden = false;
+
+  document.getElementById(
+    "specialPlanningLocation"
+  ).focus();
+
+}
+
+async function guardarSpecialPlanning() {
+    if (esPlanningViewer()) return;
+
+  const type =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningType"
+      )?.value
+    );
+
+  const location =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningLocation"
+      )?.value
+    );
+
+  const crop =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningCrop"
+      )?.value
+    );
+
+  const aoiId =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningIdentifier"
+      )?.value
+    );
+
+  const week =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningWeek"
+      )?.value
+    );
+
+  const combine =
+    limpiarTexto(
+      document.getElementById(
+        "specialPlanningCombine"
+      )?.value
+    );
+
+  if (
+    !type ||
+    !location ||
+    !crop ||
+    !aoiId ||
+    !week ||
+    !combine
+  ) {
+    alert(
+      "Complete todos los campos de Nursery / Special"
+    );
+    return;
+  }
+
+  const existe =
+    planningData.some(
+      item =>
+        normalizarTexto(item.aoiId) ===
+        normalizarTexto(aoiId)
+    );
+
+  if (existe) {
+    alert(
+      "Este identificador ya se encuentra planificado"
+    );
+    return;
+  }
+
+  const sortOrder =
+    planningData.filter(
+      item =>
+        item.week === week &&
+        item.combine === combine
+    ).length;
+
+  const boton =
+    document.getElementById(
+      "btnGuardarSpecialPlanning"
+    );
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "Guardando...";
+  }
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            PlanningModule: "Harvesting",
+            AOI_ID: aoiId,
+            Location: location,
+            Crop: crop,
+            PlanningType: type,
+            Week: week,
+            Combine: combine,
+            SortOrder: sortOrder,
+            HarvestingStatus: "Planned",
+            HarvestingDate: ""
+          })
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        "Error Flow Planning Nursery / Special"
+      );
+    }
+
+    document.getElementById(
+      "specialPlanningForm"
+    ).hidden = true;
+
+    await cargarPlanningDesdeSharePoint();
+    renderPlanningBoard();
+
+    alert(
+      `${type} agregado correctamente al Planning`
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Error guardando Nursery / Special"
+    );
+
+  } finally {
+
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent =
+        "Agregar al Planning";
+    }
+
+  }
+
+}
+
+async function cargarPlanningDesdeSharePoint() {
+
+  try {
+
+    const response =
+      await fetch(
+        URL_FLOW_PLANNING_GET,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: "{}"
+        }
+      );
+
+const data =
+  await response.json();
+
+planningData = data
+  .filter(item => limpiarTexto(item.PlanningModule?.Value || item.PlanningModule) === "Harvesting")
+  .map(
+  item => {
+
+    const sitio =
+      sitios.find(
+        s =>
+          limpiarTexto(
+            s["AOI ID"]
+          ) ===
+          limpiarTexto(
+            item.AOI_ID
+          )
+      );
+
+    return {
+      id:
+        item.ID,
+
+      sortOrder:
+        Number(item.SortOrder) || 0,
+
+      week:
+        item.Week,
+
+      combine:
+        item.Combine,
+
+      aoiId:
+        item.AOI_ID,
+
+      planningType:
+        limpiarTexto(
+          item.PlanningType
+        ) || (sitio ? "Master" : "Special"),
+
+      location:
+        sitio
+          ? limpiarTexto(
+              sitio.Location
+            )
+          : limpiarTexto(
+              item.Location
+            ) || item.AOI_ID,
+
+      crop:
+        sitio
+          ? limpiarTexto(
+              sitio.Crop
+            )
+          : limpiarTexto(
+              item.Crop
+            ) || "Sin cultivo",
+
+      harvestingDate:
+        sitio
+          ? limpiarTexto(
+              sitio[
+                "Harvest Date (MM/DD/YYYY)"
+              ]
+            )
+          : limpiarTexto(item.HarvestingDate).split("T")[0],
+
+      harvestingStatus:
+        limpiarTexto(item.HarvestingStatus?.Value || item.HarvestingStatus) || "Planned",
+
+      cosechado:
+        sitio
+          ? estaCosechado(sitio)
+          : limpiarTexto(item.HarvestingStatus?.Value || item.HarvestingStatus).toLowerCase() === "harvested",
+
+      actualCombine:
+        sitio
+          ? limpiarTexto(
+              sitio.Combine
+            )
+          : (limpiarTexto(item.HarvestingStatus?.Value || item.HarvestingStatus).toLowerCase() === "harvested" ? limpiarTexto(item.Combine) : ""),
+
+      downtimeReason:
+        limpiarTexto(item.DowntimeReason),
+
+      comment:
+        limpiarTexto(item.Comment)
+
+    };
+
+  }
+);
+console.log(
+  "PlanningData cargado",
+  planningData
+);
+console.table(
+  planningData.map(
+    item => ({
+      aoiId: item.aoiId,
+      location: item.location,
+      crop: item.crop,
+      planningType: item.planningType
+    })
+  )
+);
+
+  } catch (error) {
+
+    console.error(
+      "Error leyendo Planning",
+      error
+    );
+
+  }
+
+}
+
+function obtenerAoiPlanificadosMaster() {
+
+  return new Set(
+    planningData
+      .filter(
+        item =>
+          !item.planningType ||
+          item.planningType === "Master"
+      )
+      .map(
+        item =>
+          normalizarTexto(
+            item.aoiId
+          )
+      )
+      .filter(Boolean)
+  );
+
+}
+
+function obtenerSitiosDisponiblesPlanning() {
+
+  const aoiPlanificados =
+    obtenerAoiPlanificadosMaster();
+
+  return sitios.filter(
+    sitio => {
+
+      const aoiId =
+        normalizarTexto(
+          sitio["AOI ID"]
+        );
+
+      return (
+        aoiId &&
+        !aoiPlanificados.has(aoiId)
+      );
+
+    }
+  );
+
+}
+
+function cargarLocalidadesPlanning() {
+
+  const comboLocality =
+    document.getElementById(
+      "planningLocality"
+    );
+
+  const comboCrop =
+    document.getElementById(
+      "planningCrop"
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (!comboLocality) {
+    return;
+  }
+
+  const sitiosDisponibles =
+    obtenerSitiosDisponiblesPlanning();
+
+  const localidades =
+    [
+      ...new Set(
+        sitiosDisponibles
+          .map(
+            sitio =>
+              limpiarTexto(
+                sitio.Location
+              )
+          )
+          .filter(Boolean)
+      )
+    ].sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "es",
+          { sensitivity: "base" }
+        )
+    );
+
+  comboLocality.innerHTML = `
+    <option value="">
+      Seleccionar localidad
+    </option>
+  `;
+
+  localidades.forEach(
+    localidad => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value = localidad;
+      option.textContent = localidad;
+
+      comboLocality.appendChild(
+        option
+      );
+
+    }
+  );
+
+  if (comboCrop) {
+    comboCrop.innerHTML = `
+      <option value="">
+        Seleccionar cultivo
+      </option>
+    `;
+    comboCrop.disabled = true;
+  }
+
+  if (preview) {
+    preview.textContent =
+      localidades.length
+        ? "Seleccione localidad y cultivo"
+        : "No hay AOI disponibles para planificar";
+  }
+
+}
+
+function cargarSemanasPlanning() {
+
+  const comboSemana =
+    document.getElementById(
+      "planningWeek"
+    );
+
+  if (!comboSemana) {
+    return;
+  }
+
+  comboSemana.innerHTML = "";
+
+  const hoy = new Date();
+
+  for (let i = 0; i < 20; i++) {
+
+    const inicio =
+      obtenerInicioSemana(
+        new Date(
+          hoy.getFullYear(),
+          hoy.getMonth(),
+          hoy.getDate() + (i * 7)
+        )
+      );
+
+    const fin =
+      new Date(inicio);
+
+    fin.setDate(
+      fin.getDate() + 6
+    );
+
+    const semana =
+      `${inicio.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )} - ${fin.toLocaleDateString(
+        "es-AR",
+        {
+          day: "2-digit",
+          month: "2-digit"
+        }
+      )}`;
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value = semana;
+    option.textContent = semana;
+
+    comboSemana.appendChild(
+      option
+    );
+
+  }
+
+}
+
+function cargarCultivosPlanning() {
+
+  const localidad =
+    document.getElementById(
+      "planningLocality"
+    ).value;
+
+  const comboCrop =
+    document.getElementById(
+      "planningCrop"
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (!comboCrop) {
+    return;
+  }
+
+  comboCrop.innerHTML = `
+    <option value="">
+      Seleccionar cultivo
+    </option>
+  `;
+
+  if (!localidad) {
+    comboCrop.disabled = true;
+
+    if (preview) {
+      preview.textContent =
+        "Seleccione localidad y cultivo";
+    }
+
+    return;
+  }
+
+  const cultivos =
+    [
+      ...new Set(
+        obtenerSitiosDisponiblesPlanning()
+          .filter(
+            sitio =>
+              limpiarTexto(
+                sitio.Location
+              ) === localidad
+          )
+          .map(
+            sitio =>
+              limpiarTexto(
+                sitio.Crop
+              )
+          )
+          .filter(Boolean)
+      )
+    ].sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "es",
+          { sensitivity: "base" }
+        )
+    );
+
+  cultivos.forEach(
+    cultivo => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value = cultivo;
+      option.textContent = cultivo;
+
+      comboCrop.appendChild(
+        option
+      );
+
+    }
+  );
+
+  comboCrop.disabled =
+    cultivos.length === 0;
+
+  if (preview) {
+    preview.textContent =
+      cultivos.length
+        ? "Seleccione un cultivo"
+        : "No hay cultivos disponibles para esta localidad";
+  }
+
+}
+
+function actualizarAoiPlanning() {
+
+  const locality =
+    document.getElementById(
+      "planningLocality"
+    )?.value;
+
+  const crop =
+    document.getElementById(
+      "planningCrop"
+    )?.value;
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (!preview) {
+    return;
+  }
+
+  if (!locality || !crop) {
+    preview.textContent =
+      "Seleccione localidad y cultivo";
+    return;
+  }
+
+  const aoi =
+    obtenerSitiosDisponiblesPlanning()
+      .filter(
+        sitio =>
+          limpiarTexto(
+            sitio.Location
+          ) === locality &&
+          limpiarTexto(
+            sitio.Crop
+          ) === crop
+      )
+      .map(
+        sitio =>
+          limpiarTexto(
+            sitio["AOI ID"]
+          )
+      )
+      .filter(Boolean);
+
+  preview.innerHTML =
+    aoi.length
+      ? aoi.join("<br>")
+      : "Sin AOI disponibles";
+
+}
+
+
+function renderLeyendaEstadoPlanning() {
+
+  return `
+    <div style="
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      color:#536159;
+      font-size:13px;
+      line-height:1;
+    ">
+      <span>
+        <b style="color:#f4b400;font-size:18px;">●</b>
+        Planificado
+      </span>
+      <span>
+        <b style="color:#2e7d32;font-size:18px;">●</b>
+        Cosechado
+      </span>
+    </div>
+  `;
+
+}
+
+function cargarLibreriaExportPlanning(src, disponible) {
+  if (disponible()) return Promise.resolve();
+  return new Promise((resolve, reject) => {
+    const existente = document.querySelector(`script[src="${src}"]`);
+    if (existente) {
+      existente.addEventListener("load", resolve, { once: true });
+      existente.addEventListener("error", reject, { once: true });
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+async function asegurarLibreriasExportPlanning() {
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",
+    () => typeof window.html2canvas === "function"
+  );
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js",
+    () => Boolean(window.jspdf?.jsPDF)
+  );
+}
+
+function nombreArchivoPlanning(texto) {
+  return String(texto || "Harvesting_Planning")
+    .replace(/[\\/:*?"<>|]/g, "-")
+    .replace(/\s+/g, "_");
+}
+
+function renderTarjetaExportPlanning(item) {
+  if (item.planningType === "NoActivity") {
+    const motivo = item.downtimeReason || "No Activity";
+    return `<div style="margin-top:5px;padding:8px;border-left:5px solid #64748b;border:1px solid #dfe4e8;border-left-width:5px;border-radius:8px;background:#f5f7f8;"><div style="font-size:11px;font-weight:800;color:#334155;">⏸ ${motivo}</div>${item.comment ? `<div style="margin-top:3px;font-size:8px;color:#64748b;">${item.comment}</div>` : ""}</div>`;
+  }
+  const estado = configuracionEstadoPlanning(item);
+  const cfg = configuracionCultivoPlanning(item.crop);
+  const tipo = item.planningType && item.planningType !== "Master"
+    ? ` · ${item.planningType}` : "";
+  const detalle = item.cosechado
+    ? `${item.harvestingDate || "Cosechado"}${item.actualCombine ? ` · ${item.actualCombine}` : ""}`
+    : "Planificado";
+
+  return `
+    <div style="margin-top:5px;padding:7px;border-left:5px solid ${estado.color};border-top:1px solid #dde6e0;border-right:1px solid #dde6e0;border-bottom:1px solid #dde6e0;border-radius:8px;background:${estado.fondo};box-sizing:border-box;overflow:hidden;">
+      <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+        <span style="width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:${cfg.color}18;border:2px solid ${cfg.color};box-sizing:border-box;flex:0 0 auto;font-size:13px;">${cfg.icono}</span>
+        <div style="min-width:0;">
+          <div style="font-size:11px;font-weight:800;color:#17251d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.location}</div>
+          <div style="margin-top:1px;font-size:8px;color:#526158;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.crop}${tipo}</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:4px;margin-top:5px;padding-top:4px;border-top:1px solid ${estado.color}35;font-size:7px;">
+        <span style="color:#66736b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.aoiId}</span>
+        <span style="color:${estado.color};font-weight:800;white-space:nowrap;">${detalle}</span>
+      </div>
+    </div>`;
+}
+
+function renderSemanaExportPlanning(semana) {
+  const central = semana.posicion === 0;
+  const cantidad = planningData.filter(item => item.week === semana.week).length;
+  const etiqueta = semana.posicion === -1 ? "SEMANA ANTERIOR" : central ? "SEMANA CENTRAL" : "SEMANA SIGUIENTE";
+
+  return `
+    <section style="margin-top:10px;border:2px solid ${central ? "#69ad84" : "#d8e2dc"};border-radius:11px;background:${central ? "#f5fbf7" : "#fbfcfb"};overflow:hidden;box-sizing:border-box;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:9px;padding:6px 10px;background:${central ? "#e4f3e9" : "#f0f4f1"};border-bottom:1px solid #d8e2dc;">
+        <span style="color:${central ? "#0b6b3a" : "#59675f"};font-size:10px;font-weight:800;">${etiqueta}</span>
+        <span style="color:#173f2a;font-size:${central ? "16px" : "14px"};font-weight:900;">${semana.week}</span>
+        <span style="min-width:24px;padding:2px 7px;border:1px solid #cedbd3;border-radius:999px;background:#fff;color:#5d6c63;font-size:9px;font-weight:700;text-align:center;">${cantidad}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;align-items:start;padding:7px;">
+        ${harvestingCombines.map(combine => `
+          <div style="min-height:90px;padding:4px;border:1px dashed #d6e0da;border-radius:8px;background:#fff;box-sizing:border-box;">
+            ${planningData
+              .filter(item => item.combine === combine && item.week === semana.week)
+              .sort((a,b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+              .map(renderTarjetaExportPlanning).join("")}
+          </div>`).join("")}
+      </div>
+    </section>`;
+}
+
+function crearReporteExportPlanning() {
+  const semanas = obtenerSemanasPlanningVisibles();
+  const node = document.createElement("div");
+  node.style.position = "fixed";
+  node.style.left = "-20000px";
+  node.style.top = "0";
+  node.style.width = "1600px";
+  node.style.padding = "24px";
+  node.style.background = "#fff";
+  node.style.color = "#17251d";
+  node.style.fontFamily = "Arial,Helvetica,sans-serif";
+  node.style.boxSizing = "border-box";
+
+  const generado = new Date().toLocaleString("es-AR", {
+    day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit"
+  });
+
+  node.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;padding-bottom:12px;border-bottom:2px solid #0b6b3a;">
+      <div>
+        <div style="color:#0b6b3a;font-size:24px;font-weight:900;">Harvesting Planning</div>
+        <div style="margin-top:4px;color:#66736b;font-size:11px;">Planificación visible de tres semanas</div>
+      </div>
+      <div style="color:#66736b;font-size:10px;text-align:right;line-height:1.5;">Trial Platform 2026-27<br>Generado: ${generado}</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:11px;margin:12px 0 9px;">
+      <span style="color:#69766e;font-size:12px;font-weight:700;opacity:.75;">${semanas[0].week}</span>
+      <span style="color:#a7b5ac;">•</span>
+      <span style="padding:5px 14px;border:1px solid #b9ddc5;border-radius:999px;background:#e7f4eb;color:#0b6b3a;font-size:16px;font-weight:900;">${semanas[1].week}</span>
+      <span style="color:#a7b5ac;">•</span>
+      <span style="color:#69766e;font-size:12px;font-weight:700;opacity:.75;">${semanas[2].week}</span>
+    </div>
+    <div style="display:flex;gap:16px;margin:0 5px 8px;color:#536159;font-size:10px;font-weight:700;">
+      <span><b style="color:#f4b400;font-size:16px;">●</b> Planificado</span>
+      <span><b style="color:#2e7d32;font-size:16px;">●</b> Cosechado</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;padding:0 7px;">
+      ${harvestingCombines.map(combine => `<div style="padding:9px 5px;border-radius:8px;background:#eaf3ed;color:#173f2a;font-size:12px;font-weight:900;text-align:center;">${combine}</div>`).join("")}
+    </div>
+    ${semanas.map(renderSemanaExportPlanning).join("")}`;
+
+  document.body.appendChild(node);
+  return { node, semanas };
+}
+
+function descargarPlanningPNG(canvas, nombre) {
+  const link = document.createElement("a");
+  link.download = `${nombre}.png`;
+  link.href = canvas.toDataURL("image/png");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function descargarPlanningPDF(canvas, nombre) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:"landscape", unit:"mm", format:"a3", compress:true });
+  const margen = 8;
+  const pw = pdf.internal.pageSize.getWidth();
+  const ph = pdf.internal.pageSize.getHeight();
+  const escala = Math.min((pw - margen*2)/canvas.width, (ph - margen*2)/canvas.height);
+  const w = canvas.width * escala;
+  const h = canvas.height * escala;
+  pdf.addImage(canvas.toDataURL("image/png"), "PNG", (pw-w)/2, (ph-h)/2, w, h, undefined, "FAST");
+  pdf.save(`${nombre}.pdf`);
+}
+
+async function asegurarLibreriaExcelPlanning() {
+  await cargarLibreriaExportPlanning(
+    "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js",
+    () => Boolean(window.XLSX)
+  );
+}
+
+function obtenerFilasExcelPlanning() {
+  const semanas = obtenerSemanasPlanningVisibles();
+  const ordenSemanas = new Map(
+    semanas.map((semana, index) => [semana.week, index])
+  );
+
+  const filas = planningData
+    .filter(item => ordenSemanas.has(item.week))
+    .slice()
+    .sort((a, b) => {
+      const semanaA = ordenSemanas.get(a.week) ?? 99;
+      const semanaB = ordenSemanas.get(b.week) ?? 99;
+      if (semanaA !== semanaB) return semanaA - semanaB;
+
+      const combineA = harvestingCombines.indexOf(a.combine);
+      const combineB = harvestingCombines.indexOf(b.combine);
+      if (combineA !== combineB) return combineA - combineB;
+
+      return (a.sortOrder || 0) - (b.sortOrder || 0);
+    })
+    .map(item => ({
+      Week: item.week || "",
+      Combine: item.combine || "",
+      Location: item.location || "",
+      Crop: item.crop || "",
+      "AOI ID": item.aoiId || "",
+      "Planning Type": item.planningType || "Master",
+      Status: item.cosechado ? "Cosechado" : "Planificado",
+      "Planting Date": item.harvestingDate || "",
+      "Actual Combine": item.actualCombine || "",
+      SortOrder: Number(item.sortOrder) || 0,
+      "Downtime Reason": item.downtimeReason || "",
+      Comment: item.comment || ""
+    }));
+
+  return { semanas, filas };
+}
+
+function crearResumenExcelPlanning(semanas) {
+  return semanas.map((semana, index) => {
+    const items = planningData.filter(item => item.week === semana.week);
+    const noActivity = items.filter(item => item.planningType === "NoActivity").length;
+    const operativos = items.filter(item => item.planningType !== "NoActivity");
+    const cosechados = operativos.filter(item => item.cosechado).length;
+    const planificados = operativos.length - cosechados;
+
+    return {
+      "Visible Position": index === 0 ? "Previous" : index === 1 ? "Central" : "Next",
+      Week: semana.week,
+      Planificados: planificados,
+      Cosechados: cosechados,
+      "No Activity": noActivity,
+      Total: items.length
+    };
+  });
+}
+
+function aplicarAnchosHojaPlanning(hoja, anchos) {
+  hoja["!cols"] = anchos.map(width => ({ wch: width }));
+}
+
+async function exportarPlanningExcel() {
+  const boton = document.getElementById("btnExportPlanningExcel");
+  const textoOriginal = boton?.textContent || "📊 Export Excel";
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "Generando...";
+  }
+
+  try {
+    await asegurarLibreriaExcelPlanning();
+
+    const { semanas, filas } = obtenerFilasExcelPlanning();
+    const resumen = crearResumenExcelPlanning(semanas);
+
+    const workbook = window.XLSX.utils.book_new();
+
+    const hojaPlanning = window.XLSX.utils.json_to_sheet(
+      filas.length ? filas : [{
+        Week: "",
+        Combine: "",
+        Location: "",
+        Crop: "",
+        "AOI ID": "",
+        "Planning Type": "",
+        Status: "",
+        "Planting Date": "",
+        "Actual Combine": "",
+        SortOrder: ""
+      }]
+    );
+
+    aplicarAnchosHojaPlanning(
+      hojaPlanning,
+      [18, 13, 22, 24, 18, 15, 13, 16, 15, 10]
+    );
+
+    hojaPlanning["!autofilter"] = {
+      ref: hojaPlanning["!ref"] || "A1:J1"
+    };
+
+    const hojaSummary = window.XLSX.utils.json_to_sheet(resumen);
+    aplicarAnchosHojaPlanning(hojaSummary, [18, 18, 14, 12, 10]);
+
+    window.XLSX.utils.book_append_sheet(
+      workbook,
+      hojaPlanning,
+      "Planning"
+    );
+
+    window.XLSX.utils.book_append_sheet(
+      workbook,
+      hojaSummary,
+      "Summary"
+    );
+
+    const nombre = nombreArchivoPlanning(
+      `Harvesting_Planning_${semanas[0].week}_${semanas[2].week}`
+    );
+
+    window.XLSX.writeFile(
+      workbook,
+      `${nombre}.xlsx`
+    );
+
+  } catch (error) {
+    console.error("Error exportando Planning a Excel", error);
+    alert("No se pudo generar el archivo Excel de Planning");
+  } finally {
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent = textoOriginal;
+    }
+  }
+}
+
+async function exportarPlanning(formato) {
+  const botones = [
+    document.getElementById("btnExportPlanningPDF"),
+    document.getElementById("btnExportPlanningPNG"),
+    document.getElementById("btnExportPlanningExcel")
+  ].filter(Boolean);
+  const textos = botones.map(b => b.textContent);
+  botones.forEach(b => { b.disabled = true; b.textContent = "Generando..."; });
+  let reporte;
+  try {
+    await asegurarLibreriasExportPlanning();
+    reporte = crearReporteExportPlanning();
+    const canvas = await window.html2canvas(reporte.node, {
+      backgroundColor:"#ffffff", scale:1.35, useCORS:true, logging:false, windowWidth:1650, scrollX:0, scrollY:0
+    });
+    const nombre = nombreArchivoPlanning(`Harvesting_Planning_${reporte.semanas[0].week}_${reporte.semanas[2].week}`);
+    if (formato === "png") descargarPlanningPNG(canvas, nombre);
+    else descargarPlanningPDF(canvas, nombre);
+  } catch (error) {
+    console.error("Error exportando Planning", error);
+    alert("No se pudo generar el archivo de Planning");
+  } finally {
+    reporte?.node?.remove();
+    botones.forEach((b,i) => { b.disabled = false; b.textContent = textos[i]; });
+  }
+}
+
+function agregarBotonesExportPlanning() {
+  const toolbar = document.getElementById("planningToolbar");
+  if (!toolbar) return;
+  let grupo = document.getElementById("planningExportActions");
+  if (!grupo) {
+    grupo = document.createElement("div");
+    grupo.id = "planningExportActions";
+    grupo.style.display = "flex";
+    grupo.style.alignItems = "center";
+    grupo.style.gap = "8px";
+    grupo.style.marginLeft = "auto";
+    grupo.innerHTML = `
+      <button id="btnExportPlanningPDF" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">📄 Export PDF</button>
+      <button id="btnExportPlanningPNG" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">🖼 Export PNG</button>
+      <button id="btnExportPlanningExcel" type="button" style="padding:8px 12px;border:1px solid #c7d7cd;border-radius:9px;background:#fff;color:#0b6b3a;font-size:12px;font-weight:800;cursor:pointer;">📊 Export Excel</button>`;
+    toolbar.style.display = "flex";
+    toolbar.style.alignItems = "center";
+    toolbar.style.gap = "8px";
+    toolbar.style.flexWrap = "wrap";
+    toolbar.appendChild(grupo);
+  }
+  const pdf = document.getElementById("btnExportPlanningPDF");
+  const png = document.getElementById("btnExportPlanningPNG");
+  if (pdf && !pdf.dataset.exportReady) {
+    pdf.dataset.exportReady = "1";
+    pdf.addEventListener("click", () => exportarPlanning("pdf"));
+  }
+  if (png && !png.dataset.exportReady) {
+    png.dataset.exportReady = "1";
+    png.addEventListener("click", () => exportarPlanning("png"));
+  }
+  const excel = document.getElementById("btnExportPlanningExcel");
+  if (excel && !excel.dataset.exportReady) {
+    excel.dataset.exportReady = "1";
+    excel.addEventListener("click", exportarPlanningExcel);
+  }
+}
+
+function renderPlanningBoard() {
+    const esViewerPlanning = esPlanningViewer();
+
+  const semanas =
+    obtenerSemanasPlanningVisibles();
+
+  semanaPlanningVisible =
+    semanas[1].week;
+
+  const hayCambios =
+    planningChanges.length > 0;
+
+  document.getElementById(
+    "planningGrid"
+  ).innerHTML = `
+
+    <div style="
+      height:calc(100vh - 126px);
+      min-height:540px;
+      max-height:900px;
+      display:grid;
+      grid-template-rows:auto auto auto minmax(0, 1fr) auto;
+      padding:7px 16px 8px;
+      box-sizing:border-box;
+      background:#ffffff;
+      overflow:hidden;
+    ">
+
+      <div
+        id="planningWeekNavigator"
+        style="
+          display:grid;
+          grid-template-columns:34px 1fr 34px;
+          align-items:center;
+          gap:9px;
+          min-height:31px;
+          margin-bottom:3px;
+        "
+      >
+
+        <button
+          id="btnPlanningAnterior"
+          type="button"
+          title="Mostrar una semana anterior"
+          style="
+            width:34px;
+            height:30px;
+            border:1px solid #b9c9bf;
+            border-radius:8px;
+            background:white;
+            color:#0b6b3a;
+            font-size:19px;
+            font-weight:800;
+            cursor:pointer;
+            padding:0;
+          "
+        >‹</button>
+
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:9px;
+          min-width:0;
+          white-space:nowrap;
+        ">
+<span style="
+  font-size:13px;
+  font-weight:700;
+  color:#617265;
+  opacity:.75;
+">
+  ${semanas[0].week}
+</span>
+
+<span style="color:#a7b5ac;">•</span>
+
+<span style="
+  font-size:15px;
+  font-weight:900;
+  color:#0b6b3a;
+  background:#e8f4ec;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid #cbe4d3;
+">
+  ${semanas[1].week}
+</span>
+
+<span style="color:#a7b5ac;">•</span>
+
+<span style="
+  font-size:13px;
+  font-weight:700;
+  color:#617265;
+  opacity:.75;
+">
+  ${semanas[2].week}
+</span>
+          <button
+            id="btnPlanningHoy"
+            type="button"
+            title="Volver a la semana actual"
+            style="
+              border:none;
+              background:none;
+              padding:0 0 0 4px;
+              color:#627369;
+              font-size:13px;
+              cursor:pointer;
+              text-decoration:underline;
+              white-space:nowrap;
+            "
+          >Hoy</button>
+        </div>
+
+        <button
+          id="btnPlanningSiguiente"
+          type="button"
+          title="Mostrar una semana siguiente"
+          style="
+            width:34px;
+            height:30px;
+            border:1px solid #b9c9bf;
+            border-radius:8px;
+            background:white;
+            color:#0b6b3a;
+            font-size:19px;
+            font-weight:800;
+            cursor:pointer;
+            padding:0;
+          "
+        >›</button>
+
+      </div>
+
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:8px;
+        min-height:20px;
+        margin:0 8px 4px;
+      ">
+        ${renderLeyendaEstadoPlanning()}
+        <span style="color:#7a867f;font-size:11px;line-height:1;">
+          ${esViewerPlanning ? "Modo Viewer · Solo lectura" : "Las tarjetas sembradas pueden moverse o eliminarse."}
+        </span>
+      </div>
+
+      <div style="
+        display:grid;
+        grid-template-columns:repeat(8, minmax(0, 1fr));
+        gap:8px;
+        padding:0 8px 5px;
+        background:white;
+        z-index:5;
+      ">
+        ${renderEncabezadoCombines()}
+      </div>
+
+      <div
+        id="planningWeeksScroll"
+        style="
+          min-height:0;
+          overflow-y:auto;
+          overflow-x:hidden;
+          overscroll-behavior:contain;
+          scrollbar-gutter:stable;
+          padding:0 5px 8px 0;
+        "
+      >
+        <div style="
+          display:grid;
+          gap:8px;
+          padding-bottom:4px;
+        ">
+          ${semanas
+            .map(renderBloqueSemanaPlanning)
+            .join("")}
+        </div>
+      </div>
+
+<div
+  class="planning-save-container"
+  style="
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    min-height:46px;
+    padding:6px 4px 0;
+    border-top:1px solid #e5ebe7;
+    background:white;
+    z-index:20;
+  "
+>
+        <button
+          id="btnGuardarCambiosPlanning"
+          type="button"
+          ${hayCambios ? "" : "disabled"}
+          style="
+            border:none;
+            border-radius:9px;
+            padding:9px 14px;
+            background:${hayCambios ? "#0b6b3a" : "#cfd8d3"};
+            color:white;
+            font-weight:800;
+            box-shadow:${
+              hayCambios
+                ? "0 6px 18px rgba(11,107,58,.24)"
+                : "none"
+            };
+            cursor:${hayCambios ? "pointer" : "default"};
+          "
+        >
+          💾 Guardar cambios${
+            hayCambios
+              ? ` (${planningChanges.length})`
+              : ""
+          }
+        </button>
+      </div>
+
+    </div>
+  `;
+
+  asegurarBotonNoActivityPlanning();
+  agregarBotonesExportPlanning();
+    if (esViewerPlanning) {
+      if (btnAddPlanning) btnAddPlanning.style.display = "none";
+      if (btnAddSpecialPlanning) btnAddSpecialPlanning.style.display = "none";
+      if (planningForm) planningForm.hidden = true;
+      document.getElementById("specialPlanningForm")?.setAttribute("hidden", "");
+      document.getElementById("noActivityPlanningForm")?.setAttribute("hidden", "");
+      planningChanges = [];
+    }
+    activarInteraccionesPlanning();
+
+}
+
+function estilizarFormularioMasterPlanning() {
+
+  if (!planningForm) {
+    return;
+  }
+
+  planningForm.style.margin =
+    "10px 0 12px";
+
+  planningForm.style.padding =
+    "12px";
+
+  planningForm.style.border =
+    "1px solid #d9e3dc";
+
+  planningForm.style.borderRadius =
+    "10px";
+
+  planningForm.style.background =
+    "#f8fbf9";
+
+  planningForm.style.boxSizing =
+    "border-box";
+
+  let titulo =
+    document.getElementById(
+      "masterPlanningFormTitle"
+    );
+
+  if (!titulo) {
+
+    titulo =
+      document.createElement("div");
+
+    titulo.id =
+      "masterPlanningFormTitle";
+
+    titulo.textContent =
+      "Master Planning";
+
+    titulo.style.marginBottom =
+      "10px";
+
+    titulo.style.color =
+      "#173f2a";
+
+    titulo.style.fontSize =
+      "14px";
+
+    titulo.style.fontWeight =
+      "800";
+
+    planningForm.prepend(titulo);
+
+  }
+
+  const grid =
+    planningForm.querySelector(
+      ".planning-form-grid"
+    );
+
+  if (grid) {
+
+    grid.style.display = "grid";
+
+    grid.style.gridTemplateColumns =
+      "repeat(3, minmax(0, 1fr))";
+
+    grid.style.gap = "10px";
+
+    grid.style.alignItems = "start";
+
+  }
+
+  planningForm
+    .querySelectorAll("label")
+    .forEach(
+      label => {
+
+        label.style.display = "block";
+        label.style.marginBottom = "4px";
+        label.style.color = "#536159";
+        label.style.fontSize = "11px";
+        label.style.fontWeight = "700";
+
+      }
+    );
+
+  planningForm
+    .querySelectorAll("select")
+    .forEach(
+      select => {
+
+        select.style.width = "100%";
+        select.style.boxSizing = "border-box";
+        select.style.padding = "9px";
+        select.style.border =
+          "1px solid #bfc7c1";
+        select.style.borderRadius = "8px";
+        select.style.background = "white";
+        select.style.color = "#25352c";
+        select.style.fontSize = "13px";
+
+      }
+    );
+
+  const preview =
+    document.getElementById(
+      "planningAoiPreview"
+    );
+
+  if (preview) {
+
+    preview.style.minHeight = "38px";
+    preview.style.maxHeight = "74px";
+    preview.style.overflowY = "auto";
+    preview.style.boxSizing = "border-box";
+    preview.style.padding = "9px";
+    preview.style.border =
+      "1px solid #bfc7c1";
+    preview.style.borderRadius = "8px";
+    preview.style.background = "white";
+    preview.style.color = "#25352c";
+    preview.style.fontSize = "12px";
+    preview.style.lineHeight = "1.35";
+
+  }
+
+  const actions =
+    planningForm.querySelector(
+      ".planning-form-actions"
+    );
+
+  if (actions) {
+
+    actions.style.display = "flex";
+    actions.style.justifyContent = "flex-end";
+    actions.style.gap = "8px";
+    actions.style.marginTop = "12px";
+
+  }
+
+  if (btnCancelarPlanning) {
+
+    btnCancelarPlanning.style.padding =
+      "8px 12px";
+
+    btnCancelarPlanning.style.border =
+      "1px solid #bfc7c1";
+
+    btnCancelarPlanning.style.borderRadius =
+      "8px";
+
+    btnCancelarPlanning.style.background =
+      "white";
+
+    btnCancelarPlanning.style.color =
+      "#536159";
+
+    btnCancelarPlanning.style.fontWeight =
+      "700";
+
+    btnCancelarPlanning.style.cursor =
+      "pointer";
+
+  }
+
+  if (btnGuardarPlanning) {
+
+    btnGuardarPlanning.style.padding =
+      "8px 12px";
+
+    btnGuardarPlanning.style.border =
+      "none";
+
+    btnGuardarPlanning.style.borderRadius =
+      "8px";
+
+    btnGuardarPlanning.style.background =
+      "#0b6b3a";
+
+    btnGuardarPlanning.style.color =
+      "white";
+
+    btnGuardarPlanning.style.fontWeight =
+      "800";
+
+    btnGuardarPlanning.style.cursor =
+      "pointer";
+
+  }
+
+}
+
+btnPlanning.addEventListener(
+  "click",
+  async () => {
+
+    modalPlanning.classList.add(
+      "visible"
+    );
+
+    planningChanges = [];
+    planningWeekOffset = 0;
+    planningReferenceStart =
+      obtenerInicioSemana(new Date());
+
+    await cargarPlanningDesdeSharePoint();
+
+    renderPlanningBoard();
+
+  }
+);
+
+btnAddPlanning?.addEventListener(
+  "click",
+  () => {
+      if (esPlanningViewer()) return;
+
+    estilizarFormularioMasterPlanning();
+    cargarLocalidadesPlanning();
+    cargarSemanasPlanning();
+
+    const specialForm =
+      document.getElementById(
+        "specialPlanningForm"
+      );
+
+    if (specialForm) {
+      specialForm.hidden = true;
+    }
+
+    planningForm.hidden =
+      false;
+
+  }
+);
+
+btnAddSpecialPlanning?.addEventListener(
+  "click",
+  prepararFormularioSpecialPlanning
+);
+
+btnCancelarPlanning?.addEventListener(
+  "click",
+  () => {
+
+    planningForm.hidden =
+      true;
+
+  }
+);
+btnGuardarPlanning?.addEventListener(
+  "click",
+  async () => {
+      if (esPlanningViewer()) return;
+
+    const locality =
+      document.getElementById(
+        "planningLocality"
+      ).value;
+
+    const crop =
+      document.getElementById(
+        "planningCrop"
+      ).value;
+
+    const week =
+      document.getElementById(
+        "planningWeek"
+      ).value;
+
+    const combine =
+      document.getElementById(
+        "planningCombine"
+      ).value;
+
+    if (
+      !locality ||
+      !crop ||
+      !week ||
+      !combine
+    ) {
+
+      alert(
+        "Complete todos los campos"
+      );
+
+      return;
+    }
+
+    const registro =
+      obtenerSitiosDisponiblesPlanning()
+        .find(
+          sitio =>
+            limpiarTexto(
+              sitio.Location
+            ) === locality &&
+            limpiarTexto(
+              sitio.Crop
+            ) === crop
+        );
+
+    if (!registro) {
+      return;
+    }
+
+    const aoiId =
+      limpiarTexto(
+        registro["AOI ID"]
+      );
+const existe =
+  planningData.some(
+    item =>
+      limpiarTexto(
+        item.aoiId
+      ) === aoiId
+  );
+
+if (existe) {
+
+  alert(
+    "Este AOI ya se encuentra planificado"
+  );
+
+  return;
+
+}
+    try {
+
+      const response =
+        await fetch(
+          URL_FLOW_PLANNING,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              PlanningModule: "Harvesting",
+              AOI_ID: aoiId,
+              Location: locality,
+              Crop: crop,
+              PlanningType: "Master",
+              Week: week,
+              Combine: combine,
+              SortOrder:
+                planningData.filter(
+                  item =>
+                    item.week === week &&
+                    item.combine === combine
+                ).length
+            })
+          }
+        );
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Error Flow Planning"
+        );
+
+      }
+
+      planningData.push({
+
+        week,
+
+        combine,
+
+        location: locality,
+
+        crop,
+
+        aoiId,
+
+        planningType: "Master",
+
+        sortOrder:
+          planningData.filter(
+            item =>
+              item.week === week &&
+              item.combine === combine
+          ).length
+
+      });
+
+      planningForm.hidden =
+        true;
+
+      alert(
+        "Planning guardado correctamente"
+      );
+
+      btnPlanning.click();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error guardando Planning"
+      );
+
+    }
+
+  }
+);
+document
+  .getElementById(
+    "planningLocality"
+  )
+  ?.addEventListener(
+    "change",
+    cargarCultivosPlanning
+  );
+document
+  .getElementById(
+    "planningCrop"
+  )
+  ?.addEventListener(
+    "change",
+    actualizarAoiPlanning
+  );
+cerrarPlanning.addEventListener(
+  "click",
+  () => {
+
+    modalPlanning.classList.remove(
+      "visible"
+    );
+
+  }
+);
+
+
 const btnCombineStats =
   document.getElementById(
     "btnCombineStats"
