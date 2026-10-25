@@ -1421,3 +1421,34 @@ font-size: 28px;
     font-size: 17px !important;
   }
 }
+
+/* =========================================================
+   HARVESTING PLANNING - FIX LAYOUT MODAL
+   Mantiene toolbar visible y reserva el resto para el board.
+   ========================================================= */
+#modalPlanning .modal-timeline-contenido {
+  box-sizing: border-box;
+  overflow: hidden;
+  min-height: 0;
+}
+#modalPlanning #planningToolbar {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+#modalPlanning #planningGrid {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+#modalPlanning #planningForm,
+#modalPlanning #specialPlanningForm,
+#modalPlanning #noActivityPlanningForm {
+  flex: 0 0 auto;
+}
