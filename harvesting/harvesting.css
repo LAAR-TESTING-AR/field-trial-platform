@@ -1374,3 +1374,50 @@ font-size: 28px;
   }
 
 }
+
+/* Dashboard buttons aligned with Planting */
+.dashboard-botones {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+#btnPlanning,
+#btnTimeline,
+#btnCombineStats {
+  width: 100% !important;
+  margin-top: 8px !important;
+  padding: 10px 12px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: #e6efe8 !important;
+  color: #0b6b3a !important;
+  font-size: 17px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+#btnPlanning { order: 1 !important; }
+#btnTimeline { order: 2 !important; }
+#btnCombineStats { order: 3 !important; }
+#btnPlanning:hover,
+#btnTimeline:hover,
+#btnCombineStats:hover { background: #d9e8dd !important; }
+#btnPlanning .icono-timeline,
+#btnTimeline .icono-timeline,
+#btnCombineStats .icono-timeline { font-size: 22px !important; }
+@media (max-width: 900px) {
+  .dashboard-botones { flex-direction: column !important; gap: 12px !important; }
+  #btnPlanning,
+  #btnTimeline,
+  #btnCombineStats {
+    flex: none !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+    padding: 10px 12px !important;
+    font-size: 17px !important;
+  }
+}
