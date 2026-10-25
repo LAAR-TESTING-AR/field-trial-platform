@@ -2492,8 +2492,8 @@ function renderTarjetasCombine(
   return planningData
     .filter(
       item =>
-        item.combine === combine &&
-        item.week === week
+        normalizarCombinePlanning(item.combine) === normalizarCombinePlanning(combine) &&
+        limpiarTexto(item.week) === limpiarTexto(week)
     )
     .sort(
       (a, b) =>
@@ -3981,7 +3981,7 @@ planningData = data
         item.Week,
 
       combine:
-        item.Combine,
+        normalizarCombinePlanning(item.Combine),
 
       aoiId:
         item.AOI_ID,
