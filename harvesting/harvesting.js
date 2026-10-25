@@ -4827,6 +4827,29 @@ function agregarBotonesExportPlanning() {
 function renderPlanningBoard() {
     const esViewerPlanning = esPlanningViewer();
 
+  const planningGrid = document.getElementById("planningGrid");
+  if (!planningGrid) {
+    console.error("Planning: no se encontró #planningGrid");
+    return;
+  }
+
+  // Evita que cambios de CSS del modal oculten o colapsen el tablero.
+  planningGrid.hidden = false;
+  planningGrid.style.display = "block";
+  planningGrid.style.visibility = "visible";
+  planningGrid.style.opacity = "1";
+  planningGrid.style.minHeight = "0";
+  planningGrid.style.flex = "1 1 auto";
+  planningGrid.style.overflow = "hidden";
+
+  const contenidoModal = planningGrid.closest(".modal-timeline-contenido");
+  if (contenidoModal) {
+    contenidoModal.style.display = "flex";
+    contenidoModal.style.flexDirection = "column";
+    contenidoModal.style.maxHeight = "96vh";
+    contenidoModal.style.overflow = "hidden";
+  }
+
   const semanas =
     obtenerSemanasPlanningVisibles();
 
@@ -4836,9 +4859,7 @@ function renderPlanningBoard() {
   const hayCambios =
     planningChanges.length > 0;
 
-  document.getElementById(
-    "planningGrid"
-  ).innerHTML = `
+  planningGrid.innerHTML = `
 
     <div style="
       height:calc(100vh - 126px);
