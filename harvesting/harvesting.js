@@ -3954,6 +3954,18 @@ async function cargarPlanningDesdeSharePoint() {
 const data =
   await response.json();
 
+console.table(data
+  .filter(item => limpiarTexto(item.PlanningModule?.Value || item.PlanningModule) === "Harvesting")
+  .map(item => ({
+    ID: item.ID,
+    AOI_ID: item.AOI_ID,
+    Week: item.Week,
+    Combine_raw: item.Combine,
+    Planter_raw: item.Planter,
+    PlanningModule: item.PlanningModule?.Value || item.PlanningModule
+  }))
+);
+
 planningData = data
   .filter(item => limpiarTexto(item.PlanningModule?.Value || item.PlanningModule) === "Harvesting")
   .map(
@@ -3981,7 +3993,9 @@ planningData = data
         item.Week,
 
       combine:
-        normalizarCombinePlanning(item.Combine),
+        normalizarCombinePlanning(
+          item.Combine || item.Planter || ""
+        ),
 
       aoiId:
         item.AOI_ID,
@@ -4043,6 +4057,12 @@ planningData = data
 
   }
 );
+
+planningData = planningData.map(item => ({
+  ...item,
+  combine: normalizarCombinePlanning(item.combine) || "Sin Combine"
+}));
+
 console.log(
   "PlanningData cargado",
   planningData
