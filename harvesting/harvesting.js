@@ -1823,7 +1823,7 @@ function asegurarPlanningHarvestingUI() {
     const btn=document.createElement("button"); btn.id="btnPlanning"; btn.innerHTML='<span class="icono-timeline">📅</span> Planning'; acciones.appendChild(btn);
   }
   const modal=document.createElement("div"); modal.id="modalPlanning"; modal.className="modal-timeline";
-  modal.innerHTML=`<div class="modal-timeline-contenido" style="width:min(98vw,1700px);max-width:none;"><div class="modal-timeline-header"><h3>Harvesting Planning</h3><button id="cerrarPlanning">✕</button></div><div id="planningToolbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;"><button id="btnAddPlanning" type="button">＋ Add Planning</button><button id="btnAddSpecialPlanning" type="button">🌱 Nursery / Special</button></div><div id="planningForm" hidden><div class="planning-form-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;"><div><label>Location</label><select id="planningLocality"><option value="">Seleccionar localidad</option></select></div><div><label>Crop</label><select id="planningCrop" disabled><option value="">Seleccionar cultivo</option></select></div><div><label>Week</label><select id="planningWeek"></select></div><div><label>Combine</label><select id="planningCombine"><option value="">Seleccionar cosechadora</option>${["Contractor","CR5.85AA","CR5.85AC","CR6080","Hege","JD1470","JD1550_1","JD1550_2","JD1550_3","SPSC40","TR87","TR88","TR89","Wintersteiger"].map(x=>`<option value="${x}">${x}</option>`).join("")}</select></div><div style="grid-column:span 2"><label>AOI disponibles</label><div id="planningAoiPreview">Seleccione localidad y cultivo</div></div></div><div class="planning-form-actions"><button id="btnCancelarPlanning" type="button">Cancelar</button><button id="btnGuardarPlanning" type="button">Agregar al Planning</button></div></div><div id="planningGrid"></div></div>`;
+  modal.innerHTML=`<div class="modal-timeline-contenido" style="width:min(98vw,1700px);max-width:none;"><div class="modal-timeline-header"><h3>Harvesting Planning</h3><button id="cerrarPlanning">✕</button></div><div id="planningToolbar" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 12px;"><button id="btnAddPlanning" type="button">＋ Add Planning</button><button id="btnAddSpecialPlanning" type="button">🌱 Nursery / Special</button></div><div id="planningForm" hidden><div class="planning-form-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;"><div><label>Location</label><select id="planningLocality"><option value="">Seleccionar localidad</option></select></div><div><label>Crop</label><select id="planningCrop" disabled><option value="">Seleccionar cultivo</option></select></div><div><label>Week</label><select id="planningWeek"></select></div><div><label>Combine</label><select id="planningCombine"><option value="">Seleccionar cosechadora</option>${["CR5.85AA","CR5.85AC","CR6080","Hege","JD1470","JD1550_1","JD1550_2","JD1550_3","SPSC40","TR87","TR88","TR89","Wintersteiger"].map(x=>`<option value="${x}">${x}</option>`).join("")}</select></div><div style="grid-column:span 2"><label>AOI disponibles</label><div id="planningAoiPreview">Seleccione localidad y cultivo</div></div></div><div class="planning-form-actions"><button id="btnCancelarPlanning" type="button">Cancelar</button><button id="btnGuardarPlanning" type="button">Agregar al Planning</button></div></div><div id="planningGrid"></div></div>`;
   document.body.appendChild(modal);
 }
 asegurarPlanningHarvestingUI();
@@ -1885,9 +1885,15 @@ function esPlanningViewer() {
   return params.get("mode") === "viewer" || window.FIELD_TRIAL_FORCE_VIEWER === true || Boolean(window.FieldTrialAppMode?.isViewer);
 }
 const harvestingCombines = [
-  "Contractor", "CR5.85AA", "CR5.85AC", "CR6080", "Hege", "JD1470",
+  "CR5.85AA", "CR5.85AC", "CR6080", "Hege", "JD1470",
   "JD1550_1", "JD1550_2", "JD1550_3", "SPSC40", "TR87", "TR88", "TR89", "Wintersteiger"
 ];
+function normalizarCombinePlanning(valor) {
+  const bruto = limpiarTexto(valor?.Value || valor?.value || valor);
+  if (!bruto) return "";
+  const clave = normalizarTexto(bruto).replace(/[\s_-]+/g, "");
+  return harvestingCombines.find(c => normalizarTexto(c).replace(/[\s_-]+/g, "") === clave) || bruto;
+}
 async function eliminarPlanning(
   id
 ) {
@@ -2594,9 +2600,13 @@ function obtenerSemanasPlanningVisibles() {
 
 }
 
+function obtenerCombinesPlanningVisibles() {
+  const extras = [...new Set(planningData.map(i => normalizarCombinePlanning(i.combine)).filter(c => c && c !== "Contractor" && !harvestingCombines.includes(c)))];
+  return [...harvestingCombines, ...extras];
+}
 function renderEncabezadoCombines() {
 
-  return harvestingCombines
+  return obtenerCombinesPlanningVisibles()
     .map(
       combine => `
         <div style="
@@ -2707,14 +2717,14 @@ function renderBloqueSemanaPlanning(
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(8, minmax(0, 1fr));
+        grid-template-columns:repeat(7, minmax(0, 1fr));
         gap:8px;
         align-items:stretch;
         padding:8px;
         min-height:128px;
         box-sizing:border-box;
       ">
-        ${harvestingCombines
+        ${obtenerCombinesPlanningVisibles()
           .map(
             combine =>
               renderColumnaCombine(
@@ -4043,7 +4053,10 @@ console.table(
       aoiId: item.aoiId,
       location: item.location,
       crop: item.crop,
-      planningType: item.planningType
+      planningType: item.planningType,
+      week: item.week,
+      combine: item.combine,
+      harvestingStatus: item.harvestingStatus
     })
   )
 );
@@ -4943,7 +4956,7 @@ function renderPlanningBoard() {
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(8, minmax(0, 1fr));
+        grid-template-columns:repeat(7, minmax(0, 1fr));
         gap:8px;
         padding:0 8px 5px;
         background:white;
