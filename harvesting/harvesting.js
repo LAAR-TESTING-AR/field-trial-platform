@@ -2600,8 +2600,16 @@ function obtenerSemanasPlanningVisibles() {
 
 }
 
+function obtenerCombineVisualPlanning(item) {
+  return normalizarCombinePlanning(item?.combine || item?.actualCombine || "") || "Sin Combine";
+}
+
 function obtenerCombinesPlanningVisibles() {
-  const extras = [...new Set(planningData.map(i => obtenerCombineVisualPlanning(i)).filter(c => c && c !== "Contractor" && !harvestingCombines.includes(c)))];
+  const extras = [...new Set(
+    planningData
+      .map(item => obtenerCombineVisualPlanning(item))
+      .filter(combine => combine && combine !== "Contractor" && combine !== "Sin Combine" && !harvestingCombines.includes(combine))
+  )];
   return [...harvestingCombines, ...extras];
 }
 function renderEncabezadoCombines() {
@@ -2717,7 +2725,7 @@ function renderBloqueSemanaPlanning(
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(7, minmax(0, 1fr));
+        grid-template-columns:repeat(${obtenerCombinesPlanningVisibles().length}, minmax(0, 1fr));
         gap:8px;
         align-items:stretch;
         padding:8px;
@@ -4997,7 +5005,7 @@ function renderPlanningBoard() {
 
       <div style="
         display:grid;
-        grid-template-columns:repeat(7, minmax(0, 1fr));
+        grid-template-columns:repeat(${obtenerCombinesPlanningVisibles().length}, minmax(0, 1fr));
         gap:8px;
         padding:0 8px 5px;
         background:white;
