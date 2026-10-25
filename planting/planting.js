@@ -2392,6 +2392,7 @@ async function guardarCambiosPlanning() {
                 "application/json"
             },
             body: JSON.stringify({
+              PlanningModule: "Planting",
               ID: cambio.id,
               Week: cambio.week,
               Planter: cambio.planter,
@@ -3134,6 +3135,7 @@ async function actualizarEstadoSpecialPlanning(item, estadoNuevo, fechaNueva = "
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        PlanningModule: "Planting",
         ID: Number(item.id),
         Week: item.week || "",
         Planter: item.planter || "",
@@ -3913,11 +3915,11 @@ async function guardarNoActivityPlanning() {
   try {
     if (editId) {
       const item = planningData.find(x => Number(x.id) === editId);
-      const response = await fetch(URL_FLOW_PLANNING_UPDATE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ ID:editId, Week:week, Planter:planter, SortOrder:Number(item?.sortOrder)||0, DowntimeReason:reason, Comment:comment }) });
+      const response = await fetch(URL_FLOW_PLANNING_UPDATE, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ PlanningModule:"Planting", ID:editId, Week:week, Planter:planter, SortOrder:Number(item?.sortOrder)||0, DowntimeReason:reason, Comment:comment }) });
       if (!response.ok) throw new Error("Error actualizando No Activity");
     } else {
       const sortOrder = planningData.filter(x => x.week === week && x.planter === planter).length;
-      const response = await fetch(URL_FLOW_PLANNING, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ AOI_ID:"", Location:"", Crop:"", PlanningType:"NoActivity", Week:week, Planter:planter, SortOrder:sortOrder, DowntimeReason:reason, Comment:comment }) });
+      const response = await fetch(URL_FLOW_PLANNING, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ PlanningModule:"Planting", AOI_ID:"", Location:"", Crop:"", PlanningType:"NoActivity", Week:week, Planter:planter, SortOrder:sortOrder, DowntimeReason:reason, Comment:comment }) });
       if (!response.ok) throw new Error("Error creando No Activity");
     }
     form.hidden = true;
@@ -4262,6 +4264,7 @@ async function guardarSpecialPlanning() {
               "application/json"
           },
           body: JSON.stringify({
+            PlanningModule: "Planting",
             AOI_ID: aoiId,
             Location: location,
             Crop: crop,
@@ -4332,7 +4335,12 @@ async function cargarPlanningDesdeSharePoint() {
 const data =
   await response.json();
 
-planningData = data.map(
+planningData = data
+  .filter(item => {
+    const modulo = limpiarTexto(item.PlanningModule?.Value || item.PlanningModule);
+    return !modulo || modulo === "Planting";
+  })
+  .map(
   item => {
 
     const sitio =
@@ -4361,6 +4369,9 @@ planningData = data.map(
 
       aoiId:
         item.AOI_ID,
+
+      planningModule:
+        limpiarTexto(item.PlanningModule?.Value || item.PlanningModule) || "Planting",
 
       planningType:
         limpiarTexto(
@@ -6502,10 +6513,13 @@ if (existe) {
             },
 
             body: JSON.stringify({
+              PlanningModule: "Planting",
               AOI_ID: aoiId,
               Location: locality,
               Crop: crop,
               PlanningType: "Master",
+              PlantingStatus: "Planned",
+              PlantingDate: "",
               Week: week,
               Planter: planter,
               SortOrder:
