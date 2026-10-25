@@ -488,6 +488,9 @@ if (!planter) {
   planter
 );
 
+// Actualiza la tarjeta Master con la semana y sembradora reales.
+sincronizarPlanningConSiembraReal(aoiId, fecha, planter);
+
     /*
      * Actualización visual inmediata.
      */
@@ -2115,9 +2118,14 @@ Papa.parse(
     );
 cargarFiltrosTimeline();
 
+// Mostrar los puntos apenas termina de leerse el CSV.
+// El Flow de Planning se carga después y ya no bloquea el primer dibujo del mapa.
+actualizarVista();
+
 await cargarPlanningDesdeSharePoint();
 
-actualizarVista();
+// Solo recolorear el mapa con el estado Planificado, sin reconstruir filtros y dashboard.
+actualizarMapa(obtenerSitiosFiltrados());
 console.log(
 "Pendientes guardados:",
 obtenerSiembrasPendientes()
@@ -2279,6 +2287,67 @@ const plantingPlanters = [
   "BE19188",
   "PP23191"
 ];
+
+function obtenerSemanaPlanningDesdeFecha(fechaISO) {
+  if (!fechaISO) return "";
+  const partes = String(fechaISO).split("-").map(Number);
+  if (partes.length !== 3 || partes.some(Number.isNaN)) return "";
+  const fechaLocal = new Date(partes[0], partes[1] - 1, partes[2], 12, 0, 0);
+  return formatearRangoPlanning(obtenerInicioSemana(fechaLocal));
+}
+
+async function sincronizarPlanningConSiembraReal(aoiId, fecha, planter) {
+  const item = planningData.find(actual =>
+    normalizarTexto(actual.aoiId) === normalizarTexto(aoiId) &&
+    (actual.planningType === "Master" || !actual.planningType)
+  );
+
+  if (!item?.id) return false;
+
+  const week = obtenerSemanaPlanningDesdeFecha(fecha) || item.week;
+  const planterReal = limpiarTexto(planter);
+  const sortOrder = planningData.filter(actual =>
+    actual.id !== item.id &&
+    actual.week === week &&
+    actual.planter === planterReal
+  ).length;
+
+  // Reflejo inmediato: semana y sembradora realmente utilizadas.
+  item.week = week;
+  item.planter = planterReal;
+  item.actualPlanter = planterReal;
+  item.plantingDate = fecha;
+  item.plantingStatus = "Planted";
+  item.sembrado = true;
+  item.sortOrder = sortOrder;
+
+  if (document.getElementById("modalPlanning")?.classList.contains("visible")) {
+    renderPlanningBoard();
+  }
+
+  try {
+    const response = await fetch(URL_FLOW_PLANNING_UPDATE, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        PlanningModule: "Planting",
+        ID: Number(item.id),
+        Week: week,
+        Planter: planterReal,
+        SortOrder: sortOrder,
+        DowntimeReason: item.downtimeReason || "",
+        Comment: item.comment || "",
+        PlantingStatus: "Planted",
+        PlantingDate: fecha
+      })
+    });
+    if (!response.ok) throw new Error(`Error actualizando Planning ID ${item.id}`);
+    return true;
+  } catch (error) {
+    console.error("No se pudo sincronizar la siembra real con Planning", error);
+    return false;
+  }
+}
 async function eliminarPlanning(
   id
 ) {
@@ -5600,6 +5669,10 @@ function nombreArchivoPlanning(texto) {
   return String(texto || "Planting_Planning")
     .replace(/[\\/:*?"<>|]/g, "-")
     .replace(/\s+/g, "_");
+}
+
+function obtenerPlanterVisualPlanning(item) {
+  return limpiarTexto(item?.actualPlanter || item?.planter);
 }
 
 function renderTarjetaExportPlanning(item) {
