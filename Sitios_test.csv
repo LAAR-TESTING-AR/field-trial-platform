@@ -66,7 +66,7 @@ ACCY04NALCHT,Altos de Chipion,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Late,AC,Córdoba,
 AACY04NTRENT,Trenque Lauquen,SPD,Corn,IMPACT 3R; R3; R2; OGCA,Early,AA,Buenos Aires,Oeste,-35.88023,-62.42794,-35.878036,-62.435056,09/25/2026,BE19182,,,D4 - 88000,Estandar,2.2338,Focke,Peralta Martinez,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAMG2T,Ameghino,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Oeste,-34.98381,-62.83995,,,,,,,D3 - 75000,Estandar,0.1968,Antunes,Peralta Martinez,,REFERENCE,,REFERENCE,
 AACY04NANGUT,Anguil,SPD,Corn,IMPACT 3R; R3; R2; OGCA; HYPER,Late,AA,La Pampa,Oeste,-36.64189,-63.9591,,,,,,,D2 - 65000,Baja,2.3715,Focke,Peralta Martinez,,REFERENCE,,REFERENCE,
-AACY04NARR2T,Arrecifes,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Nucleo,-33.871665,-60.176955,-33.859044,-60.170983,,,,,D3 - 75000,Estandar,0.1968,Romero Cuny,Mazzini,,VERIFIED,09/22/2026,VERIFIED,09/22/2026
+AACY04NARR2T,Arrecifes,SPD,Corn,IMPACT 3R,Late,AA,Buenos Aires,Nucleo,-33.871665,-60.176955,-33.859077,-60.171,,,,,D3 - 75000,Estandar,0.1968,Romero Cuny,Mazzini,,VERIFIED,09/22/2026,VERIFIED,10/26/2026
 AACY04NBA2HT,Balcarce,Contractor,Corn,HYPER,Late,XL,Buenos Aires,Sudeste,,,-37.917487,-58.28116,,,,,D2 - 65000,Estandar,0.1827,Cantero,Sarlangue,,REFERENCE,,REFERENCE,
 ANCY04NBANDT,Bandera,SPD,Corn,IMPACT 3R; IMPACT TROP; R3; R2; OGCA,Late,AN,Santiago Del Estero,NEA,-28.79009,-62.21952,,,,,,,D2 - 65000,Ultra baja,0,Zaffalon,Oggero,,REFERENCE,,REFERENCE,
 ANCY04NBUENT,Buenaventura,SPD,Corn,IMPACT 3R; IMPACT TROP; R2; OGCA,Late,AN,Salta,NOA,-24.95582,-64.29458,,,,,,,D1 - 55000,Baja,0,Miranda,Aris,Ver Genetic Disc. 1,REFERENCE,,REFERENCE,
@@ -128,7 +128,7 @@ AACY04NROJAS,Rojas,SPD,Corn - Stewarded,R3; GCA,Early,AA,Buenos Aires,Nucleo,-34
 AACY04NSARAS,Sarah,SPD,Corn - Stewarded,R3; GCA,Early,AA,La Pampa,Oeste,-35.023608,-63.49315,-35.036503,-63.495392,10/15/2026,BE19182,,,D2 - 65000,Estandar,0.306,Antunes,Peralta Martinez,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NZAVAS,Zavalla,SPD,Corn - Stewarded,R3; GCA,Early,AA,Santa Fe,Nucleo,-33.059316,-60.861879,-33.053846,-60.867941,10/21/2026,BE19187,,,D3 - 75000,Estandar,0.306,Vilchez,Traggiay,,VERIFIED,09/18/2026,VERIFIED,09/18/2026
 AACY04NAME2S,America,SPD,Corn - Stewarded,R3; GCA,Late,AA,Buenos Aires,Oeste,-35.63047,-63.07252,,,,,,,D2 - 65000,Estandar,0.306,Antunes,Peralta Martinez,,REFERENCE,,REFERENCE,
-AACY04NCAS2S,Casilda,SPD,Corn - Stewarded,R3; GCA,Late,AA,Santa Fe,Nucleo,-33.02955,-61.11021,,,,,,,D3 - 75000,Estandar,0.306,Romero Cuny,Mazzini,En Ramallo,REFERENCE,,REFERENCE,
+AACY04NCAS2S,Casilda,SPD,Corn - Stewarded,R3; GCA,Late,AA,Santa Fe,Nucleo,-33.541927,-60.157914,,,,,,,D3 - 75000,Estandar,0.306,Romero Cuny,Mazzini,En Ramallo,VERIFIED,10/26/2026,REFERENCE,
 ACCY04NCHAJS,Chajan,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Oeste,-33.538656,-64.938551,-33.52272,-64.940763,,,,,D2 - 65000,Estandar,0.3074,Milani,Espelet,,REFERENCE,,VERIFIED,10/23/2026
 ACCY04NCVIDS,Colonia Videla,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Centro,-31.90911,-63.5557,,,,,,,D3 - 75000,Baja,0.306,Gomez,Capristo,,REFERENCE,,REFERENCE,
 ACCY04NCORDS,Córdoba,SPD,Corn - Stewarded,R3; GCA,Late,AC,Córdoba,Centro,-31.47336,-64.01233,,,,,,,D2 - 65000,Estandar,0.306,Attme,Capristo,,REFERENCE,,REFERENCE,
