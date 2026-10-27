@@ -1424,7 +1424,7 @@ if (estado === "PENDIENTE") {
         data-aoi="${aoiId}">
         Registrar Cosecha
       </button>
-      <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="margin-left:6px">Estado / YLDLIM</button>
+      <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="display:block;width:100%;margin-top:7px;padding:9px 12px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">Estado / YLDLIM</button>
 
     `;
 
@@ -1594,32 +1594,26 @@ marcador.on(
         sitio["AOI ID"]
       );
 
-    const boton =
-      document.querySelector(
-        `.btn-registrar-cosecha[data-aoi="${aoiId}"]`
-      );
+    const boton = document.querySelector(
+      `.btn-registrar-cosecha[data-aoi="${aoiId}"]`
+    );
+    const botonEstado = document.querySelector(
+      `.btn-estado-cosecha[data-aoi="${aoiId}"]`
+    );
 
-    if (!boton) {
+    if (window.FieldTrialAppMode && window.FieldTrialAppMode.isViewer) {
+      boton?.remove();
+      botonEstado?.remove();
       return;
     }
-if (
-  window.FieldTrialAppMode &&
-  window.FieldTrialAppMode.isViewer
-) {
 
-  boton.remove();
+    if (boton) {
+      boton.onclick = () => abrirModalCosecha(aoiId);
+    }
 
-  return;
-
-}
-    boton.onclick =
-      async () => {
-
-  abrirModalCosecha(
-  aoiId
-);
-
-      };
+    if (botonEstado) {
+      botonEstado.onclick = () => abrirEstadoHarvesting(sitio);
+    }
 
   }
 );
