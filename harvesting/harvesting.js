@@ -520,12 +520,46 @@ function abrirEstadoHarvesting(sitio) {
   overlay.style.cssText="position:fixed;inset:0;z-index:32000;background:rgba(10,25,17,.5);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
   const panel=document.createElement("div"); panel.style.cssText="width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-sizing:border-box;box-shadow:0 22px 60px rgba(0,0,0,.28)";
   const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-  panel.innerHTML=`<div style="font-size:19px;font-weight:900;color:#173f2a">Harvest status / YLDLIM</div><div style="margin-top:4px;color:#617067;font-size:12px">${esc(sitio.Location)} · ${esc(sitio["AOI ID"])}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800">ESTADO DE COSECHA</label><select id="harvestStatusEdit" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;background:#fff"><option>Not harvested</option><option>In process</option><option>Drop</option></select><div id="dropReasonWrap" style="margin-top:13px"><label style="font-size:11px;font-weight:800">DROP REASON *</label><textarea id="dropReasonEdit" rows="3" style="width:100%;margin-top:5px;padding:10px;box-sizing:border-box;border:1px solid #bfcac3;border-radius:9px">${esc(sitio["Drop reason"])}</textarea></div><div id="yldlimWrap" style="margin-top:15px"><div style="font-size:11px;font-weight:800">YIELD LIMITATIONS</div><div id="yldlimList" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px;margin-top:8px">${YLDLIM_OPTIONS.map(o=>`<label style="font-size:12px"><input type="checkbox" value="${esc(o)}"> ${esc(o)}</label>`).join("")}</div></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-hs="cancel" type="button">Cancelar</button><button data-hs="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900">Guardar</button></div>`;
+  panel.innerHTML=`
+    <div style="font-size:19px;font-weight:900;color:#173f2a">Harvest status / YLDLIM</div>
+    <div style="margin-top:4px;color:#617067;font-size:12px">${esc(sitio.Location)} · ${esc(sitio["AOI ID"])}</div>
+
+    <label style="display:block;margin-top:16px;font-size:11px;font-weight:900;color:#536159">ESTADO DE COSECHA</label>
+    <select id="harvestStatusEdit" style="width:100%;margin-top:6px;padding:11px;border:1px solid #bfcac3;border-radius:9px;background:#fff;font-weight:700">
+      <option>Not harvested</option><option>In process</option><option>Drop</option>
+    </select>
+
+    <div id="dropReasonWrap" style="margin-top:14px">
+      <label style="font-size:11px;font-weight:900;color:#536159">DROP REASON *</label>
+      <textarea id="dropReasonEdit" rows="3" style="width:100%;margin-top:6px;padding:10px;box-sizing:border-box;border:1px solid #bfcac3;border-radius:9px;resize:vertical">${esc(sitio["Drop reason"])}</textarea>
+    </div>
+
+    <div id="yldlimWrap" style="margin-top:16px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:11px;font-weight:900;color:#536159">YIELD LIMITATIONS</div>
+          <div style="font-size:11px;color:#7b8780;margin-top:2px">Seleccioná una o más limitantes</div>
+        </div>
+        <span id="yldlimCount" style="font-size:11px;font-weight:800;color:#146b3c"></span>
+      </div>
+      <input id="yldlimSearch" type="search" placeholder="Buscar limitante..." style="width:100%;box-sizing:border-box;margin-top:9px;padding:9px 10px;border:1px solid #c7d1cb;border-radius:9px;outline:none">
+      <div id="yldlimList" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 10px;margin-top:9px;max-height:280px;overflow:auto;padding:2px">
+        ${YLDLIM_OPTIONS.map(o=>`<label data-yldlim-label style="display:flex;align-items:flex-start;gap:7px;padding:8px 9px;border:1px solid #dde5e0;border-radius:8px;background:${o === "NONE" ? "#f3f8f5" : "#fff"};font-size:12px;line-height:1.25;cursor:pointer"><input type="checkbox" value="${esc(o)}" style="margin-top:1px;accent-color:#167b43"> <span>${esc(o)}</span></label>`).join("")}
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px">
+      <button data-hs="cancel" type="button" style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;font-weight:800;cursor:pointer">Cancelar</button>
+      <button data-hs="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900;cursor:pointer">Guardar</button>
+    </div>`
   overlay.appendChild(panel); document.body.appendChild(overlay);
   const status=panel.querySelector("#harvestStatusEdit"); status.value=obtenerHarvestStatus(sitio);
   const checks=[...panel.querySelectorAll('#yldlimList input')]; const actuales=new Set(obtenerYldlimSeleccionadas(sitio)); checks.forEach(c=>c.checked=actuales.has(c.value));
+  const actualizarConteoYldlim=()=>{const elegidas=checks.filter(c=>c.checked).map(c=>c.value);panel.querySelector("#yldlimCount").textContent=elegidas.length ? `${elegidas.length} seleccionada${elegidas.length===1?"":"s"}` : "Sin selección";};
+  panel.querySelector("#yldlimSearch").oninput=e=>{const q=normalizarTexto(e.target.value);panel.querySelectorAll("[data-yldlim-label]").forEach(label=>{label.style.display=!q||normalizarTexto(label.textContent).includes(q)?"flex":"none";});};
   const refrescar=()=>{const drop=status.value==="Drop";panel.querySelector("#dropReasonWrap").style.display=drop?"block":"none";panel.querySelector("#yldlimWrap").style.display=drop?"none":"block"}; status.onchange=refrescar; refrescar();
-  checks.forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="NONE")checks.forEach(x=>{if(x!==c)x.checked=false});else{const n=checks.find(x=>x.value==="NONE");if(n)n.checked=false}});
+  checks.forEach(c=>c.onchange=()=>{if(c.checked){if(c.value==="NONE")checks.forEach(x=>{if(x!==c)x.checked=false});else{const n=checks.find(x=>x.value==="NONE");if(n)n.checked=false}}actualizarConteoYldlim();});
+  actualizarConteoYldlim();
   const cerrar=()=>overlay.remove(); panel.querySelector('[data-hs="cancel"]').onclick=cerrar; overlay.onclick=e=>{if(e.target===overlay)cerrar()};
   panel.querySelector('[data-hs="save"]').onclick=async e=>{const state=status.value;const reason=state==="Drop"?limpiarTexto(panel.querySelector("#dropReasonEdit").value):"";if(state==="Drop"&&!reason){alert("Ingrese una razón para el Drop");return}const sel=checks.filter(c=>c.checked).map(c=>c.value);const limits=state==="Drop"?"":(sel.length?sel.join("; "):"NONE");e.currentTarget.disabled=true;e.currentTarget.textContent="Guardando...";try{await actualizarEstadoHarvesting(sitio,state,reason,limits);cerrar()}catch(err){console.error(err);alert("No se pudo actualizar Harvest status");e.currentTarget.disabled=false;e.currentTarget.textContent="Guardar"}};
 }
@@ -1553,6 +1587,7 @@ if (
 
     const drop = esDrop(sitio);
 const cosechado = estaCosechado(sitio);
+const enProceso = obtenerHarvestStatus(sitio) === "In process";
 
 let color = "#d32f2f";
 let estado = "PENDIENTE";
@@ -1563,6 +1598,9 @@ if (drop) {
 } else if (cosechado) {
   color = "#2e7d32";
   estado = "COSECHADO";
+} else if (enProceso) {
+  color = "#f59e0b";
+  estado = "PENDIENTE";
 }
 
   const marcador = L.circleMarker(
