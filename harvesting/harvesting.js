@@ -1424,6 +1424,7 @@ if (estado === "PENDIENTE") {
         data-aoi="${aoiId}">
         Registrar Cosecha
       </button>
+      <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="margin-left:6px">Estado / YLDLIM</button>
 
     `;
 
@@ -1450,6 +1451,11 @@ else if (estado === "COSECHADO") {
 
   `;
 
+}
+
+if (estado === "DROP") {
+  const esViewer = window.FieldTrialAppMode && window.FieldTrialAppMode.isViewer;
+  bloqueAccion = `<hr><div style="font-size:12px"><strong>Drop reason</strong><br>${String(sitio["Drop reason"] || "Sin razón registrada")}</div>${esViewer ? "" : `<button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="margin-top:8px">Editar estado</button>`}`;
 }
 
   return `
@@ -1496,7 +1502,7 @@ else if (estado === "COSECHADO") {
 
       <div class="popup-estado">
 
-        Estado: ${estado}
+        Estado: ${obtenerHarvestStatus(sitio)}
 
       </div>
 
@@ -2432,9 +2438,6 @@ function configuracionEstadoPlanning(
             </div>
           </div>
         `;
-    if (estado === "DROP" && !(window.FieldTrialAppMode && window.FieldTrialAppMode.isViewer)) {
-      bloqueAccion = `<hr><div><strong>Drop reason:</strong><br>${String(sitio["Drop reason"] || "Sin razón registrada")}</div><button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="margin-top:8px">Editar estado</button>`;
-    }
     return `
       <div
         class="planning-card"
