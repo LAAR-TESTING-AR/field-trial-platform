@@ -1546,6 +1546,13 @@ if (estado === "DROP") {
 
       </div>
 
+      ${estado === "PENDIENTE" ? `
+        <div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:#f4f7f5;font-size:12px;line-height:1.35;color:#34473c">
+          <strong>YLDLIM</strong><br>
+          ${String(sitio.YLDLIM || "NONE")}
+        </div>
+      ` : ""}
+
       ${bloqueAccion}
 
     </div>
