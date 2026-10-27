@@ -514,7 +514,7 @@ async function actualizarEstadoHarvesting(sitio, harvestStatus, dropReason, yldl
 }
 
 function abrirEstadoHarvesting(sitio) {
-  if (!sitio || estaCosechado(sitio)) return;
+  if (!sitio) return;
   document.getElementById("harvestingStatusOverlay")?.remove();
   const overlay=document.createElement("div"); overlay.id="harvestingStatusOverlay";
   overlay.style.cssText="position:fixed;inset:0;z-index:32000;background:rgba(10,25,17,.5);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
@@ -525,9 +525,10 @@ function abrirEstadoHarvesting(sitio) {
     <div style="margin-top:4px;color:#617067;font-size:12px">${esc(sitio.Location)} · ${esc(sitio["AOI ID"])}</div>
 
     <label style="display:block;margin-top:16px;font-size:11px;font-weight:900;color:#536159">ESTADO DE COSECHA</label>
-    <select id="harvestStatusEdit" style="width:100%;margin-top:6px;padding:11px;border:1px solid #bfcac3;border-radius:9px;background:#fff;font-weight:700">
-      <option>Not harvested</option><option>In process</option><option>Drop</option>
+    <select id="harvestStatusEdit" ${estaCosechado(sitio) ? "disabled" : ""} style="width:100%;margin-top:6px;padding:11px;border:1px solid #bfcac3;border-radius:9px;background:${estaCosechado(sitio) ? "#f3f6f4" : "#fff"};font-weight:700">
+      ${estaCosechado(sitio) ? '<option>Harvested</option>' : '<option>Not harvested</option><option>In process</option><option>Drop</option>'}
     </select>
+    ${estaCosechado(sitio) ? '<div style="font-size:11px;color:#6b7770;margin-top:5px">Harvested está determinado por la fecha de cosecha. YLDLIM puede editarse igualmente.</div>' : ''}
 
     <div id="dropReasonWrap" style="margin-top:14px">
       <label style="font-size:11px;font-weight:900;color:#536159">DROP REASON *</label>
@@ -557,11 +558,11 @@ function abrirEstadoHarvesting(sitio) {
   const checks=[...panel.querySelectorAll('#yldlimList input')]; const actuales=new Set(obtenerYldlimSeleccionadas(sitio)); checks.forEach(c=>c.checked=actuales.has(c.value));
   const actualizarConteoYldlim=()=>{const elegidas=checks.filter(c=>c.checked).map(c=>c.value);panel.querySelector("#yldlimCount").textContent=elegidas.length ? `${elegidas.length} seleccionada${elegidas.length===1?"":"s"}` : "Sin selección";};
   panel.querySelector("#yldlimSearch").oninput=e=>{const q=normalizarTexto(e.target.value);panel.querySelectorAll("[data-yldlim-label]").forEach(label=>{label.style.display=!q||normalizarTexto(label.textContent).includes(q)?"flex":"none";});};
-  const refrescar=()=>{const drop=status.value==="Drop";panel.querySelector("#dropReasonWrap").style.display=drop?"block":"none";panel.querySelector("#yldlimWrap").style.display=drop?"none":"block"}; status.onchange=refrescar; refrescar();
+  const refrescar=()=>{const drop=!estaCosechado(sitio)&&status.value==="Drop";panel.querySelector("#dropReasonWrap").style.display=drop?"block":"none";panel.querySelector("#yldlimWrap").style.display=drop?"none":"block"}; status.onchange=refrescar; refrescar();
   checks.forEach(c=>c.onchange=()=>{if(c.checked){if(c.value==="NONE")checks.forEach(x=>{if(x!==c)x.checked=false});else{const n=checks.find(x=>x.value==="NONE");if(n)n.checked=false}}actualizarConteoYldlim();});
   actualizarConteoYldlim();
   const cerrar=()=>overlay.remove(); panel.querySelector('[data-hs="cancel"]').onclick=cerrar; overlay.onclick=e=>{if(e.target===overlay)cerrar()};
-  panel.querySelector('[data-hs="save"]').onclick=async e=>{const state=status.value;const reason=state==="Drop"?limpiarTexto(panel.querySelector("#dropReasonEdit").value):"";if(state==="Drop"&&!reason){alert("Ingrese una razón para el Drop");return}const sel=checks.filter(c=>c.checked).map(c=>c.value);const limits=state==="Drop"?"":(sel.length?sel.join("; "):"NONE");e.currentTarget.disabled=true;e.currentTarget.textContent="Guardando...";try{await actualizarEstadoHarvesting(sitio,state,reason,limits);cerrar()}catch(err){console.error(err);alert("No se pudo actualizar Harvest status");e.currentTarget.disabled=false;e.currentTarget.textContent="Guardar"}};
+  panel.querySelector('[data-hs="save"]').onclick=async e=>{const state=estaCosechado(sitio)?"Harvested":status.value;const reason=state==="Drop"?limpiarTexto(panel.querySelector("#dropReasonEdit").value):"";if(state==="Drop"&&!reason){alert("Ingrese una razón para el Drop");return}const sel=checks.filter(c=>c.checked).map(c=>c.value);const limits=state==="Drop"?"":(sel.length?sel.join("; "):"NONE");e.currentTarget.disabled=true;e.currentTarget.textContent="Guardando...";try{await actualizarEstadoHarvesting(sitio,state,reason,limits);cerrar()}catch(err){console.error(err);alert("No se pudo actualizar Harvest status");e.currentTarget.disabled=false;e.currentTarget.textContent="Guardar"}};
 }
 
 function coincideConFiltros(
@@ -1482,6 +1483,7 @@ else if (estado === "COSECHADO") {
       ${harvestDate}
 
     </div>
+    <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="display:block;width:100%;margin-top:8px;padding:9px 12px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">YLDLIM</button>
 
   `;
 
@@ -1599,7 +1601,7 @@ if (drop) {
   color = "#2e7d32";
   estado = "COSECHADO";
 } else if (enProceso) {
-  color = "#f59e0b";
+  color = "#1976d2";
   estado = "PENDIENTE";
 }
 
