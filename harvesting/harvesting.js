@@ -1483,7 +1483,11 @@ else if (estado === "COSECHADO") {
       ${harvestDate}
 
     </div>
-    <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="display:block;width:100%;margin-top:8px;padding:9px 12px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">YLDLIM</button>
+    <div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:#f4f7f5;font-size:12px;line-height:1.35;color:#34473c">
+      <strong>YLDLIM</strong><br>
+      ${String(sitio.YLDLIM || "NONE")}
+    </div>
+    <button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="display:block;width:100%;margin-top:8px;padding:9px 12px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">Editar YLDLIM</button>
 
   `;
 
