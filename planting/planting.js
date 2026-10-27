@@ -1887,15 +1887,17 @@ else if (sembrado) {
   estado = "SEMBRADO";
 
 }
+else if (obtenerPlantingStatus(sitio) === "In process") {
+
+  color = "#1976d2";
+  estado = "IN PROCESS";
+
+}
 else if (planificado) {
 
   color = "#f4b400";
   estado = "PLANIFICADO";
 
-}
-else if (obtenerPlantingStatus(sitio) === "In process") {
-  color = "#1976d2";
-  estado = "NO PLANIFICADO";
 }
 
   const marcador = L.circleMarker(
