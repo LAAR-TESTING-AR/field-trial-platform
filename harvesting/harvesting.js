@@ -90,6 +90,19 @@ let sitios = [];
 const URL_FLOW_HARVESTING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
 
+const URL_FLOW_HARVESTING_STATUS =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/0be6fa76f3e44cd9ab0e46432305f00d/triggers/manual/paths/invoke?api-version=1";
+
+const YLDLIM_OPTIONS = [
+  "Common Rust", "Northern Leaf Blight", "Gray Leaf Spot", "Fusarium Stalk Rot",
+  "Foliar Disease Complex", "Stalk Lodging (unknown pathogen)", "Ear Molds", "Brittle Stalk",
+  "Early Frost", "Hail Damage", "Wind Damage", "Herbicide Injury", "Insecticide Injury",
+  "Excess Water", "Drought", "Late planting", "Reduced emergence", "Root Lodging",
+  "High Temp - Flowering", "Uneven stands", "Drought, Heat", "Dry Filling", "Head Smut",
+  "High Temperature", "Stalk Lodging", "NONE", "Phaeosphaeria Leaf Spot",
+  "Corn Stunt Spiroplasma Virus"
+];
+
 const URL_FLOW_PLANNING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
 const URL_FLOW_PLANNING_GET =
@@ -464,9 +477,7 @@ function ordenarValores(valores) {
 }
 
 function esDrop(sitio) {
-  return limpiarTexto(sitio.Description)
-    .toLowerCase()
-    .includes("drop");
+  return normalizarTexto(sitio?.["Harvest status"]) === "drop";
 }
 
 function estaCosechado(sitio) {
@@ -475,6 +486,48 @@ function estaCosechado(sitio) {
       sitio["Harvest Date (MM/DD/YYYY)"]
     )
   );
+}
+
+function obtenerHarvestStatus(sitio) {
+  if (estaCosechado(sitio)) return "Harvested";
+  const valor = limpiarTexto(sitio?.["Harvest status"]);
+  return ["Not harvested", "In process", "Drop"].includes(valor) ? valor : "Not harvested";
+}
+
+function obtenerYldlimSeleccionadas(sitio) {
+  const bruto = limpiarTexto(sitio?.YLDLIM);
+  if (!bruto) return ["NONE"];
+  if (YLDLIM_OPTIONS.includes(bruto)) return [bruto];
+  return YLDLIM_OPTIONS.filter(opcion => opcion !== "NONE" && bruto.includes(opcion));
+}
+
+async function actualizarEstadoHarvesting(sitio, harvestStatus, dropReason, yldlim) {
+  const response = await fetch(URL_FLOW_HARVESTING_STATUS, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ aoiId: limpiarTexto(sitio["AOI ID"]), harvestStatus, dropReason, yldlim })
+  });
+  if (!response.ok) throw new Error("Error actualizando Harvest status");
+  sitio["Harvest status"] = harvestStatus;
+  sitio["Drop reason"] = dropReason;
+  sitio.YLDLIM = yldlim;
+  actualizarVista();
+}
+
+function abrirEstadoHarvesting(sitio) {
+  if (!sitio || estaCosechado(sitio)) return;
+  document.getElementById("harvestingStatusOverlay")?.remove();
+  const overlay=document.createElement("div"); overlay.id="harvestingStatusOverlay";
+  overlay.style.cssText="position:fixed;inset:0;z-index:32000;background:rgba(10,25,17,.5);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+  const panel=document.createElement("div"); panel.style.cssText="width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-sizing:border-box;box-shadow:0 22px 60px rgba(0,0,0,.28)";
+  const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  panel.innerHTML=`<div style="font-size:19px;font-weight:900;color:#173f2a">Harvest status / YLDLIM</div><div style="margin-top:4px;color:#617067;font-size:12px">${esc(sitio.Location)} · ${esc(sitio["AOI ID"])}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:800">ESTADO DE COSECHA</label><select id="harvestStatusEdit" style="width:100%;margin-top:5px;padding:10px;border:1px solid #bfcac3;border-radius:9px;background:#fff"><option>Not harvested</option><option>In process</option><option>Drop</option></select><div id="dropReasonWrap" style="margin-top:13px"><label style="font-size:11px;font-weight:800">DROP REASON *</label><textarea id="dropReasonEdit" rows="3" style="width:100%;margin-top:5px;padding:10px;box-sizing:border-box;border:1px solid #bfcac3;border-radius:9px">${esc(sitio["Drop reason"])}</textarea></div><div id="yldlimWrap" style="margin-top:15px"><div style="font-size:11px;font-weight:800">YIELD LIMITATIONS</div><div id="yldlimList" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 12px;margin-top:8px">${YLDLIM_OPTIONS.map(o=>`<label style="font-size:12px"><input type="checkbox" value="${esc(o)}"> ${esc(o)}</label>`).join("")}</div></div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-hs="cancel" type="button">Cancelar</button><button data-hs="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900">Guardar</button></div>`;
+  overlay.appendChild(panel); document.body.appendChild(overlay);
+  const status=panel.querySelector("#harvestStatusEdit"); status.value=obtenerHarvestStatus(sitio);
+  const checks=[...panel.querySelectorAll('#yldlimList input')]; const actuales=new Set(obtenerYldlimSeleccionadas(sitio)); checks.forEach(c=>c.checked=actuales.has(c.value));
+  const refrescar=()=>{const drop=status.value==="Drop";panel.querySelector("#dropReasonWrap").style.display=drop?"block":"none";panel.querySelector("#yldlimWrap").style.display=drop?"none":"block"}; status.onchange=refrescar; refrescar();
+  checks.forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="NONE")checks.forEach(x=>{if(x!==c)x.checked=false});else{const n=checks.find(x=>x.value==="NONE");if(n)n.checked=false}});
+  const cerrar=()=>overlay.remove(); panel.querySelector('[data-hs="cancel"]').onclick=cerrar; overlay.onclick=e=>{if(e.target===overlay)cerrar()};
+  panel.querySelector('[data-hs="save"]').onclick=async e=>{const state=status.value;const reason=state==="Drop"?limpiarTexto(panel.querySelector("#dropReasonEdit").value):"";if(state==="Drop"&&!reason){alert("Ingrese una razón para el Drop");return}const sel=checks.filter(c=>c.checked).map(c=>c.value);const limits=state==="Drop"?"":(sel.length?sel.join("; "):"NONE");e.currentTarget.disabled=true;e.currentTarget.textContent="Guardando...";try{await actualizarEstadoHarvesting(sitio,state,reason,limits);cerrar()}catch(err){console.error(err);alert("No se pudo actualizar Harvest status");e.currentTarget.disabled=false;e.currentTarget.textContent="Guardar"}};
 }
 
 function coincideConFiltros(
@@ -2379,6 +2432,9 @@ function configuracionEstadoPlanning(
             </div>
           </div>
         `;
+    if (estado === "DROP" && !(window.FieldTrialAppMode && window.FieldTrialAppMode.isViewer)) {
+      bloqueAccion = `<hr><div><strong>Drop reason:</strong><br>${String(sitio["Drop reason"] || "Sin razón registrada")}</div><button type="button" class="btn-estado-cosecha" data-aoi="${aoiId}" style="margin-top:8px">Editar estado</button>`;
+    }
     return `
       <div
         class="planning-card"
