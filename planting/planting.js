@@ -395,6 +395,8 @@ mapa.on("baselayerchange", function (evento) {
 let sitios = [];
 const URL_FLOW_SIEMBRA =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/23/workflows/d1ccb1bbfc2d42b1971a8e732db9aba7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=a8tOXFBAyVBQZYwChwZCWsyvLfc33_lmeIcMHcH74Qs";
+const URL_FLOW_PLANTING_STATUS =
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/17/workflows/04c05c10d89b441f9831d513f1967885/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=KdYTcD0vGLLFP1iqsmc4DMIoNSj-9YAK-l0LuyGVn-4";
 const URL_FLOW_PLANNING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
 const URL_FLOW_PLANNING_GET =
@@ -510,6 +512,7 @@ if (sitioLocal) {
   sitioLocal[
     "Planter"
   ] = planter;
+  sitioLocal["Planting status"] = "Planted";
 }
 
     actualizarVista();
@@ -768,9 +771,7 @@ function ordenarValores(valores) {
 }
 
 function esDrop(sitio) {
-  return limpiarTexto(sitio.Description)
-    .toLowerCase()
-    .includes("drop");
+  return normalizarTexto(sitio?.["Harvest status"]) === "drop";
 }
 
 function estaSembrado(sitio) {
@@ -779,6 +780,26 @@ function estaSembrado(sitio) {
       sitio["Planting Date (MM/DD/YYYY)"]
     )
   );
+}
+
+function obtenerPlantingStatus(sitio) {
+  if (estaSembrado(sitio)) return "Planted";
+  const valor = limpiarTexto(sitio?.["Planting status"]);
+  return ["Not Planted", "In process"].includes(valor) ? valor : "Not Planted";
+}
+async function actualizarEstadoPlanting(sitio, plantingStatus) {
+  const response = await fetch(URL_FLOW_PLANTING_STATUS, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({aoiId:limpiarTexto(sitio["AOI ID"]),plantingStatus})});
+  if (!response.ok) throw new Error("Error actualizando Planting status");
+  sitio["Planting status"] = plantingStatus;
+  actualizarVista();
+}
+function abrirEstadoPlanting(sitio) {
+  if (!sitio || estaSembrado(sitio)) return;
+  document.getElementById("plantingStatusOverlay")?.remove();
+  const overlay=document.createElement("div");overlay.id="plantingStatusOverlay";overlay.style.cssText="position:fixed;inset:0;z-index:32000;background:rgba(10,25,17,.5);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+  const panel=document.createElement("div");panel.style.cssText="width:min(430px,100%);background:#fff;border-radius:16px;padding:20px;box-sizing:border-box;box-shadow:0 22px 60px rgba(0,0,0,.28)";
+  panel.innerHTML=`<div style="font-size:19px;font-weight:900;color:#173f2a">Planting status</div><div style="margin-top:4px;color:#617067;font-size:12px">${String(sitio.Location||"")} · ${String(sitio["AOI ID"]||"")}</div><label style="display:block;margin-top:16px;font-size:11px;font-weight:900;color:#536159">ESTADO DE SIEMBRA</label><select id="plantingStatusEdit" style="width:100%;margin-top:6px;padding:11px;border:1px solid #bfcac3;border-radius:9px;background:#fff;font-weight:700"><option value="Not Planted">Not Planted</option><option value="In process">In process</option></select><div style="margin-top:8px;font-size:11px;line-height:1.35;color:#6b7770">Planted se asigna automáticamente al registrar una fecha de siembra.</div><div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px"><button data-ps="cancel" type="button">Cancelar</button><button data-ps="save" type="button" style="padding:9px 13px;border:none;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900">Guardar</button></div>`;
+  overlay.appendChild(panel);document.body.appendChild(overlay);const select=panel.querySelector("#plantingStatusEdit");select.value=obtenerPlantingStatus(sitio);const cerrar=()=>overlay.remove();overlay.onclick=e=>{if(e.target===overlay)cerrar()};panel.querySelector('[data-ps="cancel"]').onclick=cerrar;panel.querySelector('[data-ps="save"]').onclick=async e=>{e.currentTarget.disabled=true;e.currentTarget.textContent="Guardando...";try{await actualizarEstadoPlanting(sitio,select.value);cerrar()}catch(error){console.error(error);alert("No se pudo actualizar Planting status");e.currentTarget.disabled=false;e.currentTarget.textContent="Guardar"}};
 }
 
 function estaPlanificado(
@@ -1700,6 +1721,7 @@ if (
         data-aoi="${aoiId}">
         Registrar Siembra
       </button>
+        <button type="button" class="btn-estado-siembra" data-aoi="${aoiId}" style="display:block;width:100%;margin-top:7px;padding:9px 12px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">Estado de siembra</button>
 
     `;
 
@@ -1772,7 +1794,7 @@ if (
 
       <div class="popup-estado">
 
-        Estado: ${estado}
+        Estado: ${estado === "PLANIFICADO" ? "Planificado" : obtenerPlantingStatus(sitio)}
 
       </div>
 
@@ -1871,6 +1893,10 @@ else if (planificado) {
   estado = "PLANIFICADO";
 
 }
+else if (obtenerPlantingStatus(sitio) === "In process") {
+  color = "#1976d2";
+  estado = "NO PLANIFICADO";
+}
 
   const marcador = L.circleMarker(
   [lat, lon],
@@ -1906,19 +1932,16 @@ marcador.on(
         `.btn-registrar-siembra[data-aoi="${aoiId}"]`
       );
 
+    const botonEstado = document.querySelector(
+      `.btn-estado-siembra[data-aoi="${aoiId}"]`
+    );
+    if (window.FieldTrialAppMode && window.FieldTrialAppMode.isViewer) {
+      boton?.remove(); botonEstado?.remove(); return;
+    }
+    if (botonEstado) botonEstado.onclick = () => abrirEstadoPlanting(sitio);
     if (!boton) {
       return;
     }
-if (
-  window.FieldTrialAppMode &&
-  window.FieldTrialAppMode.isViewer
-) {
-
-  boton.remove();
-
-  return;
-
-}
     boton.onclick =
       async () => {
 
