@@ -91,7 +91,7 @@ const URL_FLOW_HARVESTING =
   "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
 
 const URL_FLOW_HARVESTING_STATUS =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/0be6fa76f3e44cd9ab0e46432305f00d/triggers/manual/paths/invoke?api-version=1";
+  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/0be6fa76f3e44cd9ab0e46432305f00d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=whw1mJ8Yz1FfldkoiP7i1Z5HDMz0iK_I_Na0Xu3sDig";
 
 const YLDLIM_OPTIONS = [
   "Common Rust", "Northern Leaf Blight", "Gray Leaf Spot", "Fusarium Stalk Rot",
