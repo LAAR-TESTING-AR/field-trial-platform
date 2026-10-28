@@ -2,10 +2,9 @@
   "use strict";
 
   function esTrialDrop(sitio) {
-    return String(sitio?.description ?? "")
+    return String(sitio?.harvestStatus ?? "")
       .trim()
-      .toLowerCase()
-      .includes("drop");
+      .toLowerCase() === "drop";
   }
 
   function busquedaEspecial() {
@@ -55,7 +54,7 @@
     const aviso = `
       <div class="aviso-trial-drop" role="status">
         <strong>DROP - NO VISITAR</strong>
-        ${sitio.description ? `<span>${escaparHTML(sitio.description)}</span>` : ""}
+        ${sitio.dropReason ? `<span>${escaparHTML(sitio.dropReason)}</span>` : ""}
       </div>
     `;
 
