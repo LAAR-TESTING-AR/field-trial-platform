@@ -941,8 +941,29 @@ function actualizarDashboard(sitiosFiltrados) {
       ? ((drops / totalFiltrado) * 100).toFixed(1)
       : "0.0";
 
-  document.getElementById("drop").textContent =
-    `${drops} · ${porcentajeDrop}%`;
+  document.getElementById("drop").innerHTML =
+    `<span style="display:block;font-size:15px;font-weight:900;line-height:1;color:#173f2a">${drops}</span>` +
+    `<span style="display:block;margin-top:2px;font-size:17px;font-weight:900;line-height:1;color:#b3261e">(${porcentajeDrop}%)</span>`;
+
+  ["totalAOI", "sembradas", "pendientes", "drop"].forEach((id, index) => {
+    const numero = document.getElementById(id);
+    if (!numero) return;
+    const contenedor = numero.parentElement;
+    if (!contenedor) return;
+    contenedor.style.minHeight = "54px";
+    contenedor.style.padding = "7px 5px 6px";
+    contenedor.style.borderRadius = "10px";
+    contenedor.style.boxSizing = "border-box";
+    contenedor.style.border = "1px solid #e1e9e4";
+    contenedor.style.background = index === 3 ? "#fff5f4" : "#f7faf8";
+    numero.style.display = "block";
+    numero.style.fontWeight = "900";
+    if (index !== 3) {
+      numero.style.fontSize = "16px";
+      numero.style.lineHeight = "1.05";
+      numero.style.color = "#173f2a";
+    }
+  });
 
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
