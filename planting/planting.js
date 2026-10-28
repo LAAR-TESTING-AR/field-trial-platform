@@ -2373,86 +2373,82 @@ async function sincronizarPlanningConSiembraReal(aoiId, fecha, planter) {
     return false;
   }
 }
-async function eliminarPlanning(
-  id
-) {
+  function generarPlanningGroupId() {
+    return `PG-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+  }
+
+  function agruparPlanningVisual(items) {
+    const grupos = new Map();
+    items.forEach(item => {
+      if (item.planningType !== "Master") {
+        grupos.set(`single-${item.id}`, [item]);
+        return;
+      }
+      const clave = limpiarTexto(item.planningGroupId) || `single-${item.id}`;
+      if (!grupos.has(clave)) grupos.set(clave, []);
+      grupos.get(clave).push(item);
+    });
+    return [...grupos.entries()].map(([clave, miembros]) => {
+      if (miembros.length === 1) {
+        const unico = miembros[0];
+        return { ...unico, ids: [Number(unico.id)], aoiIds: [unico.aoiId], planningGroupId: limpiarTexto(unico.planningGroupId) };
+      }
+      const base = miembros[0];
+      const todosSembrados = miembros.every(x => x.sembrado);
+      const fechas = [...new Set(miembros.map(x => limpiarTexto(x.plantingDate)).filter(Boolean))];
+      const plantersReales = [...new Set(miembros.map(x => limpiarTexto(x.actualPlanter)).filter(Boolean))];
+      return {
+        ...base,
+        id: Number(base.id),
+        ids: miembros.map(x => Number(x.id)),
+        aoiIds: miembros.map(x => x.aoiId).filter(Boolean),
+        aoiId: miembros.map(x => x.aoiId).filter(Boolean).join(" · "),
+        planningGroupId: clave,
+        sembrado: todosSembrados,
+        plantingDate: todosSembrados && fechas.length === 1 ? fechas[0] : (todosSembrados ? "Fechas registradas" : ""),
+        actualPlanter: todosSembrados && plantersReales.length === 1 ? plantersReales[0] : (todosSembrados ? "Varias sembradoras" : ""),
+        groupSize: miembros.length,
+        plantedCount: miembros.filter(x => x.sembrado).length
+      };
+    });
+  }
+
+  function obtenerIdsPlanning(item) {
+    return Array.isArray(item?.ids) && item.ids.length ? item.ids.map(Number) : [Number(item?.id)];
+  }
+
+  async function eliminarPlanning(id) {
     if (esPlanningViewer()) return;
-
-  try {
-
-    const response =
-      await fetch(
-        URL_FLOW_PLANNING_DELETE,
-        {
+    const item = planningData.find(x => Number(x.id) === Number(id));
+    const ids = obtenerIdsPlanning(item || { id });
+    if (ids.length > 1 && !confirm(`¿Eliminar la tarjeta completa con ${ids.length} AOI?`)) return;
+    try {
+      for (const itemId of ids) {
+        const response = await fetch(URL_FLOW_PLANNING_DELETE, {
           method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            ID: id
-          })
-        }
-      );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "Error eliminando Planning"
-      );
-
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ID: itemId })
+        });
+        if (!response.ok) throw new Error(`Error eliminando Planning ID ${itemId}`);
+      }
+      planningChanges = planningChanges.filter(cambio => !ids.includes(Number(cambio.id)));
+      await cargarPlanningDesdeSharePoint();
+      renderPlanningBoard();
+    } catch (error) {
+      console.error(error);
+      alert("Error eliminando Planning");
     }
-
-    planningChanges = planningChanges.filter(
-      cambio => cambio.id !== id
-    );
-
-    await cargarPlanningDesdeSharePoint();
-
-    renderPlanningBoard();
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Error eliminando Planning"
-    );
-
   }
 
-}
-
-function registrarCambioPlanning(
-  item,
-  planter,
-  week,
-  sortOrder = 0
-) {
+  function registrarCambioPlanning(item, planter, week, sortOrder = 0) {
     if (esPlanningViewer()) return;
-
-  const cambio = {
-    id: item.id,
-    week,
-    planter,
-    sortOrder
-  };
-
-  const indiceExistente =
-    planningChanges.findIndex(
-      actual => actual.id === item.id
-    );
-
-  if (indiceExistente >= 0) {
-    planningChanges[indiceExistente] =
-      cambio;
-  } else {
-    planningChanges.push(cambio);
+    obtenerIdsPlanning(item).forEach(id => {
+      const cambio = { id, week, planter, sortOrder };
+      const indiceExistente = planningChanges.findIndex(actual => Number(actual.id) === Number(id));
+      if (indiceExistente >= 0) planningChanges[indiceExistente] = cambio;
+      else planningChanges.push(cambio);
+    });
   }
-
-}
 
 async function guardarCambiosPlanning() {
     if (esPlanningViewer()) return;
@@ -2700,7 +2696,9 @@ function configuracionEstadoPlanning(
               ? ` · ${item.actualPlanter}`
               : ""
           }`
-        : estado.etiqueta;
+        : (item.groupSize > 1 && item.plantedCount > 0
+            ? `Siembra parcial · ${item.plantedCount}/${item.groupSize}`
+            : (item.groupSize > 1 ? `${estado.etiqueta} · ${item.groupSize} AOI` : estado.etiqueta));
     const esMobilePlanning =
       window.matchMedia(
         "(max-width: 1100px), (pointer: coarse)"
@@ -2803,7 +2801,7 @@ function configuracionEstadoPlanning(
         data-planter="${item.planter}"
         data-week="${item.week}"
         data-sembrado="${item.sembrado}"
-        title="${item.location} · ${item.crop} · ${item.aoiId} · ${detalleEstado}"
+        title="${item.location} · ${item.crop} · ${(item.aoiIds || [item.aoiId]).join(", ")} · ${detalleEstado}"
         style="
           background:${estado.fondo};
           border-left:5px solid ${estado.color};
@@ -3288,7 +3286,7 @@ function abrirDetallePlanning(item) {
   const accionesSpecial = (!esPlanningViewer() && esSpecial) ? (item.sembrado ? `<div style="margin-top:16px"><button data-da="planned" type="button" style="width:100%;padding:11px;border:1px solid #e0b95a;border-radius:9px;background:#fffaf0;color:#8a6410;font-weight:900;cursor:pointer">↩ Volver a planificado</button></div>` : `<div style="margin-top:16px"><button data-da="planted" type="button" style="width:100%;padding:11px;border:none;border-radius:9px;background:#2e7d32;color:#fff;font-weight:900;cursor:pointer">✓ Marcar como sembrado</button></div>`) : "";
   const ov=document.createElement("div");ov.id="planningCardDetailOverlay";ov.style.cssText="position:fixed;inset:0;z-index:30000;background:rgba(10,25,17,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;backdrop-filter:blur(2px)";
   const panel=document.createElement("div");panel.style.cssText="width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:18px;border:1px solid #d9e4dd;box-shadow:0 24px 70px rgba(0,0,0,.3);transform:scale(.94);opacity:0;transition:.16s ease;box-sizing:border-box";
-  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila("AOI ID",item.aoiId)}${fila("Week",item.week)}${fila("Planned Planter",item.planter)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.sembrado?fila("Planting Date",item.plantingDate):""}${!noAct&&item.sembrado?fila("Actual Planter",item.actualPlanter):""}</div>${acciones}${accionesSpecial}</div>`;
+  panel.innerHTML=`<div style="padding:18px 20px 20px"><div style="display:flex;gap:12px;align-items:flex-start"><div>${noAct?"⏸":renderIconoCultivoPlanning(item.crop,40)}</div><div style="flex:1;min-width:0"><div style="font-size:20px;font-weight:900;color:#173f2a">${escapeDetallePlanning(noAct?(item.downtimeReason||"No Activity / Downtime"):(item.location||"Planning"))}</div>${noAct?"":`<div style="margin-top:5px;font-size:13px;font-weight:700;color:#526158">${escapeDetallePlanning(item.crop||"")}</div>`}<div style="margin-top:8px;display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;background:${color}15;color:${color};font-size:11px;font-weight:900"><span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${noAct?"No Activity / Downtime":estado.etiqueta}</div></div><button data-da="close" type="button" style="width:34px;height:34px;border:none;border-radius:50%;background:#f2f5f3;color:#526158;font-size:20px;cursor:pointer">×</button></div><div style="margin-top:16px">${noAct?"":fila(item.aoiIds?.length > 1 ? "AOI incluidos" : "AOI ID", (item.aoiIds || [item.aoiId]).join(" · "))}${fila("Week",item.week)}${fila("Planned Planter",item.planter)}${noAct?fila("Reason",item.downtimeReason||"No Activity"):""}${noAct?fila("Comment",item.comment):""}${!noAct&&item.sembrado?fila("Planting Date",item.plantingDate):""}${!noAct&&item.sembrado?fila("Actual Planter",item.actualPlanter):""}</div>${acciones}${accionesSpecial}</div>`;
   ov.appendChild(panel);document.body.appendChild(ov);document.body.style.overflow="hidden";requestAnimationFrame(()=>{panel.style.transform="scale(1)";panel.style.opacity="1"});
   ov.addEventListener("click",e=>{if(e.target===ov)cerrarDetallePlanning()});panel.querySelector('[data-da="close"]')?.addEventListener("click",cerrarDetallePlanning);panel.querySelector('[data-da="edit"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,false)});panel.querySelector('[data-da="dup"]')?.addEventListener("click",()=>{cerrarDetallePlanning();abrirFormularioNoActivity(item,true)});panel.querySelector('[data-da="del"]')?.addEventListener("click",async()=>{cerrarDetallePlanning();await eliminarPlanning(Number(item.id))});panel.querySelector('[data-da="planted"]')?.addEventListener("click",()=>pedirFechaSpecialPlanning(item));panel.querySelector('[data-da="planned"]')?.addEventListener("click",async()=>{if(!confirm("¿Volver esta tarjeta a Planificado y quitar la fecha de siembra?"))return;cerrarDetallePlanning();const ok=await actualizarEstadoSpecialPlanning(item,"Planned","");if(ok)alert("Nursery / Special volvió a Planificado")});
 }
@@ -4518,12 +4516,15 @@ planningData = data
         limpiarTexto(item.DowntimeReason),
 
       comment:
-        limpiarTexto(item.Comment)
+        limpiarTexto(item.Comment),
+      planningGroupId:
+        limpiarTexto(item.PlanningGroupId)
 
     };
 
   }
 );
+  planningData = agruparPlanningVisual(planningData);
 console.log(
   "PlanningData cargado",
   planningData
@@ -4621,13 +4622,9 @@ function cargarLocalidadesPlanning() {
     [
       ...new Set(
         sitiosDisponibles
-          .map(
-            sitio =>
-              limpiarTexto(
-                sitio.Location
-              )
-          )
-          .filter(Boolean)
+          .flatMap(item => item.aoiIds || [item.aoiId])
+        .map(normalizarTexto)
+        .filter(Boolean)
       )
     ].sort(
       (a, b) =>
@@ -4839,58 +4836,23 @@ function cargarCultivosPlanning() {
 
 }
 
-function actualizarAoiPlanning() {
-
-  const locality =
-    document.getElementById(
-      "planningLocality"
-    )?.value;
-
-  const crop =
-    document.getElementById(
-      "planningCrop"
-    )?.value;
-
-  const preview =
-    document.getElementById(
-      "planningAoiPreview"
-    );
-
-  if (!preview) {
-    return;
-  }
-
-  if (!locality || !crop) {
-    preview.textContent =
-      "Seleccione localidad y cultivo";
-    return;
-  }
-
-  const aoi =
-    obtenerSitiosDisponiblesPlanning()
-      .filter(
-        sitio =>
-          limpiarTexto(
-            sitio.Location
-          ) === locality &&
-          limpiarTexto(
-            sitio.Crop
-          ) === crop
-      )
-      .map(
-        sitio =>
-          limpiarTexto(
-            sitio["AOI ID"]
-          )
-      )
+  function actualizarAoiPlanning() {
+    const locality = document.getElementById("planningLocality")?.value;
+    const crop = document.getElementById("planningCrop")?.value;
+    const preview = document.getElementById("planningAoiPreview");
+    if (!preview) return;
+    if (!locality || !crop) {
+      preview.textContent = "Seleccione localidad y cultivo";
+      return;
+    }
+    const aoi = obtenerSitiosDisponiblesPlanning()
+      .filter(sitio => limpiarTexto(sitio.Location) === locality && limpiarTexto(sitio.Crop) === crop)
+      .map(sitio => limpiarTexto(sitio["AOI ID"]))
       .filter(Boolean);
-
-  preview.innerHTML =
-    aoi.length
-      ? aoi.join("<br>")
+    preview.innerHTML = aoi.length
+      ? `<div style="font-size:10px;font-weight:800;color:#536159;margin-bottom:6px">SELECCIONAR AOI</div>${aoi.map(id => `<label style="display:flex;align-items:center;gap:7px;padding:5px 3px;cursor:pointer"><input class="planning-aoi-checkbox" type="checkbox" value="${escapeDetallePlanning(id)}" style="accent-color:#0b6b3a"><span>${escapeDetallePlanning(id)}</span></label>`).join("")}`
       : "Sin AOI disponibles";
-
-}
+  }
 
 const btnPlanterStats =
   document.getElementById(
@@ -5852,7 +5814,7 @@ function obtenerFilasExcelPlanning() {
       Planter: item.planter || "",
       Location: item.location || "",
       Crop: item.crop || "",
-      "AOI ID": item.aoiId || "",
+      "AOI ID": (item.aoiIds || [item.aoiId]).join("; "),
       "Planning Type": item.planningType || "Master",
       Status: item.sembrado ? "Sembrado" : "Planificado",
       "Planting Date": item.plantingDate || "",
@@ -6521,167 +6483,63 @@ btnCancelarPlanning?.addEventListener(
 
   }
 );
-btnGuardarPlanning?.addEventListener(
-  "click",
-  async () => {
-      if (esPlanningViewer()) return;
-
-    const locality =
-      document.getElementById(
-        "planningLocality"
-      ).value;
-
-    const crop =
-      document.getElementById(
-        "planningCrop"
-      ).value;
-
-    const week =
-      document.getElementById(
-        "planningWeek"
-      ).value;
-
-    const planter =
-      document.getElementById(
-        "planningPlanter"
-      ).value;
-
-    if (
-      !locality ||
-      !crop ||
-      !week ||
-      !planter
-    ) {
-
-      alert(
-        "Complete todos los campos"
-      );
-
+  btnGuardarPlanning?.addEventListener("click", async () => {
+    if (esPlanningViewer()) return;
+    const locality = document.getElementById("planningLocality")?.value || "";
+    const crop = document.getElementById("planningCrop")?.value || "";
+    const week = document.getElementById("planningWeek")?.value || "";
+    const planter = document.getElementById("planningPlanter")?.value || "";
+    const aoiIds = [...document.querySelectorAll(".planning-aoi-checkbox:checked")]
+      .map(input => limpiarTexto(input.value)).filter(Boolean);
+    if (!locality || !crop || !week || !planter || aoiIds.length === 0) {
+      alert("Complete todos los campos y seleccione al menos un AOI");
       return;
     }
-
-    const registro =
-      obtenerSitiosDisponiblesPlanning()
-        .find(
-          sitio =>
-            limpiarTexto(
-              sitio.Location
-            ) === locality &&
-            limpiarTexto(
-              sitio.Crop
-            ) === crop
-        );
-
-    if (!registro) {
+    const yaPlanificados = obtenerAoiPlanificadosMaster();
+    const repetidos = aoiIds.filter(id => yaPlanificados.has(normalizarTexto(id)));
+    if (repetidos.length) {
+      alert(`Estos AOI ya se encuentran planificados: ${repetidos.join(", ")}`);
       return;
     }
-
-    const aoiId =
-      limpiarTexto(
-        registro["AOI ID"]
-      );
-const existe =
-  planningData.some(
-    item =>
-      limpiarTexto(
-        item.aoiId
-      ) === aoiId
-  );
-
-if (existe) {
-
-  alert(
-    "Este AOI ya se encuentra planificado"
-  );
-
-  return;
-
-}
+    const planningGroupId = generarPlanningGroupId();
+    const sortOrder = planningData.filter(item => item.week === week && item.planter === planter).length;
+    btnGuardarPlanning.disabled = true;
+    btnGuardarPlanning.textContent = "Guardando...";
     try {
-
-      const response =
-        await fetch(
-          URL_FLOW_PLANNING,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-              PlanningModule: "Planting",
-              AOI_ID: aoiId,
-              Location: locality,
-              Crop: crop,
-              PlanningType: "Master",
-              PlantingStatus: "Planned",
-              PlantingDate: "",
-              Week: week,
-              Planter: planter,
-              SortOrder:
-                planningData.filter(
-                  item =>
-                    item.week === week &&
-                    item.planter === planter
-                ).length
-            })
-          }
-        );
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Error Flow Planning"
-        );
-
+      for (const aoiId of aoiIds) {
+        const response = await fetch(URL_FLOW_PLANNING, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            PlanningModule: "Planting",
+            AOI_ID: aoiId,
+            Location: locality,
+            Crop: crop,
+            PlanningType: "Master",
+            PlanningGroupId: planningGroupId,
+            PlantingStatus: "Planned",
+            PlantingDate: "",
+            Week: week,
+            Planter: planter,
+            SortOrder: sortOrder
+          })
+        });
+        if (!response.ok) throw new Error(`Error creando Planning para ${aoiId}`);
       }
-
-      planningData.push({
-
-        week,
-
-        planter,
-
-        location: locality,
-
-        crop,
-
-        aoiId,
-
-        planningType: "Master",
-
-        sortOrder:
-          planningData.filter(
-            item =>
-              item.week === week &&
-              item.planter === planter
-          ).length
-
-      });
-
-      planningForm.hidden =
-        true;
-
-      alert(
-        "Planning guardado correctamente"
-      );
-
-      btnPlanning.click();
-
+      planningForm.hidden = true;
+      await cargarPlanningDesdeSharePoint();
+      renderPlanningBoard();
+      alert(aoiIds.length === 1 ? "Planning guardado correctamente" : `Tarjeta creada con ${aoiIds.length} AOI`);
     } catch (error) {
-
       console.error(error);
-
-      alert(
-        "Error guardando Planning"
-      );
-
+      alert("Error guardando Planning. Revise si todos los AOI fueron creados.");
+      await cargarPlanningDesdeSharePoint();
+      renderPlanningBoard();
+    } finally {
+      btnGuardarPlanning.disabled = false;
+      btnGuardarPlanning.textContent = "Agregar al Planning";
     }
-
-  }
-);
+  });
 document
   .getElementById(
     "planningLocality"
