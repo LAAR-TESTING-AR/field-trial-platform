@@ -993,6 +993,19 @@ function actualizarDashboard(sitiosFiltrados) {
     if (contenedorVelocimetro && contenedorVelocimetro !== document.body) {
       contenedorVelocimetro.style.transform = "translateY(14px)";
       contenedorVelocimetro.style.marginBottom = "14px";
+
+      // Escala 0-25-50-75-100: un poco mas grande, gris y con mayor peso.
+      const labelsEscala = [...contenedorVelocimetro.querySelectorAll("text, span, div")];
+      labelsEscala.forEach(el => {
+        const valor = String(el.textContent || "").trim();
+        if (["0", "25", "50", "75", "100"].includes(valor) && el.children.length === 0) {
+          el.style.fontSize = "12px";
+          el.style.fontWeight = "800";
+          el.style.color = "#5f6863";
+          el.style.fill = "#5f6863";
+          el.style.fontFamily = "Arial, Helvetica, sans-serif";
+        }
+      });
     }
   }
 
