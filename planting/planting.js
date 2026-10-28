@@ -4552,23 +4552,13 @@ console.table(
 }
 
 function obtenerAoiPlanificadosMaster() {
-
   return new Set(
     planningData
-      .filter(
-        item =>
-          !item.planningType ||
-          item.planningType === "Master"
-      )
-      .map(
-        item =>
-          normalizarTexto(
-            item.aoiId
-          )
-      )
+      .filter(item => !item.planningType || item.planningType === "Master")
+      .flatMap(item => item.aoiIds || [item.aoiId])
+      .map(normalizarTexto)
       .filter(Boolean)
   );
-
 }
 
 function obtenerSitiosDisponiblesPlanning() {
@@ -4622,17 +4612,11 @@ function cargarLocalidadesPlanning() {
     [
       ...new Set(
         sitiosDisponibles
-          .flatMap(item => item.aoiIds || [item.aoiId])
-        .map(normalizarTexto)
-        .filter(Boolean)
+          .map(sitio => limpiarTexto(sitio.Location))
+          .filter(Boolean)
       )
-    ].sort(
-      (a, b) =>
-        a.localeCompare(
-          b,
-          "es",
-          { sensitivity: "base" }
-        )
+    ].sort((a, b) =>
+      a.localeCompare(b, "es", { sensitivity: "base" })
     );
 
   comboLocality.innerHTML = `
