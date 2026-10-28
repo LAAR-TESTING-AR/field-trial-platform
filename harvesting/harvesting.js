@@ -1004,6 +1004,19 @@ function actualizarDashboard(sitiosFiltrados) {
           el.style.color = "#5f6863";
           el.style.fill = "#5f6863";
           el.style.fontFamily = "Arial, Helvetica, sans-serif";
+          el.style.position = "relative";
+
+          // Ajuste fino de la escala respecto del arco.
+          // 50 necesita mas aire vertical y 100 necesita separacion lateral.
+          if (valor === "50") {
+            el.style.transform = "translateY(-6px)";
+          } else if (valor === "100") {
+            el.style.transform = "translate(7px, -1px)";
+          } else if (valor === "0") {
+            el.style.transform = "translate(-3px, -1px)";
+          } else {
+            el.style.transform = "translateY(-2px)";
+          }
         }
       });
     }
