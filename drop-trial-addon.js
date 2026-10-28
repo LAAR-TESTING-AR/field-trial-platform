@@ -306,6 +306,11 @@ const porcentajeAccess =
       )
     : 0;
 
+const porcentajeDrop =
+  sitiosFiltrados.length > 0
+    ? ((cantidadDrop / sitiosFiltrados.length) * 100).toFixed(1)
+    : "0.0";
+
     console.log(
   "Primer sitio:",
   sitiosFiltrados[0]
@@ -328,6 +333,7 @@ contadorSitios.innerHTML = `
 
   <div class="kpi-item">
     <span class="kpi-valor">${cantidadDrop}</span>
+    <span class="kpi-subvalor">(${porcentajeDrop}%)</span>
     <span class="kpi-label">Drop</span>
   </div>
 <div class="kpi-item">
