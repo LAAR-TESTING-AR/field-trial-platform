@@ -1195,8 +1195,92 @@ function actualizarDashboard(sitiosFiltrados) {
   document.getElementById("pendientes").textContent =
     pendientes;
 
-  document.getElementById("drop").textContent =
-    drops;
+  const totalFiltrado = sitiosFiltrados.length;
+  const porcentajeDrop =
+    totalFiltrado > 0
+      ? ((drops / totalFiltrado) * 100).toFixed(1)
+      : "0.0";
+
+  document.getElementById("drop").innerHTML =
+    `<span style="display:inline-flex;align-items:baseline;justify-content:center;gap:4px;white-space:nowrap;line-height:1">` +
+      `<span style="font-size:16px;font-weight:900;color:#173f2a">${drops}</span>` +
+      `<span style="font-size:13px;font-weight:700;color:#5b665f">-</span>` +
+      `<span style="font-size:18px;font-weight:900;color:#111111">(${porcentajeDrop}%)</span>` +
+    `</span>`;
+
+  ["totalAOI", "sembradas", "pendientes", "drop"].forEach((id, index) => {
+    const numero = document.getElementById(id);
+    if (!numero) return;
+    const contenedor = numero.parentElement;
+    if (!contenedor) return;
+    contenedor.style.minHeight = "58px";
+    contenedor.style.padding = "8px 6px 7px";
+    contenedor.style.borderRadius = "10px";
+    contenedor.style.boxSizing = "border-box";
+    contenedor.style.border = "2px solid #c9d8cf";
+    contenedor.style.background = "linear-gradient(180deg, #ffffff 0%, #f2f7f4 100%)";
+    contenedor.style.boxShadow = "0 3px 7px rgba(23,63,42,.14), inset 0 1px 0 rgba(255,255,255,.95)";
+    contenedor.style.display = "flex";
+    contenedor.style.flexDirection = "column";
+    contenedor.style.alignItems = "center";
+    contenedor.style.justifyContent = "center";
+    contenedor.style.textAlign = "center";
+    numero.style.display = "block";
+    numero.style.width = "100%";
+    numero.style.textAlign = "center";
+    numero.style.fontWeight = "900";
+    if (index !== 3) {
+      numero.style.fontSize = "16px";
+      numero.style.lineHeight = "1.05";
+      numero.style.color = "#173f2a";
+    }
+  });
+
+  // Baja SOLO el velocimetro completo (escala + arco + aguja + porcentaje)
+  // sin modificar la posicion de Limpiar filtros, titulo ni tarjetas KPI.
+  const avanceGrandeEl = document.getElementById("avanceGrande");
+  const agujaAvanceEl = document.getElementById("agujaAvance");
+  if (avanceGrandeEl && agujaAvanceEl) {
+    const ancestrosAvance = [];
+    let nodo = avanceGrandeEl;
+    while (nodo) { ancestrosAvance.push(nodo); nodo = nodo.parentElement; }
+    nodo = agujaAvanceEl;
+    let contenedorVelocimetro = null;
+    while (nodo && !contenedorVelocimetro) {
+      if (ancestrosAvance.includes(nodo)) contenedorVelocimetro = nodo;
+      nodo = nodo.parentElement;
+    }
+    if (contenedorVelocimetro && contenedorVelocimetro !== document.body) {
+      contenedorVelocimetro.style.transform = "translateY(14px)";
+      contenedorVelocimetro.style.marginBottom = "14px";
+
+      // Escala 0-25-50-75-100: un poco mas grande, gris y con mayor peso.
+      const labelsEscala = [...contenedorVelocimetro.querySelectorAll("text, span, div")];
+      labelsEscala.forEach(el => {
+        const valor = String(el.textContent || "").trim();
+        if (["0", "25", "50", "75", "100"].includes(valor) && el.children.length === 0) {
+          el.style.fontSize = "12px";
+          el.style.fontWeight = "800";
+          el.style.color = "#5f6863";
+          el.style.fill = "#5f6863";
+          el.style.fontFamily = "Arial, Helvetica, sans-serif";
+
+          // Mantener la posicion absoluta/original definida por el velocimetro.
+          // Solo aplicar pequeños desplazamientos visuales sobre esa posicion.
+          el.style.transform = "none";
+          if (valor === "50") {
+            el.style.transform = "translateY(-5px)";
+          } else if (valor === "100") {
+            el.style.transform = "translate(6px, -1px)";
+          } else if (valor === "0") {
+            el.style.transform = "translate(-3px, -1px)";
+          } else if (valor === "25" || valor === "75") {
+            el.style.transform = "translateY(-1px)";
+          }
+        }
+      });
+    }
+  }
 
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
