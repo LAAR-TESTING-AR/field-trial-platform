@@ -976,6 +976,15 @@ function actualizarDashboard(sitiosFiltrados) {
     }
   });
 
+  // Separa visualmente el velocimetro de las tarjetas KPI superiores.
+  const avanceGrandeEl = document.getElementById("avanceGrande");
+  const gaugeContainer =
+    avanceGrandeEl?.closest(".gauge-container, .gauge, .velocimetro, .avance-gauge") ||
+    avanceGrandeEl?.parentElement?.parentElement;
+  if (gaugeContainer) {
+    gaugeContainer.style.marginTop = "16px";
+  }
+
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
 let colorAvance;
