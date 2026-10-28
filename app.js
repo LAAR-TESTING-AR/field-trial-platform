@@ -280,6 +280,11 @@ accessCoordinateUpdateDate:
     fila["Access Coordinate Update Date"]
   ),
     plantingDate: limpiarTexto(fila["Planting Date (MM/DD/YYYY)"]),
+    harvestDate: limpiarTexto(fila["Harvest Date (MM/DD/YYYY)"]),
+    plantingStatus: limpiarTexto(fila["Planting status"]),
+    harvestStatus: limpiarTexto(fila["Harvest status"]),
+    dropReason: limpiarTexto(fila["Drop reason"]),
+    yldlim: limpiarTexto(fila["YLDLIM"]),
     plantDensity: limpiarTexto(fila["Plant Density (plants/ha)"]),
     fertilization: limpiarTexto(fila["Fertilization"]),
     area: limpiarTexto(fila["Area ( Ha)"]),
@@ -476,6 +481,12 @@ function crearPopupTrial(sitio) {
       ${linea("FTS", sitio.fts)}
       ${linea("SPA", sitio.spa)}
       ${linea("Fecha de siembra", sitio.plantingDate)}
+        ${linea("Fecha de cosecha", sitio.harvestDate)}
+        ${linea("Planting status", sitio.plantingStatus)}
+        ${linea("Harvest status", sitio.harvestStatus)}
+        ${normalizarTexto(sitio.harvestStatus) === "drop"
+          ? linea("Drop reason", sitio.dropReason)
+          : linea("YLDLIM", sitio.yldlim)}
       ${linea("Densidad de plantas", sitio.plantDensity ? sitio.plantDensity + " plantas/ha" : "", "")}
       ${linea("Fertilización", sitio.fertilization)}
       ${linea("Área", sitio.area, sitio.area ? " ha" : "")}
@@ -646,10 +657,7 @@ const porcentajeAccess =
   
 const cantidadDrop =
   sitiosFiltrados.filter(
-    sitio =>
-      String(sitio.description || "")
-        .toLowerCase()
-        .includes("drop")
+    sitio => normalizarTexto(sitio.harvestStatus) === "drop"
   ).length;
 
   console.log({
