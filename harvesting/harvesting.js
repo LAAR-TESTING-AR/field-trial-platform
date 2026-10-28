@@ -935,8 +935,14 @@ function actualizarDashboard(sitiosFiltrados) {
   document.getElementById("pendientes").textContent =
     pendientes;
 
+  const totalFiltrado = sitiosFiltrados.length;
+  const porcentajeDrop =
+    totalFiltrado > 0
+      ? ((drops / totalFiltrado) * 100).toFixed(1)
+      : "0.0";
+
   document.getElementById("drop").textContent =
-    drops;
+    `${drops} · ${porcentajeDrop}%`;
 
   document.getElementById("avanceGrande").textContent =
   `${avance}%`;
