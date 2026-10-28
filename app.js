@@ -660,6 +660,11 @@ const cantidadDrop =
     sitio => normalizarTexto(sitio.harvestStatus) === "drop"
   ).length;
 
+const porcentajeDrop =
+  sitiosFiltrados.length > 0
+    ? ((cantidadDrop / sitiosFiltrados.length) * 100).toFixed(1)
+    : "0.0";
+
   console.log({
   AOI: sitiosFiltrados.length,
   Trials: cantidadTrials,
@@ -693,7 +698,7 @@ console.log(
   </div>
 
   <div class="kpi-item">
-    <span class="kpi-valor">${cantidadDrop}</span>
+    <span class="kpi-valor">${cantidadDrop} - (${porcentajeDrop}%)</span>
     <span class="kpi-label">Drop</span>
   </div>
   <div class="kpi-item">
