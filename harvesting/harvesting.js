@@ -993,31 +993,37 @@ function actualizarDashboard(sitiosFiltrados) {
     if (contenedorVelocimetro && contenedorVelocimetro !== document.body) {
       contenedorVelocimetro.style.transform = "translateY(14px)";
       contenedorVelocimetro.style.marginBottom = "14px";
+    }
+  }
 
-      // Escala 0-25-50-75-100: un poco mas grande, gris y con mayor peso.
-      const labelsEscala = [...contenedorVelocimetro.querySelectorAll("text, span, div")];
-      labelsEscala.forEach(el => {
+  // Estilo estable para la escala del velocimetro.
+  // Se ajustan posiciones con offsets relativos, sin transformar el contenedor completo.
+  const avanceGrandeEscala = document.getElementById("avanceGrande");
+  const agujaEscala = document.getElementById("agujaAvance");
+  if (avanceGrandeEscala && agujaEscala) {
+    const ancestros = [];
+    let n = avanceGrandeEscala;
+    while (n) { ancestros.push(n); n = n.parentElement; }
+    n = agujaEscala;
+    let gauge = null;
+    while (n && !gauge) { if (ancestros.includes(n)) gauge = n; n = n.parentElement; }
+    if (gauge && gauge !== document.body) {
+      [...gauge.querySelectorAll("text, span, div")].forEach(el => {
         const valor = String(el.textContent || "").trim();
-        if (["0", "25", "50", "75", "100"].includes(valor) && el.children.length === 0) {
-          el.style.fontSize = "12px";
-          el.style.fontWeight = "800";
-          el.style.color = "#5f6863";
-          el.style.fill = "#5f6863";
-          el.style.fontFamily = "Arial, Helvetica, sans-serif";
-          el.style.position = "relative";
-
-          // Ajuste fino de la escala respecto del arco.
-          // 50 necesita mas aire vertical y 100 necesita separacion lateral.
-          if (valor === "50") {
-            el.style.transform = "translateY(-6px)";
-          } else if (valor === "100") {
-            el.style.transform = "translate(7px, -1px)";
-          } else if (valor === "0") {
-            el.style.transform = "translate(-3px, -1px)";
-          } else {
-            el.style.transform = "translateY(-2px)";
-          }
-        }
+        if (!["0", "25", "50", "75", "100"].includes(valor) || el.children.length) return;
+        el.style.fontSize = "11px";
+        el.style.fontWeight = "800";
+        el.style.color = "#5f6863";
+        el.style.fill = "#5f6863";
+        el.style.fontFamily = "Arial, Helvetica, sans-serif";
+        el.style.position = "relative";
+        el.style.transform = "none";
+        el.style.left = "0";
+        el.style.top = "0";
+        if (valor === "50") { el.style.top = "-8px"; }
+        else if (valor === "25" || valor === "75") { el.style.top = "-4px"; }
+        else if (valor === "0") { el.style.left = "-5px"; el.style.top = "-2px"; }
+        else if (valor === "100") { el.style.left = "9px"; el.style.top = "-2px"; }
       });
     }
   }
