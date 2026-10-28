@@ -976,13 +976,18 @@ function actualizarDashboard(sitiosFiltrados) {
     }
   });
 
-  // Separa visualmente el velocimetro de las tarjetas KPI superiores.
+  // Separacion SOLO entre las tarjetas KPI y el velocimetro.
+  // Tomamos el bloque inmediatamente anterior al boton Planning, que contiene
+  // el conjunto completo del velocimetro (escala, arco, aguja y porcentaje).
+  const btnPlanningDashboard = document.getElementById("btnPlanning");
+  const panelDashboard = document.getElementById("avanceGrande")?.closest(".dashboard-section, .sidebar-section, .panel, section, div");
   const avanceGrandeEl = document.getElementById("avanceGrande");
-  const gaugeContainer =
-    avanceGrandeEl?.closest(".gauge-container, .gauge, .velocimetro, .avance-gauge") ||
-    avanceGrandeEl?.parentElement?.parentElement;
-  if (gaugeContainer) {
-    gaugeContainer.style.marginTop = "16px";
+  let bloqueVelocimetro = avanceGrandeEl;
+  while (bloqueVelocimetro?.parentElement && bloqueVelocimetro.parentElement !== panelDashboard) {
+    bloqueVelocimetro = bloqueVelocimetro.parentElement;
+  }
+  if (bloqueVelocimetro && bloqueVelocimetro !== panelDashboard) {
+    bloqueVelocimetro.style.marginTop = "14px";
   }
 
   document.getElementById("avanceGrande").textContent =
