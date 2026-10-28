@@ -976,18 +976,24 @@ function actualizarDashboard(sitiosFiltrados) {
     }
   });
 
-  // Separacion SOLO entre las tarjetas KPI y el velocimetro.
-  // Tomamos el bloque inmediatamente anterior al boton Planning, que contiene
-  // el conjunto completo del velocimetro (escala, arco, aguja y porcentaje).
-  const btnPlanningDashboard = document.getElementById("btnPlanning");
-  const panelDashboard = document.getElementById("avanceGrande")?.closest(".dashboard-section, .sidebar-section, .panel, section, div");
+  // Baja SOLO el velocimetro completo (escala + arco + aguja + porcentaje)
+  // sin modificar la posicion de Limpiar filtros, titulo ni tarjetas KPI.
   const avanceGrandeEl = document.getElementById("avanceGrande");
-  let bloqueVelocimetro = avanceGrandeEl;
-  while (bloqueVelocimetro?.parentElement && bloqueVelocimetro.parentElement !== panelDashboard) {
-    bloqueVelocimetro = bloqueVelocimetro.parentElement;
-  }
-  if (bloqueVelocimetro && bloqueVelocimetro !== panelDashboard) {
-    bloqueVelocimetro.style.marginTop = "14px";
+  const agujaAvanceEl = document.getElementById("agujaAvance");
+  if (avanceGrandeEl && agujaAvanceEl) {
+    const ancestrosAvance = [];
+    let nodo = avanceGrandeEl;
+    while (nodo) { ancestrosAvance.push(nodo); nodo = nodo.parentElement; }
+    nodo = agujaAvanceEl;
+    let contenedorVelocimetro = null;
+    while (nodo && !contenedorVelocimetro) {
+      if (ancestrosAvance.includes(nodo)) contenedorVelocimetro = nodo;
+      nodo = nodo.parentElement;
+    }
+    if (contenedorVelocimetro && contenedorVelocimetro !== document.body) {
+      contenedorVelocimetro.style.transform = "translateY(14px)";
+      contenedorVelocimetro.style.marginBottom = "14px";
+    }
   }
 
   document.getElementById("avanceGrande").textContent =
