@@ -88,15 +88,38 @@
       ${!esAccess && visita.cropStage
         ? `<p class="field-history-estadio">Estadio: ${escaparHTML(visita.cropStage)}</p>`
         : ""}
-      ${visita.comments
-        ? `<p class="field-history-comentario">${escaparHTML(visita.comments)}</p>`
-        : ""}
+      ${esAccess
+        ? `<div class="field-history-comentario-bloque" style="margin:10px 0 8px;padding:9px 10px;border:1px solid #d9e3dd;border-radius:9px;background:#f8fbf9">
+            <div style="font-size:11px;font-weight:900;color:#536159;margin-bottom:4px">COMENTARIO</div>
+            <div class="field-history-comentario" style="font-size:12px;line-height:1.4;color:${visita.comments ? "#34473c" : "#7a847e"};font-style:${visita.comments ? "normal" : "italic"}">${visita.comments ? escaparHTML(visita.comments) : "Sin comentario"}</div>
+          </div>`
+        : (visita.comments
+            ? `<p class="field-history-comentario">${escaparHTML(visita.comments)}</p>`
+            : "")}
       <div class="field-history-galeria">${fotosHTML}</div>
+      ${esAccess
+        ? `<div style="display:flex;justify-content:flex-end;margin-top:10px">
+            <button class="field-history-editar-comentario" type="button" style="padding:8px 11px;border:1px solid #167b43;border-radius:8px;background:#fff;color:#146b3c;font-weight:800;cursor:pointer">✏️ ${visita.comments ? "Editar comentario" : "Agregar comentario"}</button>
+          </div>`
+        : ""}
     `;
 
     tarjeta.querySelectorAll(".field-history-foto").forEach(boton => {
       boton.addEventListener("click", () => abrirFoto(boton.dataset.photoUrl));
     });
+
+    const botonComentario = tarjeta.querySelector(".field-history-editar-comentario");
+    if (botonComentario) {
+      botonComentario.addEventListener("click", () => {
+        if (!window.FieldPhotoHistory || typeof window.FieldPhotoHistory.abrirEditorComentario !== "function") {
+          window.alert("La edición de comentarios todavía no está disponible.");
+          return;
+        }
+        window.FieldPhotoHistory.abrirEditorComentario(visita, async () => {
+          await renderizarHistorialAbierto();
+        });
+      });
+    }
     return tarjeta;
   }
 
@@ -267,6 +290,12 @@
   }
 
   window.addEventListener("fieldphotos:history-updated", () => {
+    if (historialAbierto) {
+      renderizarHistorialAbierto();
+    }
+  });
+
+  window.addEventListener("fieldphotos:comment-updated", () => {
     if (historialAbierto) {
       renderizarHistorialAbierto();
     }
