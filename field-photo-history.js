@@ -4,6 +4,8 @@
   const CSV_URL = "AccessPhotos.csv";
   const REFRESH_ATTEMPTS = 5;
   const REFRESH_DELAY_MS = 2500;
+  const UPDATE_COMMENT_URL =
+    "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/11/workflows/4572bdc03ad742f28aa4b08b37975774/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=VcS9B9f0qySwIOVSgnjerXEKfoPVk___3FlGBgYiyyM";
 
   let registros = [];
   let cargaPromise = null;
@@ -280,6 +282,7 @@
           visitScore: foto.visitScore,
           comments: foto.comments,
           captureDate: foto.captureDate,
+          recordId: foto.title,
           photos: []
         });
       }
@@ -303,13 +306,81 @@
       );
   }
 
+  async function actualizarComentarioVisita(visita, comments) {
+    const comentario = texto(comments);
+    if (!visita?.visitId || !visita?.aoiId) {
+      throw new Error("La visita no tiene VisitId o AccessID válido.");
+    }
+
+    const response = await fetch(UPDATE_COMMENT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        recordId: texto(visita.recordId || visita.photos?.[0]?.title),
+        visitId: texto(visita.visitId),
+        aoiId: texto(visita.aoiId),
+        comments: comentario
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`No se pudo actualizar el comentario (${response.status}).`);
+    }
+
+    await cargarHistorial(true);
+    return comentario;
+  }
+
+  function abrirEditorComentario(visita, onSaved) {
+    document.getElementById("fieldPhotoCommentEditor")?.remove();
+    const overlay = document.createElement("div");
+    overlay.id = "fieldPhotoCommentEditor";
+    overlay.style.cssText = "position:fixed;inset:0;z-index:45000;background:rgba(0,0,0,.48);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+    const panel = document.createElement("div");
+    panel.style.cssText = "width:min(520px,100%);background:#fff;border-radius:16px;padding:20px;box-shadow:0 22px 60px rgba(0,0,0,.28)";
+    panel.innerHTML = `
+      <div style="font-size:18px;font-weight:900;color:#21352a">${visita.comments ? "Editar comentario" : "Agregar comentario"}</div>
+      <div style="font-size:12px;color:#66756d;margin-top:4px">${texto(visita.location)} · ${texto(visita.aoiId)}</div>
+      <textarea id="fieldPhotoCommentText" rows="5" style="width:100%;box-sizing:border-box;margin-top:14px;padding:11px;border:1px solid #bfcac3;border-radius:9px;resize:vertical;font:inherit" placeholder="Escriba una referencia del Access...">${texto(visita.comments).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</textarea>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px">
+        <button type="button" data-comment-cancel style="padding:9px 13px;border:1px solid #c6d1ca;border-radius:9px;background:#fff;font-weight:800">Cancelar</button>
+        <button type="button" data-comment-save style="padding:9px 13px;border:0;border-radius:9px;background:#0b6b3a;color:#fff;font-weight:900">Guardar</button>
+      </div>`;
+    overlay.appendChild(panel);
+    document.body.appendChild(overlay);
+    const cerrar = () => overlay.remove();
+    overlay.onclick = e => { if (e.target === overlay) cerrar(); };
+    panel.querySelector("[data-comment-cancel]").onclick = cerrar;
+    panel.querySelector("[data-comment-save]").onclick = async e => {
+      const boton = e.currentTarget;
+      const nuevo = texto(panel.querySelector("#fieldPhotoCommentText").value);
+      boton.disabled = true;
+      boton.textContent = "Guardando...";
+      try {
+        await actualizarComentarioVisita(visita, nuevo);
+        visita.comments = nuevo;
+        cerrar();
+        if (typeof onSaved === "function") await onSaved(nuevo);
+        window.dispatchEvent(new CustomEvent("fieldphotos:comment-updated", { detail: { visitId: visita.visitId, aoiId: visita.aoiId, comments: nuevo } }));
+      } catch (error) {
+        console.error(error);
+        alert("No se pudo actualizar el comentario del Access.");
+        boton.disabled = false;
+        boton.textContent = "Guardar";
+      }
+    };
+    panel.querySelector("#fieldPhotoCommentText")?.focus();
+  }
+
   window.FieldPhotoHistory = {
     cargarHistorial,
     refrescarHastaEncontrar,
     obtenerFotos,
     obtenerVisitas,
     limpiarComentario,
-    colorScore
+    colorScore,
+    actualizarComentarioVisita,
+    abrirEditorComentario
   };
 
   cargarHistorial().catch(() => {
