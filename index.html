@@ -302,7 +302,7 @@ if (submodulo) {
   function aplicar(frase){
     const input=document.getElementById("busqueda");if(!input)return;
     const r=interpretar(frase);
-    if(r.clear){window.masterVoiceStatusFilter="";const b=document.getElementById("limpiarFiltros");if(b)b.click();return;}
+    if(r.clear){window.masterVoiceStatusFilter="";window.masterVoiceTextQuery="";const b=document.getElementById("limpiarFiltros");if(b)b.click();return;}
 
     const tokens=r.query.split(/\s+/).filter(Boolean);
     let status="";
@@ -314,7 +314,9 @@ if (submodulo) {
       if(i>=0){status=tokens[i];quitar.add(i);}
     }
     window.masterVoiceStatusFilter=status;
-    input.value=tokens.filter((_,i)=>!quitar.has(i)).join(" ");
+    window.masterVoiceTextQuery=tokens.filter((_,i)=>!quitar.has(i)).join(" ");
+    // Mostrar en el buscador lo que la voz interpretó, incluido el estado semántico.
+    input.value=[status, window.masterVoiceTextQuery].filter(Boolean).join(" ");
     input.dispatchEvent(new Event("input",{bubbles:true}));
     input.dispatchEvent(new Event("change",{bubbles:true}));
   }
@@ -335,7 +337,7 @@ if (submodulo) {
     return false;
   };
   const boton=document.getElementById("btnVoiceSearchMasterList");if(boton)boton.innerHTML=MIC;
-  const limpiarVoice=document.getElementById("limpiarFiltros");if(limpiarVoice)limpiarVoice.addEventListener("click",()=>{window.masterVoiceStatusFilter="";});
+  const limpiarVoice=document.getElementById("limpiarFiltros");if(limpiarVoice)limpiarVoice.addEventListener("click",()=>{window.masterVoiceStatusFilter="";window.masterVoiceTextQuery="";});
 
   // Voice-only semantic status filter. This uses the normalized fields already loaded by app.js,
   // instead of relying on status text being found by the generic free-text search.
@@ -343,7 +345,14 @@ if (submodulo) {
     if(typeof window.coincideConFiltros!=="function" && typeof coincideConFiltros!=="function")return;
     const original=window.coincideConFiltros||coincideConFiltros;
     const semantic=function(sitio){
-      if(!original(sitio))return false;
+      const input=document.getElementById("busqueda");
+      const visibleValue=input?input.value:"";
+      // El texto visible puede contener "planted", "harvested", etc. Esos términos
+      // se evalúan abajo como estados y no deben participar en la búsqueda genérica.
+      if(input && window.masterVoiceStatusFilter) input.value=window.masterVoiceTextQuery||"";
+      const coincideBase=original(sitio);
+      if(input && window.masterVoiceStatusFilter) input.value=visibleValue;
+      if(!coincideBase)return false;
       const mode=window.masterVoiceStatusFilter||"";
       if(!mode)return true;
       const planting=String(sitio.plantingStatus||"").trim().toLowerCase();
