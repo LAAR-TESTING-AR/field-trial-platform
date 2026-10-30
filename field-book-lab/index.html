@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>Field Book Lab</title>
+
+  <link
+    rel="stylesheet"
+    href="field-book.css"
+  >
+</head>
+
+<body>
+
+  <header class="lab-header">
+    <div class="lab-title">
+      FIELD BOOK LAB
+    </div>
+
+    <div class="lab-status">
+      Ambiente de desarrollo
+    </div>
+  </header>
+
+  <main class="field-book-app">
+
+    <section class="lab-warning">
+      <strong>FIELD BOOK LAB</strong>
+      <span>
+        Ambiente de prueba. No utilizar para operación real.
+      </span>
+    </section>
+
+    <section class="field-book-header">
+
+      <div>
+        <span class="section-label">
+          FIELD TRIAL PLATFORM
+        </span>
+
+        <h1>
+          Field Book
+        </h1>
+
+        <p>
+          Planting execution & trial layout
+        </p>
+      </div>
+
+    </section>
+
+    <section class="field-book-selector">
+
+      <label for="fieldBookAoi">
+        AOI
+      </label>
+
+      <select id="fieldBookAoi">
+
+        <option value="">
+          Seleccionar AOI
+        </option>
+
+        <option value="ANCY04NMETAT">
+          ANCY04NMETAT
+        </option>
+
+      </select>
+
+    </section>
+
+    <section
+      id="fieldBookContent"
+      class="field-book-content"
+    >
+
+      <div class="empty-state">
+
+        <strong>
+          Field Book Lab
+        </strong>
+
+        <span>
+          Seleccioná una AOI para comenzar.
+        </span>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="field-book.js"></script>
+
+</body>
+</html>
