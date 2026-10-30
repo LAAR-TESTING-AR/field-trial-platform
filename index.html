@@ -98,7 +98,7 @@
   <section class="panel">
     <div id="masterSearchRow" style="display:flex;flex-wrap:nowrap;gap:5px;align-items:center;width:100%;box-sizing:border-box;">
       <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA" style="flex:1 1 auto;width:1%;min-width:0;box-sizing:border-box;margin:0;">
-      <button id="btnVoiceSearchMasterList" type="button" title="Buscar por voz" aria-label="Buscar por voz" style="width:38px;min-width:38px;height:38px;flex:0 0 38px;margin:0;padding:0;border:0;border-radius:8px;background:transparent;color:#34423a;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">
+      <button id="btnVoiceSearchMasterList" type="button" onclick="window.masterListVoiceStart && window.masterListVoiceStart(event)" title="Buscar por voz" aria-label="Buscar por voz" style="width:38px;min-width:38px;height:38px;flex:0 0 38px;margin:0;padding:0;border:1px solid #b9c9c0;border-radius:9px;background:#fff;color:#34423a;cursor:pointer;display:flex;align-items:center;justify-content:center;touch-action:manipulation;">
         <svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 10.5V11.5C6.5 14.5376 8.96243 17 12 17C15.0376 17 17.5 14.5376 17.5 11.5V10.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M12 17V21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M9 21H15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </div>
@@ -144,7 +144,6 @@
   <script src="filtros-dependientes-v3.js?v=6"></script>
   <script src="summary-toolbar.js?v=1"></script>
   <script src="drop-trial-addon.js?v=2"></script>
-  <script src="master-list-voice-search_v10.js?v=10"></script>
   <script src="foto-access-addon.js?v=4"></script>
   <script src="popup-mobile-addon.js?v=5"></script>
    <script src="global-settings.js?v=1"></script>
@@ -172,7 +171,8 @@
   <script src="version.js"></script>
   <script src="version-check.js"></script>
   <script src="pwa-ui.js?v=2"></script>
-<script>
+
+  <script>
     checkAppVersion();
     let recargaPorActualizacion = false;
 
@@ -272,7 +272,44 @@ if (submodulo) {
 </script> 
   
 
-
+<script>
+(function(){
+  "use strict";
+  function norm(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s-]/g," ").replace(/\s+/g," ").trim();}
+  const STOP=new Set(["mostrar","mostrame","muestrame","buscar","busca","quiero","ver","localidad","localidades","sitio","sitios","ensayo","ensayos","de","del","la","las","el","los","por","para","con","en","fts","especialista","responsable","que","tengan","tiene","estado"]);
+  function aplicar(frase){
+    const input=document.getElementById("busqueda"); if(!input)return;
+    const t=norm(frase);
+    if(/\b(limpiar|borrar|resetear|restablecer)\b/.test(t)&&/\bfiltros?\b/.test(t)){const b=document.getElementById("limpiarFiltros");if(b)b.click();return;}
+    input.value=[...new Set(t.split(" ").filter(Boolean).filter(x=>!STOP.has(x)))].join(" ");
+    input.dispatchEvent(new Event("input",{bubbles:true})); input.dispatchEvent(new Event("change",{bubbles:true}));
+  }
+  window.masterListVoiceStart=function(ev){
+    if(ev){ev.preventDefault();ev.stopPropagation();}
+    const boton=document.getElementById("btnVoiceSearchMasterList");
+    const input=document.getElementById("busqueda");
+    if(boton){boton.textContent="…";boton.style.background="#eef6f1";}
+    const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!R){
+      if(boton){boton.textContent="🎙️";boton.style.background="#fff";}
+      if(input)input.focus();
+      alert("El navegador de este dispositivo no habilita reconocimiento de voz directo en la aplicación. Podés dictar usando el micrófono del teclado del teléfono dentro del buscador.");
+      return false;
+    }
+    try{
+      const r=new R(); r.lang="es-AR"; r.continuous=false; r.interimResults=false; r.maxAlternatives=1;
+      r.onstart=function(){if(boton){boton.textContent="🔴";boton.style.background="#eef6f1";}};
+      r.onresult=function(e){aplicar(e.results&&e.results[0]&&e.results[0][0]?e.results[0][0].transcript:"");};
+      r.onerror=function(e){console.warn("Voice search",e.error);alert("Búsqueda por voz: "+e.error);};
+      r.onend=function(){if(boton){boton.textContent="🎙️";boton.style.background="#fff";}};
+      r.start();
+    }catch(e){
+      console.error(e); if(boton){boton.textContent="🎙️";boton.style.background="#fff";} alert("No se pudo iniciar la búsqueda por voz.");
+    }
+    return false;
+  };
+})();
+</script>
 
 </body>
 </html>
