@@ -311,6 +311,26 @@ function completarFiltro(elemento, valores) {
   });
 }
 
+function actualizarVocabularioBusquedaVoz() {
+  const campos = [
+    "aoiId", "location", "operations", "crop", "laarStatus", "season",
+    "station", "province", "region", "fts", "spa", "plantingStatus",
+    "harvestStatus", "trialCoordinateStatus", "accessCoordinateStatus", "yldlim"
+  ];
+  const vocabulario = new Map();
+  const agregar = valor => {
+    const original = limpiarTexto(valor);
+    const clave = normalizarTexto(original)
+      .replace(/[^a-z0-9\s-]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (clave && !vocabulario.has(clave)) vocabulario.set(clave, original);
+  };
+  sitios.forEach(sitio => campos.forEach(campo => agregar(sitio[campo])));
+  ["planted", "not planted", "harvested", "not harvested", "in process", "drop", "verified", "reference", "trial", "access"].forEach(agregar);
+  window.MasterListSearchVocabulary = [...vocabulario.entries()].map(([normalizado, original]) => ({ normalizado, original }));
+}
+
 function completarFiltros() {
   completarFiltro(
     filtroCultivo,
@@ -844,6 +864,7 @@ function cargarSitios() {
             sitio.location
         );
 
+      actualizarVocabularioBusquedaVoz();
       completarFiltros();
       actualizarMapa();
 setTimeout(() => {
