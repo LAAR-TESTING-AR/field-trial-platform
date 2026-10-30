@@ -140,7 +140,7 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
  <script src="app-mode.js?v=1"></script>
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=14"></script>
   <script src="filtros-dependientes-v3.js?v=6"></script>
   <script src="summary-toolbar.js?v=1"></script>
   <script src="drop-trial-addon.js?v=2"></script>
@@ -279,6 +279,22 @@ if (submodulo) {
   const MIC_ON=`<svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2"/><path d="M6.5 10.5V11.5C6.5 14.5376 8.96243 17 12 17C15.0376 17 17.5 14.5376 17.5 11.5V10.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="5" r="2.3" fill="#28a060"/></svg>`;
   const STOP=new Set(["mostrar","mostrame","muestrame","buscar","busca","quiero","ver","localidad","localidades","sitio","sitios","ensayo","ensayos","de","del","la","las","el","los","por","para","con","en","fts","especialista","responsable","que","tengan","tiene","estado"]);
   function norm(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s-]/g," ").replace(/\s+/g," ").trim();}
+  function fonetica(v){return norm(v).replace(/k/g,"c").replace(/q/g,"c").replace(/y/g,"i").replace(/v/g,"b").replace(/z/g,"s").replace(/h/g,"");}
+  function distancia(a,b){const m=Array.from({length:a.length+1},()=>Array(b.length+1).fill(0));for(let i=0;i<=a.length;i++)m[i][0]=i;for(let j=0;j<=b.length;j++)m[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)m[i][j]=Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return m[a.length][b.length];}
+  function similitud(a,b){a=fonetica(a);b=fonetica(b);if(!a||!b)return 0;if(a===b)return 1;return 1-distancia(a,b)/Math.max(a.length,b.length);}
+  function corregirConVocabulario(texto){
+    const vocab=Array.isArray(window.MasterListSearchVocabulary)?window.MasterListSearchVocabulary:[];
+    if(!vocab.length)return texto;
+    const candidatos=new Set();
+    vocab.forEach(item=>String(item.normalizado||"").split(/\s+/).filter(x=>x.length>=3).forEach(x=>candidatos.add(x)));
+    const protegidas=new Set(["planted","not","harvested","in","process","drop","verified","reference","trial","access"]);
+    return texto.split(/\s+/).filter(Boolean).map(token=>{
+      if(protegidas.has(token)||token.length<3||candidatos.has(token))return token;
+      let mejor=token,puntaje=0;
+      for(const candidato of candidatos){if(Math.abs(candidato.length-token.length)>2)continue;const p=similitud(token,candidato);if(p>puntaje){puntaje=p;mejor=candidato;}}
+      return (fonetica(token)===fonetica(mejor)||puntaje>=0.72)?mejor:token;
+    }).join(" ");
+  }
   function interpretar(frase){
     let t=norm(frase);
     if(/\b(limpiar|borrar|resetear|restablecer)\b/.test(t)&&/\bfiltros?\b/.test(t))return{clear:true,query:""};
@@ -293,6 +309,7 @@ if (submodulo) {
       [/\bverificad[oa]s?\b/g,"verified"]
     ];
     aliases.forEach(([r,v])=>{t=t.replace(r,v);});
+    t=corregirConVocabulario(t);
     const phrases=["not planted","not harvested","in process"];
     const saved=new Map();
     phrases.forEach((phrase,i)=>{const key=`zz${i}`;if(t.includes(phrase)){t=t.replaceAll(phrase,key);saved.set(key,phrase);}});
