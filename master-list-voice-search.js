@@ -1,271 +1,65 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+(function () {
+  "use strict";
 
-  <title>Field Trial Map Argentina 2026-27</title>
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const STOP = new Set(["mostrar","mostrame","muestrame","buscar","busca","quiero","ver","localidad","localidades","sitio","sitios","ensayo","ensayos","de","del","la","las","el","los","por","para","con","en","fts","especialista","responsable","que","tengan","tiene","estado"]);
 
-  <meta name="description" content="Mapa de ensayos, accesos e informacion de campo de Research Argentina.">
-  <meta name="theme-color" content="#0b6b3a">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Trial Map">
-
-  <link rel="manifest" href="manifest.webmanifest">
-  <script src="manifest-selector.js?v=1"></script>
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="icon-192.png">
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="style.css?v=4"">
-  <link rel="stylesheet" href="summary-toolbar.css?v=1">
-  <link rel="stylesheet" href="foto-access-addon.css?v=3">
-  <link rel="stylesheet" href="popup-mobile-addon.css?v=3">
-  <link rel="stylesheet" href="drop-trial-addon.css?v=1">
-  <link rel="stylesheet" href="filtros-dependientes-v3.css?v=3">
-  <link rel="stylesheet" href="field-photo-capture.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-capture.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-pending.css?v=1">
-  <link rel="stylesheet" href="field-coordinate-sync-ui.css?v=1">
-  <link rel="stylesheet" href="field-photo-history.css?v=1">
-  <link rel="stylesheet" href="field-photo-admin.css?v=1">
-  <link rel="stylesheet" href="pwa-ui.css?v=2">
-  <link rel="stylesheet" href="header-app.css?v=2">
-</head>
-
-<body>
-  <header class="encabezado">    
-    <div class="encabezado-app">
-<a
-  href="platform.html"
-  class="btn-dashboard"
-  title="Dashboard">
-
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg">
-
-    <path
-      d="M3 10.5L12 3L21 10.5"
-      stroke="white"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"/>
-
-    <path
-      d="M5 9.5V20H19V9.5"
-      stroke="white"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"/>
-
-  </svg>
-
-</a>
-<a
-  href="planting/"
-  class="btn-module-switch"
-  title="Go to Planting Module">
-🌱
-</a>
- <a
-  href="harvesting/"
-  class="btn-harvesting-switch"
-  title="Go to Harvesting Module">
-🌾
-</a>     
-      <img class="encabezado-logo" src="icon-192.png" alt="Icono de Field Trial Map">
-
-      <div class="encabezado-textos">
-        <h1>Field Trial Platform</h1>
-
-<p class="encabezado-subtitulo">
-  Argentina 2026-27
-</p>
-
-<p class="encabezado-funciones" id="moduleTitle">
-  Module 01 · Master List
-</p>        
-      </div>
-    </div>
-  </header>
-
-  <section class="panel">
-    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA">
-    <button id="limpiarFiltros" type="button">Limpiar filtros</button>
-
-    <select id="filtroCultivo">
-      <option value="">Todos los cultivos</option>
-    </select>
-
-    <select id="filtroSeason">
-      <option value="">Todas las seasons</option>
-    </select>
-
-    <select id="filtroOperations">
-      <option value="">Todas las operaciones</option>
-    </select>
-
-<select id="filtroStation">
-  <option value="">Todas las estaciones</option>
-</select>
-
-    <select id="filtroLocalidad">
-      <option value="">Todas las localidades</option>
-    </select>
-
-    <select id="filtroFTS">
-      <option value="">Todos los FTS</option>
-    </select>
-  
-  </section>
-
-  <div class="resumen">
-   <div id="contadorSitios">Cargando sitios...</div>
-  </div>
-
-  <main id="mapa"></main>
-
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
- <script src="app-mode.js?v=1"></script>
-  <script src="app.js?v=11"></script>
-  <script src="filtros-dependientes-v3.js?v=6"></script>
-  <script src="summary-toolbar.js?v=1"></script>
-  <script src="drop-trial-addon.js?v=2"></script>
-  <script src="master-list-voice-search_v3.js?v=3"></script>
-  <script src="foto-access-addon.js?v=4"></script>
-  <script src="popup-mobile-addon.js?v=5"></script>
-   <script src="global-settings.js?v=1"></script>
-  <script src="platform-features.js?v=1"></script>
-  
-  <script src="field-photo-capture.js?v=1"></script>
-  <script src="field-photo-popup-integration.js?v=3"></script>
-  <script src="field-photo-sync.js?v=3"></script>
-  <script src="field-photo-pending.js?v=2"></script>
-  <script src="field-photo-sync-ui.js?v=1"></script>
-  <script src="field-photo-history.js?v=2"></script>
-  <script src="field-photo-history-ui.js?v=2"></script>
-  <script src="field-photo-admin.js?v=1"></script>
-  <script src="field-photo-history-viewer.js?v=1"></script>
-  <script src="field-photo-timeline-icons.js?v=1"></script>
-
-  <script src="field-coordinate-storage.js?v=1"></script>
-  <script src="field-coordinate-capture.js?v=2"></script>
-  <script src="field-coordinate-popup-integration.js?v=3"></script>
-  <script src="field-coordinate-pending.js?v=1"></script>
-  <script src="field-coordinate-sync.js?v=1"></script>
-  <script src="field-coordinate-sync-ui.js?v=1"></script>
-  <script src="field-access-status.js?v=5"></script>
-  <script src="app-viewer-controls.js?v=1"></script>
-  <script src="version.js"></script>
-  <script src="version-check.js"></script>
-  <script src="pwa-ui.js?v=2"></script>
-
-  <script>
-    checkAppVersion();
-    let recargaPorActualizacion = false;
-
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", async () => {
-        try {
-          const registration = await navigator.serviceWorker.register(
-            "./service-worker.js",
-            { updateViaCache: "none" }
-          );
-
-          window.fieldTrialServiceWorkerRegistration = registration;
-
-          console.log(
-            "Service Worker registrado:",
-            registration.scope
-          );
-
-          if (registration.waiting) {
-            registration.waiting.postMessage({
-              type: "SKIP_WAITING"
-            });
-          }
-
-          registration.addEventListener("updatefound", () => {
-            const nuevoWorker = registration.installing;
-
-            if (!nuevoWorker) return;
-
-            nuevoWorker.addEventListener("statechange", () => {
-              if (
-                nuevoWorker.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                nuevoWorker.postMessage({
-                  type: "SKIP_WAITING"
-                });
-              }
-            });
-          });
-
-          await registration.update();
-        } catch (error) {
-          console.error(
-            "Error al registrar o actualizar Service Worker:",
-            error
-          );
-        }
-      });
-
-      navigator.serviceWorker.addEventListener(
-        "controllerchange",
-        () => {
-          if (recargaPorActualizacion) return;
-
-          recargaPorActualizacion = true;
-          console.log(
-            "Nueva version activa. Recargando la aplicacion."
-          );
-          window.location.reload();
-        }
-      );
-    }
-  </script>
-
- <script>
-document.addEventListener("DOMContentLoaded", () => {
-
-  if (
-    window.FieldTrialAppMode &&
-    window.FieldTrialAppMode.isViewer
-  ) {
-const titulo =
-  document.getElementById("moduleTitle");
-
-if (titulo) {
-  titulo.innerHTML =
-    'Module 01 · Master List <span style="font-weight:bold;color:#a8ffb0;">· VIEWER MODE</span>';
-}
-    const boton =
-      document.querySelector(".btn-dashboard");
-
-    if (boton) {
-      boton.href =
-        "viewer.html";
-    }
-const submodulo =
-  document.querySelector(".submodulo");
-
-if (submodulo) {
-  submodulo.textContent =
-    "Module 02 · Planting · VIEWER MODE";
-}
+  function norm(v) {
+    return String(v || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
   }
 
-});
-</script> 
-  
-</body>
-</html>
+  function interpretar(frase) {
+    const texto = norm(frase);
+    if (/\b(limpiar|borrar|resetear|restablecer)\b/.test(texto) && /\bfiltros?\b/.test(texto)) return { clear: true, query: "" };
+    return { clear: false, query: [...new Set(texto.split(" ").filter(Boolean).filter(x => !STOP.has(x)))].join(" ") };
+  }
+
+  function buscar(input, valor) {
+    input.value = valor;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  function iniciar() {
+    const input = document.getElementById("busqueda");
+    const boton = document.getElementById("btnVoiceSearchMasterList");
+    if (!input || !boton || boton.dataset.voiceReady === "1") return;
+    boton.dataset.voiceReady = "1";
+
+    const recognition = Recognition ? new Recognition() : null;
+    if (recognition) {
+      recognition.lang = "es-AR";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => { boton.textContent = "🔴"; boton.title = "Escuchando..."; };
+      recognition.onend = () => { boton.textContent = "🎙️"; boton.title = "Buscar por voz"; };
+      recognition.onerror = e => {
+        console.warn("Voice search:", e.error);
+        boton.textContent = "🎙️";
+        if (e.error !== "no-speech" && e.error !== "aborted") alert("No se pudo reconocer la búsqueda por voz.");
+      };
+      recognition.onresult = e => {
+        const frase = e.results?.[0]?.[0]?.transcript || "";
+        const r = interpretar(frase);
+        if (r.clear) {
+          const limpiar = document.getElementById("limpiarFiltros");
+          if (limpiar) limpiar.click(); else buscar(input, "");
+        } else if (r.query) {
+          buscar(input, r.query);
+        }
+      };
+    }
+
+    boton.addEventListener("click", () => {
+      if (!recognition) {
+        alert("Este navegador no ofrece reconocimiento de voz. El micrófono queda visible y la búsqueda manual continúa disponible.");
+        return;
+      }
+      try { recognition.start(); } catch (e) { console.warn(e); }
+    });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", iniciar, { once: true });
+  else iniciar();
+})();
