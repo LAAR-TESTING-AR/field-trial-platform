@@ -204,7 +204,147 @@
     capaMarcadores.clearLayers();
     console.log("DROP actualizarMapa");
     console.log("contadorSitios:", contadorSitios?.innerHTML);
-    const sitiosFiltrados = sitios.filter(coincideConFiltros);
+
+const consultaOriginal = normalizarLocalidadAddon(
+  busqueda?.value || ""
+);
+
+let estadoSemantico = "";
+
+const estadosCompuestos = [
+  "not planted",
+  "not harvested",
+  "in process"
+];
+
+estadoSemantico =
+  estadosCompuestos.find(estado =>
+    consultaOriginal.includes(estado)
+  ) || "";
+
+if (!estadoSemantico) {
+  estadoSemantico =
+    [
+      "planted",
+      "harvested",
+      "drop",
+      "verified",
+      "reference"
+    ].find(estado =>
+      consultaOriginal
+        .split(/\s+/)
+        .includes(estado)
+    ) || "";
+}
+
+const consultaSinEstado = estadoSemantico
+  ? consultaOriginal
+      .replace(estadoSemantico, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  : consultaOriginal;
+
+const sitiosFiltrados = sitios.filter(sitio => {
+  const valorBusquedaOriginal = busqueda?.value || "";
+
+  if (busqueda && estadoSemantico) {
+    busqueda.value = consultaSinEstado;
+  }
+
+  const coincideBase = coincideConFiltros(sitio);
+
+  if (busqueda && estadoSemantico) {
+    busqueda.value = valorBusquedaOriginal;
+  }
+
+  if (!coincideBase) {
+    return false;
+  }
+
+  if (!estadoSemantico) {
+    return true;
+  }
+
+  const plantingStatus = normalizarLocalidadAddon(
+    sitio.plantingStatus
+  );
+
+  const harvestStatus = normalizarLocalidadAddon(
+    sitio.harvestStatus
+  );
+
+  const plantingDate = String(
+    sitio.plantingDate || ""
+  ).trim();
+
+  const harvestDate = String(
+    sitio.harvestDate || ""
+  ).trim();
+
+  const trialStatus = normalizarLocalidadAddon(
+    sitio.trialCoordinateStatus
+  );
+
+  const accessStatus = normalizarLocalidadAddon(
+    sitio.accessCoordinateStatus
+  );
+
+  if (estadoSemantico === "planted") {
+    return (
+      plantingStatus === "planted" ||
+      Boolean(plantingDate)
+    );
+  }
+
+  if (estadoSemantico === "not planted") {
+    return (
+      plantingStatus === "not planted" &&
+      !plantingDate
+    );
+  }
+
+  if (estadoSemantico === "harvested") {
+    return (
+      harvestStatus === "harvested" ||
+      Boolean(harvestDate)
+    );
+  }
+
+  if (estadoSemantico === "not harvested") {
+    return (
+      harvestStatus === "not harvested" &&
+      !harvestDate
+    );
+  }
+
+  if (estadoSemantico === "in process") {
+    return (
+      plantingStatus === "in process" ||
+      harvestStatus === "in process"
+    );
+  }
+
+  if (estadoSemantico === "drop") {
+    return harvestStatus === "drop";
+  }
+
+  if (estadoSemantico === "verified") {
+    return (
+      trialStatus === "verified" ||
+      accessStatus === "verified"
+    );
+  }
+
+  if (estadoSemantico === "reference") {
+    return (
+      trialStatus === "reference" ||
+      accessStatus === "reference"
+    );
+  }
+
+  return true;
+});
+    
     console.log("sitiosFiltrados:", sitiosFiltrados.length);
     const coordenadas = [];
     const modo = busquedaEspecial();
