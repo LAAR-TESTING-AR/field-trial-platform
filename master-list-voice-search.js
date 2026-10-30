@@ -1,151 +1,271 @@
-(function () {
-  "use strict";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const INPUT_ID = "busqueda";
-  const BUTTON_ID = "btnVoiceSearchMasterList";
+  <title>Field Trial Map Argentina 2026-27</title>
 
-  const STOP_WORDS = new Set([
-    "mostrar", "mostrame", "muestrame", "buscar", "busca", "quiero", "ver",
-    "localidad", "localidades", "sitio", "sitios", "ensayo", "ensayos",
-    "de", "del", "la", "las", "el", "los", "por", "para", "con", "en",
-    "fts", "especialista", "responsable", "que", "tengan", "tiene", "estado"
-  ]);
+  <meta name="description" content="Mapa de ensayos, accesos e informacion de campo de Research Argentina.">
+  <meta name="theme-color" content="#0b6b3a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Trial Map">
 
-  function normalizar(valor) {
-    return String(valor || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\s-]/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-  }
+  <link rel="manifest" href="manifest.webmanifest">
+  <script src="manifest-selector.js?v=1"></script>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
 
-  function interpretarFrase(frase) {
-    const texto = normalizar(frase);
-    if (!texto) return { query: "", display: "" };
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css?v=4"">
+  <link rel="stylesheet" href="summary-toolbar.css?v=1">
+  <link rel="stylesheet" href="foto-access-addon.css?v=3">
+  <link rel="stylesheet" href="popup-mobile-addon.css?v=3">
+  <link rel="stylesheet" href="drop-trial-addon.css?v=1">
+  <link rel="stylesheet" href="filtros-dependientes-v3.css?v=3">
+  <link rel="stylesheet" href="field-photo-capture.css?v=1">
+  <link rel="stylesheet" href="field-coordinate-capture.css?v=1">
+  <link rel="stylesheet" href="field-coordinate-pending.css?v=1">
+  <link rel="stylesheet" href="field-coordinate-sync-ui.css?v=1">
+  <link rel="stylesheet" href="field-photo-history.css?v=1">
+  <link rel="stylesheet" href="field-photo-admin.css?v=1">
+  <link rel="stylesheet" href="pwa-ui.css?v=2">
+  <link rel="stylesheet" href="header-app.css?v=2">
+</head>
 
-    if (/\b(limpiar|borrar|resetear|restablecer)\b/.test(texto) && /\bfiltros?\b/.test(texto)) {
-      return { clear: true, query: "", display: "Limpiar filtros" };
+<body>
+  <header class="encabezado">    
+    <div class="encabezado-app">
+<a
+  href="platform.html"
+  class="btn-dashboard"
+  title="Dashboard">
+
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+
+    <path
+      d="M3 10.5L12 3L21 10.5"
+      stroke="white"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+
+    <path
+      d="M5 9.5V20H19V9.5"
+      stroke="white"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"/>
+
+  </svg>
+
+</a>
+<a
+  href="planting/"
+  class="btn-module-switch"
+  title="Go to Planting Module">
+🌱
+</a>
+ <a
+  href="harvesting/"
+  class="btn-harvesting-switch"
+  title="Go to Harvesting Module">
+🌾
+</a>     
+      <img class="encabezado-logo" src="icon-192.png" alt="Icono de Field Trial Map">
+
+      <div class="encabezado-textos">
+        <h1>Field Trial Platform</h1>
+
+<p class="encabezado-subtitulo">
+  Argentina 2026-27
+</p>
+
+<p class="encabezado-funciones" id="moduleTitle">
+  Module 01 · Master List
+</p>        
+      </div>
+    </div>
+  </header>
+
+  <section class="panel">
+    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA">
+    <button id="limpiarFiltros" type="button">Limpiar filtros</button>
+
+    <select id="filtroCultivo">
+      <option value="">Todos los cultivos</option>
+    </select>
+
+    <select id="filtroSeason">
+      <option value="">Todas las seasons</option>
+    </select>
+
+    <select id="filtroOperations">
+      <option value="">Todas las operaciones</option>
+    </select>
+
+<select id="filtroStation">
+  <option value="">Todas las estaciones</option>
+</select>
+
+    <select id="filtroLocalidad">
+      <option value="">Todas las localidades</option>
+    </select>
+
+    <select id="filtroFTS">
+      <option value="">Todos los FTS</option>
+    </select>
+  
+  </section>
+
+  <div class="resumen">
+   <div id="contadorSitios">Cargando sitios...</div>
+  </div>
+
+  <main id="mapa"></main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+ <script src="app-mode.js?v=1"></script>
+  <script src="app.js?v=11"></script>
+  <script src="filtros-dependientes-v3.js?v=6"></script>
+  <script src="summary-toolbar.js?v=1"></script>
+  <script src="drop-trial-addon.js?v=2"></script>
+  <script src="master-list-voice-search_v3.js?v=3"></script>
+  <script src="foto-access-addon.js?v=4"></script>
+  <script src="popup-mobile-addon.js?v=5"></script>
+   <script src="global-settings.js?v=1"></script>
+  <script src="platform-features.js?v=1"></script>
+  
+  <script src="field-photo-capture.js?v=1"></script>
+  <script src="field-photo-popup-integration.js?v=3"></script>
+  <script src="field-photo-sync.js?v=3"></script>
+  <script src="field-photo-pending.js?v=2"></script>
+  <script src="field-photo-sync-ui.js?v=1"></script>
+  <script src="field-photo-history.js?v=2"></script>
+  <script src="field-photo-history-ui.js?v=2"></script>
+  <script src="field-photo-admin.js?v=1"></script>
+  <script src="field-photo-history-viewer.js?v=1"></script>
+  <script src="field-photo-timeline-icons.js?v=1"></script>
+
+  <script src="field-coordinate-storage.js?v=1"></script>
+  <script src="field-coordinate-capture.js?v=2"></script>
+  <script src="field-coordinate-popup-integration.js?v=3"></script>
+  <script src="field-coordinate-pending.js?v=1"></script>
+  <script src="field-coordinate-sync.js?v=1"></script>
+  <script src="field-coordinate-sync-ui.js?v=1"></script>
+  <script src="field-access-status.js?v=5"></script>
+  <script src="app-viewer-controls.js?v=1"></script>
+  <script src="version.js"></script>
+  <script src="version-check.js"></script>
+  <script src="pwa-ui.js?v=2"></script>
+
+  <script>
+    checkAppVersion();
+    let recargaPorActualizacion = false;
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", async () => {
+        try {
+          const registration = await navigator.serviceWorker.register(
+            "./service-worker.js",
+            { updateViaCache: "none" }
+          );
+
+          window.fieldTrialServiceWorkerRegistration = registration;
+
+          console.log(
+            "Service Worker registrado:",
+            registration.scope
+          );
+
+          if (registration.waiting) {
+            registration.waiting.postMessage({
+              type: "SKIP_WAITING"
+            });
+          }
+
+          registration.addEventListener("updatefound", () => {
+            const nuevoWorker = registration.installing;
+
+            if (!nuevoWorker) return;
+
+            nuevoWorker.addEventListener("statechange", () => {
+              if (
+                nuevoWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                nuevoWorker.postMessage({
+                  type: "SKIP_WAITING"
+                });
+              }
+            });
+          });
+
+          await registration.update();
+        } catch (error) {
+          console.error(
+            "Error al registrar o actualizar Service Worker:",
+            error
+          );
+        }
+      });
+
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        () => {
+          if (recargaPorActualizacion) return;
+
+          recargaPorActualizacion = true;
+          console.log(
+            "Nueva version activa. Recargando la aplicacion."
+          );
+          window.location.reload();
+        }
+      );
     }
+  </script>
 
-    const tokens = texto
-      .split(" ")
-      .filter(Boolean)
-      .filter(token => !STOP_WORDS.has(token));
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
 
-    // Mantener palabras operativas reconocidas por la base y el addon.
-    // Ejemplo: “localidades Drop de FTS Romero Cuny” -> “drop romero cuny”.
-    return {
-      clear: false,
-      query: [...new Set(tokens)].join(" "),
-      display: frase.trim()
-    };
-  }
+  if (
+    window.FieldTrialAppMode &&
+    window.FieldTrialAppMode.isViewer
+  ) {
+const titulo =
+  document.getElementById("moduleTitle");
 
-  function dispararBusqueda(input, valor) {
-    input.value = valor;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.dispatchEvent(new Event("change", { bubbles: true }));
-  }
+if (titulo) {
+  titulo.innerHTML =
+    'Module 01 · Master List <span style="font-weight:bold;color:#a8ffb0;">· VIEWER MODE</span>';
+}
+    const boton =
+      document.querySelector(".btn-dashboard");
 
-  function limpiarFiltros(input) {
-    const botonLimpiar = document.getElementById("limpiarFiltros");
-    if (botonLimpiar) {
-      botonLimpiar.click();
-      return;
+    if (boton) {
+      boton.href =
+        "viewer.html";
     }
-    dispararBusqueda(input, "");
+const submodulo =
+  document.querySelector(".submodulo");
+
+if (submodulo) {
+  submodulo.textContent =
+    "Module 02 · Planting · VIEWER MODE";
+}
   }
 
-  function crearBoton(input) {
-    if (document.getElementById(BUTTON_ID)) return;
-
-    const boton = document.createElement("button");
-    boton.id = BUTTON_ID;
-    boton.type = "button";
-    boton.title = "Buscar por voz";
-    boton.setAttribute("aria-label", "Buscar por voz");
-    boton.innerHTML = "🎙️";
-    boton.style.cssText = [
-      "margin-left:6px", "width:38px", "height:38px", "border-radius:10px",
-      "border:1px solid #b9c9c0", "background:#fff", "color:#174c31",
-      "font-size:17px", "cursor:pointer", "display:inline-flex",
-      "align-items:center", "justify-content:center", "flex:0 0 auto",
-      "box-shadow:0 2px 5px rgba(23,63,42,.12)"
-    ].join(";");
-
-    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-    if (recognition) {
-      recognition.lang = "es-AR";
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-    }
-
-    if (recognition) recognition.onstart = function () {
-      boton.innerHTML = "🔴";
-      boton.title = "Escuchando...";
-      boton.style.background = "#eef7f1";
-      input.placeholder = "Escuchando búsqueda...";
-    };
-
-    if (recognition) recognition.onresult = function (event) {
-      const frase = event.results?.[0]?.[0]?.transcript || "";
-      const interpretada = interpretarFrase(frase);
-      if (interpretada.clear) {
-        limpiarFiltros(input);
-      } else if (interpretada.query) {
-        dispararBusqueda(input, interpretada.query);
-      }
-      input.title = interpretada.display
-        ? `Búsqueda por voz: ${interpretada.display}`
-        : "";
-    };
-
-    if (recognition) recognition.onerror = function (event) {
-      console.warn("Búsqueda por voz no disponible:", event.error);
-      if (event.error !== "no-speech" && event.error !== "aborted") {
-        window.alert("No se pudo reconocer la búsqueda por voz. Podés seguir usando el buscador manual.");
-      }
-    };
-
-    if (recognition) recognition.onend = function () {
-      boton.innerHTML = "🎙️";
-      boton.title = "Buscar por voz";
-      boton.style.background = "#fff";
-      input.placeholder = input.dataset.voiceOriginalPlaceholder || "Buscar...";
-    };
-
-    boton.addEventListener("click", function () {
-      if (!recognition) {
-        window.alert("Este navegador no ofrece reconocimiento de voz para la búsqueda. Podés seguir usando el buscador manual.");
-        return;
-      }
-      try {
-        recognition.start();
-      } catch (error) {
-        console.warn("El reconocimiento de voz ya estaba activo.", error);
-      }
-    });
-
-    input.dataset.voiceOriginalPlaceholder = input.placeholder || "Buscar...";
-
-    // No modificar el layout del panel ni el ancho del buscador.
-    // El micrófono se inserta como un control hermano inmediatamente después del buscador.
-    input.insertAdjacentElement("afterend", boton);
-  }
-
-  function iniciar() {
-    const input = document.getElementById(INPUT_ID);
-    if (!input) return;
-    crearBoton(input);
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", iniciar, { once: true });
-  } else {
-    iniciar();
-  }
-})();
+});
+</script> 
+  
+</body>
+</html>
