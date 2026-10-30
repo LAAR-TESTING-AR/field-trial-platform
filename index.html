@@ -302,8 +302,19 @@ if (submodulo) {
   function aplicar(frase){
     const input=document.getElementById("busqueda");if(!input)return;
     const r=interpretar(frase);
-    if(r.clear){const b=document.getElementById("limpiarFiltros");if(b)b.click();return;}
-    input.value=r.query;
+    if(r.clear){window.masterVoiceStatusFilter="";const b=document.getElementById("limpiarFiltros");if(b)b.click();return;}
+
+    const tokens=r.query.split(/\s+/).filter(Boolean);
+    let status="";
+    const quitar=new Set();
+    const tomarFrase=(a,b,valor)=>{const i=tokens.findIndex((x,idx)=>x===a&&tokens[idx+1]===b);if(i>=0){status=valor;quitar.add(i);quitar.add(i+1);return true;}return false;};
+    if(!tomarFrase("not","planted","not planted")&&!tomarFrase("not","harvested","not harvested")&&!tomarFrase("in","process","in process")){
+      const estados=["planted","harvested","drop","verified","reference"];
+      const i=tokens.findIndex(x=>estados.includes(x));
+      if(i>=0){status=tokens[i];quitar.add(i);}
+    }
+    window.masterVoiceStatusFilter=status;
+    input.value=tokens.filter((_,i)=>!quitar.has(i)).join(" ");
     input.dispatchEvent(new Event("input",{bubbles:true}));
     input.dispatchEvent(new Event("change",{bubbles:true}));
   }
@@ -324,6 +335,34 @@ if (submodulo) {
     return false;
   };
   const boton=document.getElementById("btnVoiceSearchMasterList");if(boton)boton.innerHTML=MIC;
+  const limpiarVoice=document.getElementById("limpiarFiltros");if(limpiarVoice)limpiarVoice.addEventListener("click",()=>{window.masterVoiceStatusFilter="";});
+
+  // Voice-only semantic status filter. This uses the normalized fields already loaded by app.js,
+  // instead of relying on status text being found by the generic free-text search.
+  setTimeout(function(){
+    if(typeof window.coincideConFiltros!=="function" && typeof coincideConFiltros!=="function")return;
+    const original=window.coincideConFiltros||coincideConFiltros;
+    const semantic=function(sitio){
+      if(!original(sitio))return false;
+      const mode=window.masterVoiceStatusFilter||"";
+      if(!mode)return true;
+      const planting=String(sitio.plantingStatus||"").trim().toLowerCase();
+      const harvest=String(sitio.harvestStatus||"").trim().toLowerCase();
+      const trial=String(sitio.trialCoordinateStatus||"").trim().toLowerCase();
+      const access=String(sitio.accessCoordinateStatus||"").trim().toLowerCase();
+      if(mode==="planted")return planting==="planted" || Boolean(String(sitio.plantingDate||"").trim());
+      if(mode==="not planted")return planting==="not planted" && !String(sitio.plantingDate||"").trim();
+      if(mode==="harvested")return harvest==="harvested" || Boolean(String(sitio.harvestDate||"").trim());
+      if(mode==="not harvested")return harvest==="not harvested" && !String(sitio.harvestDate||"").trim();
+      if(mode==="in process")return planting==="in process" || harvest==="in process";
+      if(mode==="drop")return harvest==="drop";
+      if(mode==="verified")return trial==="verified" || access==="verified";
+      if(mode==="reference")return trial==="reference" || access==="reference";
+      return true;
+    };
+    window.coincideConFiltros=semantic;
+    try{coincideConFiltros=semantic;}catch(e){}
+  },0);
 })();
 </script>
 
