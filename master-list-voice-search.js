@@ -1,7 +1,6 @@
 (function () {
   "use strict";
 
-  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const STOP = new Set(["mostrar","mostrame","muestrame","buscar","busca","quiero","ver","localidad","localidades","sitio","sitios","ensayo","ensayos","de","del","la","las","el","los","por","para","con","en","fts","especialista","responsable","que","tengan","tiene","estado"]);
 
   function norm(v) {
@@ -14,8 +13,15 @@
     return { clear: false, query: [...new Set(texto.split(" ").filter(Boolean).filter(x => !STOP.has(x)))].join(" ") };
   }
 
-  function buscar(input, valor) {
-    input.value = valor;
+  function aplicar(input, frase) {
+    const r = interpretar(frase);
+    if (r.clear) {
+      const limpiar = document.getElementById("limpiarFiltros");
+      if (limpiar) limpiar.click();
+      else input.value = "";
+    } else if (r.query) {
+      input.value = r.query;
+    }
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
   }
@@ -26,8 +32,10 @@
     if (!input || !boton || boton.dataset.voiceReady === "1") return;
     boton.dataset.voiceReady = "1";
 
-    const recognition = Recognition ? new Recognition() : null;
-    if (recognition) {
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    if (Recognition) {
+      recognition = new Recognition();
       recognition.lang = "es-AR";
       recognition.continuous = false;
       recognition.interimResults = false;
@@ -37,26 +45,22 @@
       recognition.onerror = e => {
         console.warn("Voice search:", e.error);
         boton.textContent = "🎙️";
-        if (e.error !== "no-speech" && e.error !== "aborted") alert("No se pudo reconocer la búsqueda por voz.");
+        boton.title = "Buscar por voz";
+        if (!["no-speech","aborted"].includes(e.error)) alert("No se pudo reconocer la búsqueda por voz.");
       };
-      recognition.onresult = e => {
-        const frase = e.results?.[0]?.[0]?.transcript || "";
-        const r = interpretar(frase);
-        if (r.clear) {
-          const limpiar = document.getElementById("limpiarFiltros");
-          if (limpiar) limpiar.click(); else buscar(input, "");
-        } else if (r.query) {
-          buscar(input, r.query);
-        }
-      };
+      recognition.onresult = e => aplicar(input, e.results?.[0]?.[0]?.transcript || "");
     }
 
-    boton.addEventListener("click", () => {
-      if (!recognition) {
-        alert("Este navegador no ofrece reconocimiento de voz. El micrófono queda visible y la búsqueda manual continúa disponible.");
+    boton.addEventListener("click", async () => {
+      if (recognition) {
+        try { recognition.start(); } catch (e) { console.warn(e); }
         return;
       }
-      try { recognition.start(); } catch (e) { console.warn(e); }
+
+      // iOS/Safari/PWA: Web Speech recognition may not be exposed. Keep the control functional
+      // by focusing the search field so the native keyboard dictation can be used immediately.
+      input.focus({ preventScroll: true });
+      alert("En este dispositivo el navegador no habilita reconocimiento de voz directo. Usá el micrófono de dictado del teclado: el texto dictado se filtra automáticamente en Master List.");
     });
   }
 
