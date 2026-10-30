@@ -96,7 +96,10 @@
   </header>
 
   <section class="panel">
-    <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA">
+    <div id="masterSearchRow" style="display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:6px;align-items:center;width:100%;">
+      <input type="search" id="busqueda" placeholder="Buscar AOI, localidad, cultivo, FTS..." aria-label="Buscar por AOI ID, localidad, Trial, Access, Drop, descripción, cultivo, season, operations, región, provincia, FTS o SPA" style="width:100%;min-width:0;box-sizing:border-box;">
+      <button id="btnVoiceSearchMasterList" type="button" title="Buscar por voz" aria-label="Buscar por voz" style="width:40px;height:40px;padding:0;border:1px solid #b9c9c0;border-radius:10px;background:#fff;color:#174c31;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 5px rgba(23,63,42,.12);">🎙️</button>
+    </div>
     <button id="limpiarFiltros" type="button">Limpiar filtros</button>
 
     <select id="filtroCultivo">
@@ -139,7 +142,7 @@
   <script src="filtros-dependientes-v3.js?v=6"></script>
   <script src="summary-toolbar.js?v=1"></script>
   <script src="drop-trial-addon.js?v=2"></script>
-  <script src="master-list-voice-search_v2.js?v=2"></script>
+  <script src="master-list-voice-search_v4.js?v=4"></script>
   <script src="foto-access-addon.js?v=4"></script>
   <script src="popup-mobile-addon.js?v=5"></script>
    <script src="global-settings.js?v=1"></script>
