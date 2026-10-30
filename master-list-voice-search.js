@@ -126,17 +126,9 @@
 
     input.dataset.voiceOriginalPlaceholder = input.placeholder || "Buscar...";
 
-    // Mantener el layout existente. Si el padre ya es flex, se integra directamente.
-    const padre = input.parentElement;
-    if (padre) {
-      if (getComputedStyle(padre).display !== "flex") {
-        padre.style.display = "flex";
-        padre.style.alignItems = "center";
-      }
-      input.style.minWidth = "0";
-      input.style.flex = "1 1 auto";
-      padre.appendChild(boton);
-    }
+    // No modificar el layout del panel ni el ancho del buscador.
+    // El micrófono se inserta como un control hermano inmediatamente después del buscador.
+    input.insertAdjacentElement("afterend", boton);
   }
 
   function iniciar() {
