@@ -60,7 +60,7 @@
   }
 
   function crearBoton(input) {
-    if (!SpeechRecognition || document.getElementById(BUTTON_ID)) return;
+    if (document.getElementById(BUTTON_ID)) return;
 
     const boton = document.createElement("button");
     boton.id = BUTTON_ID;
@@ -76,20 +76,22 @@
       "box-shadow:0 2px 5px rgba(23,63,42,.12)"
     ].join(";");
 
-    const recognition = new SpeechRecognition();
-    recognition.lang = "es-AR";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
+    const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+    if (recognition) {
+      recognition.lang = "es-AR";
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+    }
 
-    recognition.onstart = function () {
+    if (recognition) recognition.onstart = function () {
       boton.innerHTML = "🔴";
       boton.title = "Escuchando...";
       boton.style.background = "#eef7f1";
       input.placeholder = "Escuchando búsqueda...";
     };
 
-    recognition.onresult = function (event) {
+    if (recognition) recognition.onresult = function (event) {
       const frase = event.results?.[0]?.[0]?.transcript || "";
       const interpretada = interpretarFrase(frase);
       if (interpretada.clear) {
@@ -102,14 +104,14 @@
         : "";
     };
 
-    recognition.onerror = function (event) {
+    if (recognition) recognition.onerror = function (event) {
       console.warn("Búsqueda por voz no disponible:", event.error);
       if (event.error !== "no-speech" && event.error !== "aborted") {
         window.alert("No se pudo reconocer la búsqueda por voz. Podés seguir usando el buscador manual.");
       }
     };
 
-    recognition.onend = function () {
+    if (recognition) recognition.onend = function () {
       boton.innerHTML = "🎙️";
       boton.title = "Buscar por voz";
       boton.style.background = "#fff";
@@ -117,6 +119,10 @@
     };
 
     boton.addEventListener("click", function () {
+      if (!recognition) {
+        window.alert("Este navegador no ofrece reconocimiento de voz para la búsqueda. Podés seguir usando el buscador manual.");
+        return;
+      }
       try {
         recognition.start();
       } catch (error) {
