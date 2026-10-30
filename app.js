@@ -334,9 +334,86 @@ function completarFiltros() {
 }
 
 function coincideConFiltros(sitio) {
+  const consultaCompleta = normalizarTexto(busqueda.value);
+
+  const equivalenciasEstado = {
+    planted: sitio =>
+      normalizarTexto(sitio.plantingStatus) === "planted" ||
+      Boolean(limpiarTexto(sitio.plantingDate)),
+
+    "not planted": sitio =>
+      normalizarTexto(sitio.plantingStatus) === "not planted" &&
+      !limpiarTexto(sitio.plantingDate),
+
+    harvested: sitio =>
+      normalizarTexto(sitio.harvestStatus) === "harvested" ||
+      Boolean(limpiarTexto(sitio.harvestDate)),
+
+    "not harvested": sitio =>
+      normalizarTexto(sitio.harvestStatus) === "not harvested" &&
+      !limpiarTexto(sitio.harvestDate),
+
+    "in process": sitio =>
+      normalizarTexto(sitio.plantingStatus) === "in process" ||
+      normalizarTexto(sitio.harvestStatus) === "in process",
+
+    drop: sitio =>
+      normalizarTexto(sitio.harvestStatus) === "drop",
+
+    verified: sitio =>
+      normalizarTexto(sitio.trialCoordinateStatus) === "verified" ||
+      normalizarTexto(sitio.accessCoordinateStatus) === "verified",
+
+    reference: sitio =>
+      normalizarTexto(sitio.trialCoordinateStatus) === "reference" ||
+      normalizarTexto(sitio.accessCoordinateStatus) === "reference"
+  };
+
+  let estadoBuscado = "";
+
+  const estadosCompuestos = [
+    "not planted",
+    "not harvested",
+    "in process"
+  ];
+
+  estadosCompuestos.some(estado => {
+    if (consultaCompleta.includes(estado)) {
+      estadoBuscado = estado;
+      return true;
+    }
+
+    return false;
+  });
+
+  if (!estadoBuscado) {
+    const estadosSimples = [
+      "planted",
+      "harvested",
+      "drop",
+      "verified",
+      "reference"
+    ];
+
+    estadoBuscado =
+      estadosSimples.find(estado =>
+        consultaCompleta
+          .split(/\s+/)
+          .includes(estado)
+      ) || "";
+  }
+
+  let consultaTexto = consultaCompleta;
+
+  if (estadoBuscado) {
+    consultaTexto = consultaTexto
+      .replace(estadoBuscado, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
 
   const palabras =
-    normalizarTexto(busqueda.value)
+    consultaTexto
       .split(/\s+/)
       .filter(Boolean);
 
@@ -351,19 +428,26 @@ function coincideConFiltros(sitio) {
 
   const coincideBusqueda =
     palabras.length === 0 ||
-    palabras.every(
-      palabra =>
-        contenidoCompleto.includes(palabra)
+    palabras.every(palabra =>
+      contenidoCompleto.includes(palabra)
     );
+
+  const coincideEstado =
+    !estadoBuscado ||
+    equivalenciasEstado[estadoBuscado](sitio);
 
   return (
     coincideBusqueda &&
-    (!filtroCultivo.value || sitio.crop === filtroCultivo.value) &&
-    (!filtroStation.value || sitio.station === filtroStation.value) &&
-    (!filtroLocalidad.value || sitio.location === filtroLocalidad.value) &&
-    (!filtroFTS.value || sitio.fts === filtroFTS.value)
+    coincideEstado &&
+    (!filtroCultivo.value ||
+      sitio.crop === filtroCultivo.value) &&
+    (!filtroStation.value ||
+      sitio.station === filtroStation.value) &&
+    (!filtroLocalidad.value ||
+      sitio.location === filtroLocalidad.value) &&
+    (!filtroFTS.value ||
+      sitio.fts === filtroFTS.value)
   );
-
 }
 
 function configuracionCultivo(cultivo) {
