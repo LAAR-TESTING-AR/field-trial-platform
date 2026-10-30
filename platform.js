@@ -37,6 +37,11 @@ console.log(
       esDrop
     ).length;
 
+  const porcentajeDrop =
+    sitiosValidos.length > 0
+      ? ((drops / sitiosValidos.length) * 100).toFixed(1)
+      : "0.0";
+
   const sembrados =
     sitiosValidos.filter(
       sitio =>
@@ -121,7 +126,7 @@ if (tarjetasKpi.length >= 4) {
   tarjetasKpi[3]
     .querySelector(".kpi-valor")
     .textContent =
-      drops;
+      `${drops} - (${porcentajeDrop}%)`;
 }
 
   /*
