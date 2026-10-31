@@ -20,6 +20,35 @@
   // Datos embebidos opcionales para pruebas con doble clic (file://).
   // Si existe window.FIELD_BOOK_LAYOUTS, Field Book usa esos datos sin fetch.
   const layoutsEmbebidos = window.FIELD_BOOK_LAYOUTS || {};
+  const settingsEmbebidos = window.FIELD_BOOK_SETTINGS || { experimentSettings: [], locationSettings: [] };
+
+  function normalizar(valor) { return String(valor ?? "").trim().toLowerCase(); }
+
+  function obtenerLocationSetting(aoiId) {
+    return (settingsEmbebidos.locationSettings || []).find(item => normalizar(item.AOI_ID) === normalizar(aoiId)) || null;
+  }
+
+  function obtenerExperimentSetting(location) {
+    if (!location) return null;
+    return (settingsEmbebidos.experimentSettings || []).find(item =>
+      normalizar(item.Season) === normalizar(location.Season) &&
+      normalizar(item.Crop) === normalizar(location.Crop) &&
+      normalizar(item.Config) === normalizar(location.Config)
+    ) || null;
+  }
+
+  function completarSelectorAoi() {
+    const existentes = new Set([...selectorAoi.options].map(option => option.value).filter(Boolean));
+    (settingsEmbebidos.locationSettings || []).forEach(item => {
+      const aoiId = String(item.AOI_ID || "").trim();
+      if (!aoiId || existentes.has(aoiId)) return;
+      const option = document.createElement("option");
+      option.value = aoiId;
+      option.textContent = `${aoiId} · ${item.Location || ""}`;
+      selectorAoi.appendChild(option);
+      existentes.add(aoiId);
+    });
+  }
 
   const datosDemo = {
     ANCY04NMETAT: {
@@ -93,6 +122,45 @@
       const filas = ranges.map(r => `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center"><div style="position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:center;background:#eef6f1;color:#174c31;font-size:10px;font-weight:900;padding:9px 0;border-radius:5px">R${r}</div>${columnas.map(c => { const plot=porCoord.get(`${r}|${c}`); if(!plot) return `<div style="width:32px;min-width:32px;height:28px;border:1px dashed #e2e9e5;border-radius:4px"></div>`; const color=colorPorExperimento.get(plot.experimentName)||"#e7ece9"; return `<button class="field-book-real-plot" data-range="${r}" data-column="${c}" type="button" style="width:32px;min-width:32px;height:28px;border:1px solid #bfcac3;border-radius:4px;background:${color};font-size:8px;font-weight:800;cursor:pointer">${c}</button>`; }).join("")}</div>`).join("");
       contenido.innerHTML = `<div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:14px"><div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${layoutReal.trial?.year || "-"} · Season ${layoutReal.trial?.season || "-"}</div></div><span style="padding:6px 9px;border-radius:999px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900;height:max-content">REAL LAYOUT · READ ONLY</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:16px"><section style="min-width:0;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">LAYOUT</span><h3 style="margin:5px 0">Plano interactivo</h3><p style="color:#6c7a72;font-size:12px">Range ${layout.rangeMin}-${layout.rangeMax} · Column ${layout.columnMin}-${layout.columnMax} · ${layout.plotRecordCount} parcelas · ${experimentos.length} experimentos</p><div style="overflow:auto;max-height:68vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div></section><aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff"><span class="section-label">PLOT DETAIL</span><div id="fieldBookRealDetail" style="margin-top:8px;color:#6c7a72;font-size:12px">Tocá una parcela para ver sus datos.</div></aside></div></div>`;
       contenido.querySelectorAll(".field-book-real-plot").forEach(btn => btn.addEventListener("click", () => { const plot=porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`); const d=document.getElementById("fieldBookRealDetail"); if(d&&plot) d.innerHTML=`<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:9px;line-height:1.6"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>Germplasm ID:</b> ${plot.germplasmId ?? "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>EUDQ:</b> ${plot.eudq || "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Comment:</b> ${plot.entryComment || "-"}</div>`; }));
+      return;
+    }
+
+    const locationSetting = obtenerLocationSetting(aoiId);
+    const experimentSetting = obtenerExperimentSetting(locationSetting);
+
+    if (!layoutReal && locationSetting) {
+      const loc = locationSetting;
+      const exp = experimentSetting;
+      contenido.innerHTML = `
+        <div style="padding:18px">
+          <div style="display:flex;justify-content:space-between;gap:16px;margin-bottom:16px">
+            <div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${loc.Location || "-"} · ${loc.Crop || "-"} · ${loc.Season || "-"}</div></div>
+            <span style="padding:6px 9px;border-radius:999px;background:#fff7df;color:#775900;font-size:10px;font-weight:900;height:max-content">SETTINGS REAL · LAYOUT PENDING</span>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,340px);gap:16px">
+            <section style="min-height:330px;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9">
+              <span class="section-label">LAYOUT</span><h3 style="margin:5px 0 8px">Plano pendiente</h3><p style="color:#6c7a72;font-size:12px">Todavía no se cargó el export de plano para ${aoiId}.</p>
+            </section>
+            <aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff">
+              <span class="section-label">PLANTING SETUP</span><h3 style="margin:5px 0 10px">${loc.Config || "-"}</h3>
+              <div style="margin-bottom:10px;padding:7px 8px;border-radius:7px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900">SETUP REAL · DEV</div>
+              ${crearFila("Seeds / row", exp?.SeedsPerRow)}
+              ${crearFila("Target density", exp?.TargetDensity)}
+              ${crearFila("Trip horn", exp?.TripHorn)}
+              ${crearFila("Splitter", exp?.Splitter)}
+              ${crearFila("Machine config", exp?.MachineConfig)}
+              ${crearFila("Extra seeds", exp?.ExtraSeeds)}
+              ${crearFila("Seed min clams", exp?.SeedMinClams)}
+              ${crearFila("Recommendation", exp?.Recommendation)}
+              <div style="margin-top:14px"><span class="section-label">LOCATION SETUP</span>
+                ${crearFila("Area", loc.AreaHa == null ? null : `${loc.AreaHa} ha`)}
+                ${crearFila("Urea", loc.UreaKgHa == null ? null : `${loc.UreaKgHa} kg/ha`)}
+                ${crearFila("Microstar", loc.MicrostarKgHa == null ? null : `${loc.MicrostarKgHa} kg/ha`)}
+                ${crearFila("Microstar bags", loc.MicrostarBags)}
+              </div>
+            </aside>
+          </div>
+        </div>`;
       return;
     }
 
@@ -277,6 +345,8 @@
       </div>
     `;
   }
+
+  completarSelectorAoi();
 
   selectorAoi.addEventListener(
     "change",
