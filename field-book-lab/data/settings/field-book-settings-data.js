@@ -48,7 +48,7 @@ window.FIELD_BOOK_SETTINGS = {
       "AOI_ID": "ACBY08NHERNT",
       "Location": "Hernando",
       "Crop": "Soybean",
-      "Config": "Research",
+      "Config": "Impact",
       "AreaHa": 1.15,
       "UreaKgHa": 0,
       "MicrostarKgHa": 30,
