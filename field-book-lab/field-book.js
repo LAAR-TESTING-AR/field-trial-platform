@@ -152,6 +152,10 @@
     fondo: "#eaf2fb"
   };
 
+  function simboloShift(offset) {
+    return Number(offset) > 0 ? "↑" : "↓";
+  }
+
   function claveEvento(aoiId, range, column) {
     return `${aoiId}|${range}|${column}`;
   }
@@ -195,11 +199,15 @@
   }
 
   function shiftParaPlot(aoiId, range, column) {
-    return leerBlockShifts(aoiId).find(shift =>
-      Number(shift.column) === Number(column) &&
-      Number(range) >= Number(shift.startRange) &&
-      Number(range) <= Number(shift.endRange)
-    ) || null;
+    return leerBlockShifts(aoiId).find(shift => {
+      const desde = Math.min(Number(shift.startRange), Number(shift.endRange));
+      const hasta = Math.max(Number(shift.startRange), Number(shift.endRange));
+      return (
+        Number(shift.column) === Number(column) &&
+        Number(range) >= desde &&
+        Number(range) <= hasta
+      );
+    }) || null;
   }
 
   function eliminarShift(aoiId, shiftId) {
@@ -214,7 +222,9 @@
     if (!cfg) return;
     const marca = document.createElement("span");
     marca.className = "field-book-status-mark";
-    marca.textContent = cfg.simbolo;
+    marca.textContent = evento.status === "Shifted"
+      ? simboloShift(evento.offset)
+      : cfg.simbolo;
     marca.style.cssText = `position:absolute;right:1px;top:1px;min-width:11px;height:11px;padding:0 1px;border-radius:3px;background:${cfg.fondo};color:${cfg.color};font-size:8px;line-height:11px;font-weight:900;text-align:center;border:1px solid ${cfg.color}55;`;
     boton.appendChild(marca);
   }
@@ -232,13 +242,13 @@
       return `<button type="button" class="field-book-exec-status" data-status="${status}" style="padding:7px 8px;border:1px solid ${activo ? cfg.color : '#d4ded8'};border-radius:7px;background:${activo ? cfg.fondo : '#fff'};color:${activo ? cfg.color : '#536159'};font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap">${cfg.simbolo} ${status}</button>`;
     }).join("");
     const restore = evento.status ? `<button id="fieldBookRestoreNormal" type="button" style="width:100%;margin-top:7px;padding:7px;border:1px solid #c7d4cc;border-radius:7px;background:#fff;color:#536159;font-weight:800;font-size:10px;cursor:pointer">↺ RESTORE TO NORMAL</button>` : "";
-    const shiftInfo = shift ? `<div style="margin:8px 0;padding:8px;border-radius:7px;background:${shiftConfig.fondo};color:${shiftConfig.color};font-size:10px"><b>BLOCK SHIFT ${shift.offset > 0 ? '+' : ''}${shift.offset}</b><br>Planned: ${plot.range}-${plot.column}<br>Actual: ${actualRange}-${actualColumn}${fuera ? '<br><b>⚠ Outside planned layout</b>' : ''}<br>Range ${shift.startRange}-${shift.endRange} · Column ${shift.column}</div><button id="fieldBookRemoveShift" data-shift-id="${shift.id}" type="button" style="width:100%;padding:7px;border:1px solid #9fb8d5;border-radius:7px;background:#fff;color:#315d91;font-weight:800;font-size:10px;cursor:pointer">↺ REMOVE BLOCK SHIFT</button>` : "";
+    const shiftInfo = shift ? `<div style="margin:8px 0;padding:8px;border-radius:7px;background:${shiftConfig.fondo};color:${shiftConfig.color};font-size:10px"><b>${simboloShift(shift.offset)} BLOCK SHIFT ${shift.offset > 0 ? '+' : ''}${shift.offset}</b><br>Planned: ${plot.range}-${plot.column}<br>Actual: ${actualRange}-${actualColumn}${fuera ? '<br><b>⚠ Outside planned layout</b>' : ''}<br>Range ${shift.startRange}-${shift.endRange} · Column ${shift.column}</div><button id="fieldBookRemoveShift" data-shift-id="${shift.id}" type="button" style="width:100%;padding:7px;border:1px solid #9fb8d5;border-radius:7px;background:#fff;color:#315d91;font-weight:800;font-size:10px;cursor:pointer">↺ REMOVE BLOCK SHIFT</button>` : "";
     return `
       <div id="fieldBookExecution" style="margin-top:12px;padding-top:11px;border-top:1px solid #dce6e0">
         <span class="section-label">PLANTING EXECUTION · LAB</span>
         <div style="margin-top:6px;color:#6c7a72;font-size:10px">${evento.status ? `Current issue: <b>${evento.status}</b>` : "No issues registered · Normal by default"}</div>
         ${shiftInfo}
-        <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 9px">${botones}<button type="button" id="fieldBookShiftBlock" style="padding:7px 8px;border:1px solid ${shiftConfig.color};border-radius:7px;background:#fff;color:${shiftConfig.color};font-size:10px;font-weight:900;cursor:pointer">↕ SHIFT BLOCK</button></div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 9px">${botones}<button type="button" id="fieldBookShiftBlock" style="padding:7px 8px;border:1px solid ${shiftConfig.color};border-radius:7px;background:#fff;color:${shiftConfig.color};font-size:10px;font-weight:900;cursor:pointer">SHIFT BLOCK</button></div>
         <textarea id="fieldBookExecutionComment" rows="3" placeholder="Comentario de ejecución..." style="width:100%;box-sizing:border-box;resize:vertical;padding:8px;border:1px solid #c7d4cc;border-radius:7px;font:inherit;font-size:11px">${evento.comment || ""}</textarea>
         <button id="fieldBookSaveExecution" type="button" style="width:100%;margin-top:7px;padding:8px;border:0;border-radius:7px;background:#0b6b3a;color:#fff;font-weight:900;font-size:11px;cursor:pointer">GUARDAR INCIDENCIA</button>
         ${restore}
@@ -257,7 +267,7 @@
       <span class="section-label">SHIFT BLOCK · LAB</span><h3 style="margin:5px 0 4px">Column ${plot.column} · From Range ${plot.range}</h3>
       <p style="margin:0 0 12px;color:#6c7a72;font-size:11px">Desplaza esta parcela y todas las siguientes de la misma columna.</p>
       <label style="font-size:10px;font-weight:800;color:#536159">DIRECTION / OFFSET</label>
-      <select id="fieldBookShiftOffset" style="width:100%;margin:5px 0 10px;padding:8px;border:1px solid #c7d4cc;border-radius:7px"><option value="1">+1 Range</option><option value="-1">-1 Range</option><option value="2">+2 Ranges</option><option value="-2">-2 Ranges</option></select>
+      <select id="fieldBookShiftOffset" style="width:100%;margin:5px 0 10px;padding:8px;border:1px solid #c7d4cc;border-radius:7px"><option value="1">↑ +1 Range</option><option value="-1">↓ -1 Range</option><option value="2">↑ +2 Ranges</option><option value="-2">↓ -2 Ranges</option></select>
       <div id="fieldBookShiftPreview" style="padding:10px;background:#f7faf8;border:1px solid #d9e3dd;border-radius:8px;font-size:10px;line-height:1.55"></div>
       <textarea id="fieldBookShiftComment" rows="3" placeholder="Comentario del salto..." style="width:100%;box-sizing:border-box;margin-top:10px;padding:8px;border:1px solid #c7d4cc;border-radius:7px"></textarea>
       <div style="display:flex;gap:7px;margin-top:10px"><button id="fieldBookShiftCancel" style="flex:1;padding:8px;border:1px solid #c7d4cc;border-radius:7px;background:#fff;font-weight:800">CANCEL</button><button id="fieldBookShiftApply" style="flex:1;padding:8px;border:0;border-radius:7px;background:#315d91;color:#fff;font-weight:900">APPLY SHIFT</button></div>
@@ -270,7 +280,7 @@
       const start = Number(plot.range);
       const affected = [...porCoord.values()].filter(p => Number(p.column)===Number(plot.column) && (offset > 0 ? Number(p.range)>=start : Number(p.range)<=start)).sort((a,b)=>Number(a.range)-Number(b.range));
       const lines = affected.map(p => { const to=Number(p.range)+offset; const out=to<Number(layout.rangeMin)||to>Number(layout.rangeMax); return `${p.range}-${p.column} → ${to}-${p.column}${out?' ⚠ outside layout':''}`; });
-      previewEl.innerHTML = `<b>${affected.length} parcelas afectadas</b><br>${lines.join('<br>')}`;
+      previewEl.innerHTML = `<b>${simboloShift(offset)} ${affected.length} parcelas afectadas · ${offset > 0 ? '+' : ''}${offset}</b><br>${lines.join('<br>')}`;
       overlay.dataset.endRange=String(endRange);
       overlay.dataset.affected=String(affected.length);
     };
@@ -318,7 +328,10 @@
         if (plotInicial) {
           const eventoIndividual = eventosIniciales[claveEvento(aoiId, plotInicial.range, plotInicial.column)];
           const shift = shiftParaPlot(aoiId, plotInicial.range, plotInicial.column);
-          aplicarMarcaBoton(btn, eventoIndividual || (shift ? { status: "Shifted" } : null));
+          aplicarMarcaBoton(
+              btn,
+              eventoIndividual || (shift ? { status: "Shifted", offset: shift.offset } : null)
+            );
         }
 
         btn.addEventListener("click", () => {
