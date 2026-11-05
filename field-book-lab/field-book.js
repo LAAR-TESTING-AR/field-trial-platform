@@ -413,6 +413,43 @@
     return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">PLANTING CHECKLIST</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px"><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Completed</small><b style="display:block;font-size:20px">${metrics.completed}/${metrics.total}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Observations</small><b style="display:block;font-size:20px">${metrics.observations}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Problems</small><b style="display:block;font-size:20px">${metrics.problems}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Pending</small><b style="display:block;font-size:20px">${metrics.pending}</b></div></div>${sectionHTML}<button id="fieldBookSaveChecklist" type="button" style="width:100%;margin-top:14px;padding:10px;border:0;border-radius:8px;background:#0b6b3a;color:#fff;font-size:11px;font-weight:900;cursor:pointer">SAVE CHECKLIST</button><div id="fieldBookChecklistMsg" style="margin-top:6px;color:#6c7a72;font-size:9px">Guardado local en LAB.</div></section>`;
   }
 
+  function crearIssuesMapHTML(aoiId, layoutReal, colorPorExperimento) {
+    const layout = layoutReal.layout || {};
+    const porCoord = new Map(layoutReal.plots.map(plot => [`${plot.range}|${plot.column}`, plot]));
+    const eventos = leerEventos(aoiId);
+    const columnas = [];
+    const ranges = [];
+    for (let c = layout.columnMin; c <= layout.columnMax; c++) columnas.push(c);
+    for (let r = layout.rangeMax; r >= layout.rangeMin; r--) ranges.push(r);
+    const header = columnas.map(c => `<div style="width:44px;min-width:44px;text-align:center;font-size:9px;font-weight:800;color:#6c7a72">${c}</div>`).join("");
+    const filas = ranges.map(r => `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center"><div style="position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:center;background:#eef6f1;color:#174c31;font-size:10px;font-weight:900;padding:9px 0;border-radius:5px">R${r}</div>${columnas.map(c => {
+      const plot=porCoord.get(`${r}|${c}`);
+      if(!plot) return `<div style="width:44px;min-width:44px;height:28px;border:1px dashed #e2e9e5;border-radius:4px"></div>`;
+      const esBuffer=plot.type === "BUFFER" || String(plot.experimentName || "").toLowerCase() === "buffer";
+      const color=esBuffer ? "#e2e5e3" : (colorPorExperimento.get(plot.experimentName) || "#e7ece9");
+      const evento=eventos[claveEvento(aoiId,r,c)];
+      const shift=shiftParaPlot(aoiId,r,c);
+      const marca=evento ? estadosEjecucion[evento.status]?.simbolo : shift ? simboloShift(shift.offset) : "";
+      const cfg=evento ? estadosEjecucion[evento.status] : shift ? shiftConfig : null;
+      return `<button type="button" class="field-book-issues-plot" data-range="${r}" data-column="${c}" style="position:relative;width:44px;min-width:44px;height:28px;border:1px solid ${cfg ? cfg.color : '#bfcac3'};border-radius:4px;background:${color};font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap">${r}-${c}${marca ? `<span style="position:absolute;right:1px;top:1px;min-width:12px;height:12px;border-radius:3px;background:${cfg.fondo};color:${cfg.color};font-size:9px;line-height:12px;font-weight:900">${marca}</span>` : ""}</button>`;
+    }).join("")}</div>`).join("");
+    return `<section style="margin-top:15px;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">ISSUES MAP · READ ONLY</span><p style="margin:5px 0 10px;color:#6c7a72;font-size:11px">Vista informativa. La edición de incidencias se realiza únicamente en Field Map.</p><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,300px);gap:12px"><div style="overflow:auto;max-height:62vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div><aside style="padding:12px;border:1px solid #bfd4c7;border-radius:9px;background:#fff"><span class="section-label">PLOT INFORMATION</span><div id="fieldBookIssuesPlotInfo" style="margin-top:8px;color:#6c7a72;font-size:11px">Tocá una parcela para consultar el material y su incidencia.</div></aside></div></section>`;
+  }
+
+  function conectarIssuesMap(aoiId, layoutReal) {
+    const porCoord=new Map(layoutReal.plots.map(plot=>[`${plot.range}|${plot.column}`,plot]));
+    document.querySelectorAll(".field-book-issues-plot").forEach(btn=>btn.addEventListener("click",()=>{
+      const plot=porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
+      const info=document.getElementById("fieldBookIssuesPlotInfo");
+      if(!plot || !info) return;
+      const evento=leerEventos(aoiId)[claveEvento(aoiId,plot.range,plot.column)];
+      const shift=shiftParaPlot(aoiId,plot.range,plot.column);
+      const issue=evento?.status || (shift ? `Shifted ${shift.offset > 0 ? '+' : ''}${shift.offset}` : "Normal");
+      const comment=evento?.comment || shift?.comment || "-";
+      info.innerHTML=`<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:8px;line-height:1.55"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Issue:</b> ${issue}<br><b>Comment:</b> ${comment}</div>`;
+    }));
+  }
+
   function crearIssuesHTML(aoiId, layout) {
     const eventos = leerEventos(aoiId);
     const shifts = leerBlockShifts(aoiId);
@@ -444,26 +481,38 @@
   function activarVistaFieldBook(vista) {
     const views = { overview:"fieldBookOverviewView", layout:"fieldBookLayoutView", checklist:"fieldBookChecklistView", issues:"fieldBookIssuesView" };
     const tabs = { overview:"fieldBookTabOverview", layout:"fieldBookTabLayout", checklist:"fieldBookTabChecklist", issues:"fieldBookTabIssues" };
-    Object.entries(views).forEach(([name,id]) => { const el=document.getElementById(id); if(el) el.hidden=name!==vista; });
-    Object.entries(tabs).forEach(([name,id]) => { const el=document.getElementById(id); if(el){const active=name===vista;el.style.background=active?"#174c31":"#fff";el.style.color=active?"#fff":"#536159";el.style.borderColor=active?"#174c31":"#c8d5ce";} });
+    Object.entries(views).forEach(([name,id]) => {
+      const el=document.getElementById(id);
+      if(!el) return;
+      const active=name===vista;
+      el.hidden=!active;
+      el.style.display=active ? (name === "layout" ? "grid" : "block") : "none";
+    });
+    Object.entries(tabs).forEach(([name,id]) => {
+      const el=document.getElementById(id);
+      if(!el) return;
+      const active=name===vista;
+      el.style.background=active?"#174c31":"#fff";
+      el.style.color=active?"#fff":"#536159";
+      el.style.borderColor=active?"#174c31":"#c8d5ce";
+    });
   }
 
   function refrescarIssuesEnPantalla(aoiId, layout) {
-    const issuesView = document.getElementById("fieldBookIssuesView");
-    if (!issuesView) return;
-    const estabaVisible = !issuesView.hidden;
-    issuesView.innerHTML = crearIssuesHTML(aoiId, layout);
-    issuesView.querySelectorAll(".field-book-issue-link").forEach(issueButton => {
-      issueButton.addEventListener("click", () => {
-        activarVistaFieldBook("layout");
-        const target = contenido.querySelector(`.field-book-real-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
-        if (target) {
-          target.click();
-          target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-        }
-      });
-    });
-    if (estabaVisible) activarVistaFieldBook("issues");
+    const issuesView=document.getElementById("fieldBookIssuesView");
+    const layoutReal=layoutsEmbebidos[aoiId];
+    if(!issuesView || !layoutReal) return;
+    const estabaVisible=issuesView.style.display !== "none" && !issuesView.hidden;
+    const colores=["#dff3e7","#e5ecff","#fff0d8","#f3e4ff","#dff4f7","#ffe3e3","#edf1d4","#f6e8cf","#e8e8ff"];
+    const colorPorExperimento=new Map((layoutReal.experiments||[]).map((exp,i)=>[exp.name,(exp.type === "BUFFER" || String(exp.name||"").toLowerCase() === "buffer") ? "#e2e5e3" : colores[i % colores.length]]));
+    issuesView.innerHTML=crearIssuesHTML(aoiId,layout)+crearIssuesMapHTML(aoiId,layoutReal,colorPorExperimento);
+    conectarIssuesMap(aoiId,layoutReal);
+    issuesView.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
+      activarVistaFieldBook("issues");
+      const target=issuesView.querySelector(`.field-book-issues-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
+      if(target){target.click();target.scrollIntoView({behavior:"smooth",block:"center",inline:"center"});}
+    }));
+    if(estabaVisible) activarVistaFieldBook("issues");
   }
 
   function renderizarAoi(
@@ -489,20 +538,19 @@
               <span class="section-label">PLOT DETAIL</span>
               <div id="fieldBookRealDetail" style="margin-top:8px;color:#6c7a72;font-size:12px">Tocá una parcela para ver sus datos.</div>
             </section>
-          </aside></div><div id="fieldBookChecklistView" hidden>${crearChecklistHTML(aoiId)}</div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}</div></div>`;
+          </aside></div><div id="fieldBookChecklistView" hidden>${crearChecklistHTML(aoiId)}</div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}${crearIssuesMapHTML(aoiId, layoutReal, colorPorExperimento)}</div></div>`;
       document.getElementById("fieldBookTabOverview")?.addEventListener("click",()=>activarVistaFieldBook("overview"));
       document.getElementById("fieldBookTabLayout")?.addEventListener("click",()=>activarVistaFieldBook("layout"));
       document.getElementById("fieldBookTabChecklist")?.addEventListener("click",()=>activarVistaFieldBook("checklist"));
       document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>activarVistaFieldBook("issues"));
-      document.getElementById("fieldBookOpenMap")?.addEventListener("click",()=>activarVistaFieldBook("layout"));
-      document.getElementById("fieldBookOpenChecklist")?.addEventListener("click",()=>activarVistaFieldBook("checklist"));
-      document.getElementById("fieldBookOpenIssues")?.addEventListener("click",()=>activarVistaFieldBook("issues"));
+      conectarIssuesMap(aoiId, layoutReal);
+      activarVistaFieldBook("overview");
       document.getElementById("fieldBookStartVisit")?.addEventListener("click",()=>{const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"In progress",startedAt:v.startedAt||new Date().toISOString()});renderizarAoi(aoiId);});
       document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",()=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"Completed",startedAt:v.startedAt||new Date().toISOString(),completedAt:new Date().toISOString()});renderizarAoi(aoiId);});
       document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",()=>{const respuestas={};contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});guardarChecklist(aoiId,respuestas);const view=document.getElementById("fieldBookChecklistView");if(view)view.innerHTML=crearChecklistHTML(aoiId);renderizarAoi(aoiId);setTimeout(()=>activarVistaFieldBook("checklist"),0);});
       contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
-        activarVistaFieldBook("layout");
-        const target=contenido.querySelector(`.field-book-real-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
+        activarVistaFieldBook("issues");
+        const target=contenido.querySelector(`.field-book-issues-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
         if(target){target.click();target.scrollIntoView({behavior:"smooth",block:"center",inline:"center"});}
       }));
 
