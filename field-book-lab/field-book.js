@@ -231,6 +231,13 @@
 
   function crearEjecucionHTML(aoiId, plot, layout) {
     if (!plot) return "";
+    if ((leerVisit(aoiId).status || "Not started") === "Completed") {
+      const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)] || {};
+      const shift = shiftParaPlot(aoiId, plot.range, plot.column);
+      const estado = evento.status || (shift ? `Shifted ${shift.offset > 0 ? "+" : ""}${shift.offset}` : "Normal");
+      const comentario = evento.comment || shift?.comment || "-";
+      return `<div style="margin-top:12px;padding:10px;border-top:1px solid #dce6e0;background:#f7faf8;border-radius:7px"><span class="section-label">PLANTING EXECUTION · READ ONLY</span><div style="margin-top:6px;color:#536159;font-size:10px"><b>Status:</b> ${estado}<br><b>Comment:</b> ${comentario}</div></div>`;
+    }
     const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)] || {};
     const shift = shiftParaPlot(aoiId, plot.range, plot.column);
     const actualRange = shift ? Number(plot.range) + Number(shift.offset) : Number(plot.range);
@@ -392,6 +399,7 @@
 
   function crearChecklistHTML(aoiId) {
     const respuestas = leerChecklist(aoiId);
+    const checklistReadOnly = (leerVisit(aoiId).status || "Not started") === "Completed";
     const metrics = metricasChecklist(aoiId);
     const sections = [...new Set(checklistTemplate.map(x => x.section))];
     const sectionHTML = sections.map(section => `
@@ -401,13 +409,13 @@
           return `<div class="field-book-check-row" data-check-id="${item.id}" style="padding:10px;border:1px solid #d9e3dd;border-radius:9px;background:#fff">
             <div style="display:grid;grid-template-columns:minmax(190px,1fr) 145px;gap:9px;align-items:center">
               <strong style="font-size:11px;color:#34473c">${item.label}</strong>
-              <select class="field-book-check-status" style="padding:7px;border:1px solid #c7d4cc;border-radius:7px;font-size:10px"><option value="Pending" ${!response.status || response.status === "Pending" ? "selected" : ""}>Pending</option><option value="OK" ${response.status === "OK" ? "selected" : ""}>✓ OK</option><option value="Observation" ${response.status === "Observation" ? "selected" : ""}>! Observation</option><option value="Problem" ${response.status === "Problem" ? "selected" : ""}>X Problem</option><option value="N/A" ${response.status === "N/A" ? "selected" : ""}>N/A</option></select>
+              <select class="field-book-check-status" ${checklistReadOnly ? "disabled" : ""} style="padding:7px;border:1px solid #c7d4cc;border-radius:7px;font-size:10px"><option value="Pending" ${!response.status || response.status === "Pending" ? "selected" : ""}>Pending</option><option value="OK" ${response.status === "OK" ? "selected" : ""}>✓ OK</option><option value="Observation" ${response.status === "Observation" ? "selected" : ""}>! Observation</option><option value="Problem" ${response.status === "Problem" ? "selected" : ""}>X Problem</option><option value="N/A" ${response.status === "N/A" ? "selected" : ""}>N/A</option></select>
             </div>
-            <input class="field-book-check-comment" value="${String(response.comment || "").replace(/"/g,"&quot;")}" placeholder="Comentario opcional..." style="width:100%;box-sizing:border-box;margin-top:7px;padding:7px;border:1px solid #d9e3dd;border-radius:7px;font-size:10px">
+            <input class="field-book-check-comment" ${checklistReadOnly ? "readonly" : ""} value="${String(response.comment || "").replace(/"/g,"&quot;")}" placeholder="Comentario opcional..." style="width:100%;box-sizing:border-box;margin-top:7px;padding:7px;border:1px solid #d9e3dd;border-radius:7px;font-size:10px">
           </div>`;
         }).join("")}</div>
       </section>`).join("");
-    return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">PLANTING CHECKLIST</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px"><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Completed</small><b style="display:block;font-size:20px">${metrics.completed}/${metrics.total}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Observations</small><b style="display:block;font-size:20px">${metrics.observations}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Problems</small><b style="display:block;font-size:20px">${metrics.problems}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Pending</small><b style="display:block;font-size:20px">${metrics.pending}</b></div></div>${sectionHTML}<button id="fieldBookSaveChecklist" type="button" style="width:100%;margin-top:14px;padding:10px;border:0;border-radius:8px;background:#0b6b3a;color:#fff;font-size:11px;font-weight:900;cursor:pointer">SAVE CHECKLIST</button><div id="fieldBookChecklistMsg" style="margin-top:6px;color:#6c7a72;font-size:9px">Guardado local en LAB.</div></section>`;
+    return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">PLANTING CHECKLIST</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px"><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Completed</small><b style="display:block;font-size:20px">${metrics.completed}/${metrics.total}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Observations</small><b style="display:block;font-size:20px">${metrics.observations}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Problems</small><b style="display:block;font-size:20px">${metrics.problems}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Pending</small><b style="display:block;font-size:20px">${metrics.pending}</b></div></div>${sectionHTML}${checklistReadOnly ? `<div style="margin-top:14px;padding:9px;border-radius:8px;background:#eef6f1;color:#0b6b3a;font-size:10px;font-weight:900;text-align:center">FIELD BOOK COMPLETED · CHECKLIST READ ONLY</div>` : `<button id="fieldBookSaveChecklist" type="button" style="width:100%;margin-top:14px;padding:10px;border:0;border-radius:8px;background:#0b6b3a;color:#fff;font-size:11px;font-weight:900;cursor:pointer">SAVE CHECKLIST</button>`}<div id="fieldBookChecklistMsg" style="margin-top:6px;color:#6c7a72;font-size:9px">Guardado local en LAB.</div></section>`;
   }
 
   function crearIssuesMapHTML(aoiId, layoutReal, colorPorExperimento) {
@@ -536,10 +544,23 @@
               <div id="fieldBookRealDetail" style="margin-top:8px;color:#6c7a72;font-size:12px">Tocá una parcela para ver sus datos.</div>
             </section>
           </aside></div><div id="fieldBookChecklistView" hidden>${crearChecklistHTML(aoiId)}</div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}${crearIssuesMapHTML(aoiId, layoutReal, colorPorExperimento)}</div></div>`;
+      const visitStatusActual = (leerVisit(aoiId).status || "Not started");
+      const procesoIniciado = visitStatusActual !== "Not started";
+      ["fieldBookTabLayout","fieldBookTabChecklist","fieldBookTabIssues"].forEach(id => {
+        const tab = document.getElementById(id);
+        if (!tab) return;
+        tab.disabled = !procesoIniciado;
+        if (!procesoIniciado) {
+          tab.style.opacity = ".38";
+          tab.style.cursor = "not-allowed";
+          tab.title = "Primero iniciá el Field Book desde Overview";
+        }
+      });
+
       document.getElementById("fieldBookTabOverview")?.addEventListener("click",()=>activarVistaFieldBook("overview"));
-      document.getElementById("fieldBookTabLayout")?.addEventListener("click",()=>activarVistaFieldBook("layout"));
-      document.getElementById("fieldBookTabChecklist")?.addEventListener("click",()=>activarVistaFieldBook("checklist"));
-      document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>activarVistaFieldBook("issues"));
+      document.getElementById("fieldBookTabLayout")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("layout"); });
+      document.getElementById("fieldBookTabChecklist")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("checklist"); });
+      document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("issues"); });
       conectarIssuesMap(aoiId, layoutReal);
       activarVistaFieldBook("overview");
       document.getElementById("fieldBookStartVisit")?.addEventListener("click",()=>{const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"In progress",startedAt:v.startedAt||new Date().toISOString()});renderizarAoi(aoiId);});
