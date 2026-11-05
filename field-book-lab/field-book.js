@@ -384,11 +384,8 @@
           <section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff"><span class="section-label">LOCATION SETUP</span><h3 style="margin:5px 0 10px">${loc.Location || "-"}</h3>${fila("Area",loc.AreaHa==null?"-":`${loc.AreaHa} ha`)}${fila("Urea",loc.UreaKgHa==null?"-":`${loc.UreaKgHa} kg/ha`)}${fila("Microstar",loc.MicrostarKgHa==null?"-":`${loc.MicrostarKgHa} kg/ha`)}${fila("Microstar bags",loc.MicrostarBags)}</section>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
-          <button id="fieldBookOpenMap" type="button" style="padding:9px 13px;border:0;border-radius:8px;background:#174c31;color:#fff;font-size:10px;font-weight:900;cursor:pointer">OPEN FIELD MAP</button>
-          <button id="fieldBookOpenChecklist" type="button" style="padding:9px 13px;border:1px solid #174c31;border-radius:8px;background:#fff;color:#174c31;font-size:10px;font-weight:900;cursor:pointer">OPEN CHECKLIST</button>
-          <button id="fieldBookOpenIssues" type="button" style="padding:9px 13px;border:1px solid #174c31;border-radius:8px;background:#fff;color:#174c31;font-size:10px;font-weight:900;cursor:pointer">VIEW ISSUES</button>
-          <button id="fieldBookStartVisit" type="button" style="padding:9px 13px;border:0;border-radius:8px;background:#6d4aff;color:#fff;font-size:10px;font-weight:900;cursor:pointer">${status === "Not started" ? "START FIELD BOOK" : "CONTINUE FIELD BOOK"}</button>
-          <button id="fieldBookCompleteVisit" type="button" ${status === "Completed" ? "disabled" : ""} style="padding:9px 13px;border:1px solid #6d4aff;border-radius:8px;background:#fff;color:#5a3cc6;font-size:10px;font-weight:900;cursor:pointer;opacity:${status === "Completed" ? ".45" : "1"}">COMPLETE FIELD BOOK</button>
+          ${status === "Not started" ? `<button id="fieldBookStartVisit" type="button" style="padding:9px 13px;border:0;border-radius:8px;background:#6d4aff;color:#fff;font-size:10px;font-weight:900;cursor:pointer">START FIELD BOOK</button>` : ""}
+          ${status === "Not started" ? "" : `<button id="fieldBookCompleteVisit" type="button" ${status === "Completed" ? "disabled" : ""} style="padding:9px 13px;border:1px solid #6d4aff;border-radius:8px;background:${status === "Completed" ? "#eef6f1" : "#fff"};color:${status === "Completed" ? "#0b6b3a" : "#5a3cc6"};font-size:10px;font-weight:900;cursor:${status === "Completed" ? "default" : "pointer"};opacity:1">${status === "Completed" ? "FIELD BOOK COMPLETED" : "COMPLETE FIELD BOOK"}</button>`}
         </div>
       </section>`;
   }
