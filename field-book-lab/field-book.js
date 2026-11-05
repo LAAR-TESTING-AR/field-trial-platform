@@ -294,6 +294,41 @@
     };
   }
 
+  function crearIssuesHTML(aoiId, layout) {
+    const eventos = leerEventos(aoiId);
+    const shifts = leerBlockShifts(aoiId);
+    const individuales = Object.entries(eventos).map(([key, evento]) => {
+      const partes = key.split("|");
+      return { range:Number(partes[1]), column:Number(partes[2]), status:evento.status, comment:evento.comment || "" };
+    });
+    const counts = {
+      Refilled: individuales.filter(x => x.status === "Refilled").length,
+      Lost: individuales.filter(x => x.status === "Lost").length,
+      Observation: individuales.filter(x => x.status === "Observation").length,
+      Shifts: shifts.length
+    };
+    const total = counts.Refilled + counts.Lost + counts.Observation + counts.Shifts;
+    const cards = [
+      ["Refilled",counts.Refilled,"R",estadosEjecucion.Refilled],
+      ["Lost",counts.Lost,"X",estadosEjecucion.Lost],
+      ["Observation",counts.Observation,"!",estadosEjecucion.Observation],
+      ["Shift Blocks",counts.Shifts,"↑↓",shiftConfig]
+    ].map(([label,value,symbol,cfg]) => `<div style="padding:12px;border:1px solid #d9e3dd;border-radius:10px;background:#fff"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="display:inline-flex;align-items:center;gap:7px;color:${cfg.color};font-size:11px;font-weight:900"><b style="min-width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:${cfg.fondo};border:1px solid ${cfg.color}55">${symbol}</b>${label}</span><strong style="font-size:20px;color:#26352d">${value}</strong></div></div>`).join("");
+    const individualHTML = ["Lost","Refilled","Observation"].map(status => {
+      const items=individuales.filter(x=>x.status===status); if(!items.length) return ""; const cfg=estadosEjecucion[status];
+      return `<section style="margin-top:16px"><h4 style="margin:0 0 7px;color:${cfg.color};font-size:11px">${cfg.simbolo} ${status.toUpperCase()}</h4><div style="display:grid;gap:6px">${items.map(item=>`<button type="button" class="field-book-issue-link" data-range="${item.range}" data-column="${item.column}" style="width:100%;padding:9px 10px;text-align:left;border:1px solid #d9e3dd;border-radius:8px;background:#fff;cursor:pointer"><strong style="color:#174c31">${item.range}-${item.column}</strong><span style="display:block;margin-top:3px;color:#6c7a72;font-size:10px">${item.comment || "Sin comentario"}</span></button>`).join("")}</div></section>`;
+    }).join("");
+    const shiftHTML = shifts.length ? `<section style="margin-top:16px"><h4 style="margin:0 0 7px;color:${shiftConfig.color};font-size:11px">↑↓ SHIFT BLOCKS</h4><div style="display:grid;gap:6px">${shifts.map(shift=>{const affected=Math.abs(Number(shift.endRange)-Number(shift.startRange))+1;const actualEnd=Number(shift.endRange)+Number(shift.offset);const outside=actualEnd<Number(layout.rangeMin)||actualEnd>Number(layout.rangeMax);return `<button type="button" class="field-book-issue-link" data-range="${shift.startRange}" data-column="${shift.column}" style="width:100%;padding:9px 10px;text-align:left;border:1px solid #c8d8e9;border-radius:8px;background:#f7faff;cursor:pointer"><strong style="color:${shiftConfig.color}">${simboloShift(shift.offset)} Column ${shift.column} · Range ${shift.startRange}-${shift.endRange} · ${shift.offset>0?"+":""}${shift.offset}</strong><span style="display:block;margin-top:3px;color:#6c7a72;font-size:10px">${affected} parcelas afectadas${outside?" · ⚠ termina fuera del layout":""}</span>${shift.comment?`<span style="display:block;margin-top:3px;color:#6c7a72;font-size:10px">${shift.comment}</span>`:""}</button>`;}).join("")}</div></section>` : "";
+    return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">FIELD EXECUTION SUMMARY</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px">${cards}</div><div style="margin-top:10px;padding:10px 12px;border-radius:9px;background:#174c31;color:#fff;display:flex;justify-content:space-between;align-items:center"><strong style="font-size:11px">TOTAL ISSUES</strong><strong style="font-size:22px">${total}</strong></div>${total ? individualHTML+shiftHTML : `<div style="margin-top:18px;padding:28px;text-align:center;border:1px dashed #cbd7d0;border-radius:10px;color:#6c7a72;font-size:12px">No hay incidencias registradas en esta AOI.</div>`}</section>`;
+  }
+
+  function activarVistaFieldBook(vista) {
+    const layoutView=document.getElementById("fieldBookLayoutView"); const issuesView=document.getElementById("fieldBookIssuesView"); const layoutTab=document.getElementById("fieldBookTabLayout"); const issuesTab=document.getElementById("fieldBookTabIssues"); const issues=vista==="issues";
+    if(layoutView) layoutView.hidden=issues; if(issuesView) issuesView.hidden=!issues;
+    if(layoutTab){layoutTab.style.background=issues?"#fff":"#174c31";layoutTab.style.color=issues?"#536159":"#fff";}
+    if(issuesTab){issuesTab.style.background=issues?"#174c31":"#fff";issuesTab.style.color=issues?"#fff":"#536159";}
+  }
+
   function renderizarAoi(
     aoiId
   ) {
@@ -312,7 +347,7 @@
       for (let r = layout.rangeMax; r >= layout.rangeMin; r--) ranges.push(r);
       const header = columnas.map(c => `<div style="width:44px;min-width:44px;text-align:center;font-size:9px;font-weight:800;color:#6c7a72">${c}</div>`).join("");
       const filas = ranges.map(r => `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center"><div style="position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:center;background:#eef6f1;color:#174c31;font-size:10px;font-weight:900;padding:9px 0;border-radius:5px">R${r}</div>${columnas.map(c => { const plot=porCoord.get(`${r}|${c}`); if(!plot) return `<div style="width:44px;min-width:44px;height:28px;border:1px dashed #e2e9e5;border-radius:4px"></div>`; const esBuffer = plot.type === "BUFFER" || String(plot.experimentName || "").toLowerCase() === "buffer"; const color = esBuffer ? "#e2e5e3" : (colorPorExperimento.get(plot.experimentName)||"#e7ece9"); return `<button class="field-book-real-plot" data-range="${r}" data-column="${c}" type="button" style="width:44px;min-width:44px;height:28px;border:1px solid #bfcac3;border-radius:4px;background:${color};font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap">${r}-${c}</button>`; }).join("")}</div>`).join("");
-      contenido.innerHTML = `<div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:14px"><div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${layoutReal.trial?.year || "-"} · Season ${layoutReal.trial?.season || "-"}</div></div><span style="padding:6px 9px;border-radius:999px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900;height:max-content">REAL LAYOUT · READ ONLY</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:16px"><section style="min-width:0;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">LAYOUT</span><h3 style="margin:5px 0">Plano interactivo</h3><p style="color:#6c7a72;font-size:12px">Range ${layout.rangeMin}-${layout.rangeMax} · Column ${layout.columnMin}-${layout.columnMax} · ${layout.plotRecordCount} parcelas · ${experimentos.length} experimentos</p><div style="overflow:auto;max-height:68vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div></section><aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff;max-height:76vh;overflow:auto">
+      contenido.innerHTML = `<div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:14px"><div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${layoutReal.trial?.year || "-"} · Season ${layoutReal.trial?.season || "-"}</div></div><span style="padding:6px 9px;border-radius:999px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900;height:max-content">REAL LAYOUT · READ ONLY</span></div><div style="display:flex;gap:7px;margin-bottom:12px"><button id="fieldBookTabLayout" type="button" style="padding:8px 15px;border:1px solid #174c31;border-radius:8px;background:#174c31;color:#fff;font-size:10px;font-weight:900;cursor:pointer">LAYOUT</button><button id="fieldBookTabIssues" type="button" style="padding:8px 15px;border:1px solid #c8d5ce;border-radius:8px;background:#fff;color:#536159;font-size:10px;font-weight:900;cursor:pointer">ISSUES</button></div><div id="fieldBookLayoutView" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:16px"><section style="min-width:0;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">LAYOUT</span><h3 style="margin:5px 0">Plano interactivo</h3><p style="color:#6c7a72;font-size:12px">Range ${layout.rangeMin}-${layout.rangeMax} · Column ${layout.columnMin}-${layout.columnMax} · ${layout.plotRecordCount} parcelas · ${experimentos.length} experimentos</p><div style="overflow:auto;max-height:68vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div></section><aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff;max-height:76vh;overflow:auto">
             <section style="padding:12px;border:1px solid #bfd4c7;border-radius:9px;background:#f8fbf9">
               <span class="section-label">PLOT DETAIL</span>
               <div id="fieldBookRealDetail" style="margin-top:8px;color:#6c7a72;font-size:12px">Tocá una parcela para ver sus datos.</div>
@@ -321,7 +356,15 @@
             <section>${crearPlantingSetupHTML(aoiId)}</section>
             <div style="height:1px;background:#e4ebe7;margin:16px 0"></div>
             <section>${crearLocationSetupHTML(aoiId)}</section>
-          </aside></div></div>`;
+          </aside></div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}</div></div>`;
+      document.getElementById("fieldBookTabLayout")?.addEventListener("click",()=>activarVistaFieldBook("layout"));
+      document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>activarVistaFieldBook("issues"));
+      contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
+        activarVistaFieldBook("layout");
+        const target=contenido.querySelector(`.field-book-real-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
+        if(target){target.click();target.scrollIntoView({behavior:"smooth",block:"center",inline:"center"});}
+      }));
+
       const eventosIniciales = leerEventos(aoiId);
       contenido.querySelectorAll(".field-book-real-plot").forEach(btn => {
         const plotInicial = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
