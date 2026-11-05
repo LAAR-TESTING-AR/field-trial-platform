@@ -329,6 +329,24 @@
     if(issuesTab){issuesTab.style.background=issues?"#174c31":"#fff";issuesTab.style.color=issues?"#fff":"#536159";}
   }
 
+  function refrescarIssuesEnPantalla(aoiId, layout) {
+    const issuesView = document.getElementById("fieldBookIssuesView");
+    if (!issuesView) return;
+    const estabaVisible = !issuesView.hidden;
+    issuesView.innerHTML = crearIssuesHTML(aoiId, layout);
+    issuesView.querySelectorAll(".field-book-issue-link").forEach(issueButton => {
+      issueButton.addEventListener("click", () => {
+        activarVistaFieldBook("layout");
+        const target = contenido.querySelector(`.field-book-real-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
+        if (target) {
+          target.click();
+          target.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }
+      });
+    });
+    if (estabaVisible) activarVistaFieldBook("issues");
+  }
+
   function renderizarAoi(
     aoiId
   ) {
@@ -409,6 +427,7 @@
           d.querySelector("#fieldBookSaveExecution")?.addEventListener("click", () => {
             const comment = d.querySelector("#fieldBookExecutionComment")?.value || "";
             guardarEvento(aoiId, plot.range, plot.column, statusSeleccionado, comment);
+            refrescarIssuesEnPantalla(aoiId, layout);
             const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)];
             aplicarMarcaBoton(btn, evento);
             const msg = d.querySelector("#fieldBookExecutionMsg");
@@ -421,6 +440,7 @@
 
           d.querySelector("#fieldBookRestoreNormal")?.addEventListener("click", () => {
             restaurarNormal(aoiId, plot.range, plot.column);
+            refrescarIssuesEnPantalla(aoiId, layout);
             aplicarMarcaBoton(btn, null);
             btn.click();
           });
