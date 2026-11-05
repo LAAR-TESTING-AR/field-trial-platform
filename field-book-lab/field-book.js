@@ -140,6 +140,78 @@
     `;
   }
 
+  const estadosEjecucion = {
+    Normal: { simbolo: "✓", color: "#178047", fondo: "#e9f7ef" },
+    Refilled: { simbolo: "R", color: "#995c00", fondo: "#fff3d6" },
+    Lost: { simbolo: "X", color: "#8b2d2d", fondo: "#fdeaea" },
+    Shifted: { simbolo: "↔", color: "#315d91", fondo: "#eaf2fb" },
+    Observation: { simbolo: "!", color: "#674d9b", fondo: "#f2edfb" }
+  };
+
+  function claveEvento(aoiId, range, column) {
+    return `${aoiId}|${range}|${column}`;
+  }
+
+  function claveStorage(aoiId) {
+    return `fieldBookLabEvents:${aoiId}`;
+  }
+
+  function leerEventos(aoiId) {
+    try {
+      return JSON.parse(localStorage.getItem(claveStorage(aoiId)) || "{}");
+    } catch (error) {
+      console.warn("Field Book: no se pudieron leer eventos locales", error);
+      return {};
+    }
+  }
+
+  function guardarEvento(aoiId, range, column, status, comment) {
+    const eventos = leerEventos(aoiId);
+    const key = claveEvento(aoiId, range, column);
+    if (!status || status === "Normal") {
+      if (status === "Normal" && String(comment || "").trim()) {
+        eventos[key] = { status: "Normal", comment: String(comment || "").trim(), updatedAt: new Date().toISOString() };
+      } else {
+        delete eventos[key];
+      }
+    } else {
+      eventos[key] = { status, comment: String(comment || "").trim(), updatedAt: new Date().toISOString() };
+    }
+    localStorage.setItem(claveStorage(aoiId), JSON.stringify(eventos));
+  }
+
+  function aplicarMarcaBoton(boton, evento) {
+    boton.querySelector(".field-book-status-mark")?.remove();
+    boton.style.position = "relative";
+    if (!evento?.status) return;
+    const cfg = estadosEjecucion[evento.status];
+    if (!cfg) return;
+    const marca = document.createElement("span");
+    marca.className = "field-book-status-mark";
+    marca.textContent = cfg.simbolo;
+    marca.style.cssText = `position:absolute;right:1px;top:1px;min-width:11px;height:11px;padding:0 1px;border-radius:3px;background:${cfg.fondo};color:${cfg.color};font-size:8px;line-height:11px;font-weight:900;text-align:center;border:1px solid ${cfg.color}55;`;
+    boton.appendChild(marca);
+  }
+
+  function crearEjecucionHTML(aoiId, plot) {
+    if (!plot) return "";
+    const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)] || {};
+    const actual = evento.status || "Normal";
+    const botones = Object.keys(estadosEjecucion).map(status => {
+      const cfg = estadosEjecucion[status];
+      const activo = status === actual;
+      return `<button type="button" class="field-book-exec-status" data-status="${status}" style="padding:7px 8px;border:1px solid ${activo ? cfg.color : '#d4ded8'};border-radius:7px;background:${activo ? cfg.fondo : '#fff'};color:${activo ? cfg.color : '#536159'};font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap">${cfg.simbolo} ${status}</button>`;
+    }).join("");
+    return `
+      <div id="fieldBookExecution" style="margin-top:12px;padding-top:11px;border-top:1px solid #dce6e0">
+        <span class="section-label">PLANTING EXECUTION · LAB</span>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 9px">${botones}</div>
+        <textarea id="fieldBookExecutionComment" rows="3" placeholder="Comentario de ejecución..." style="width:100%;box-sizing:border-box;resize:vertical;padding:8px;border:1px solid #c7d4cc;border-radius:7px;font:inherit;font-size:11px">${evento.comment || ""}</textarea>
+        <button id="fieldBookSaveExecution" type="button" style="width:100%;margin-top:7px;padding:8px;border:0;border-radius:7px;background:#0b6b3a;color:#fff;font-weight:900;font-size:11px;cursor:pointer">GUARDAR EN LAB</button>
+        <div id="fieldBookExecutionMsg" style="margin-top:5px;color:#6c7a72;font-size:9px">Guardado local en este navegador. No sincroniza con SharePoint.</div>
+      </div>`;
+  }
+
   function renderizarAoi(
     aoiId
   ) {
@@ -168,7 +240,54 @@
             <div style="height:1px;background:#e4ebe7;margin:16px 0"></div>
             <section>${crearLocationSetupHTML(aoiId)}</section>
           </aside></div></div>`;
-      contenido.querySelectorAll(".field-book-real-plot").forEach(btn => btn.addEventListener("click", () => { const plot=porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`); const d=document.getElementById("fieldBookRealDetail"); if(d&&plot) d.innerHTML=`<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:9px;line-height:1.6"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>Germplasm ID:</b> ${plot.germplasmId ?? "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>EUDQ:</b> ${plot.eudq || "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Comment:</b> ${plot.entryComment || "-"}</div>`; }));
+      const eventosIniciales = leerEventos(aoiId);
+      contenido.querySelectorAll(".field-book-real-plot").forEach(btn => {
+        const plotInicial = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
+        if (plotInicial) aplicarMarcaBoton(btn, eventosIniciales[claveEvento(aoiId, plotInicial.range, plotInicial.column)]);
+
+        btn.addEventListener("click", () => {
+          const plot = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
+          const d = document.getElementById("fieldBookRealDetail");
+          if (!d || !plot) return;
+
+          contenido.querySelectorAll(".field-book-real-plot").forEach(actual => {
+            actual.style.outline = "none";
+            actual.style.outlineOffset = "0";
+          });
+          btn.style.outline = "3px solid #0b6b3a";
+          btn.style.outlineOffset = "1px";
+
+          d.innerHTML = `<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:9px;line-height:1.6"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>Germplasm ID:</b> ${plot.germplasmId ?? "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>EUDQ:</b> ${plot.eudq || "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Comment:</b> ${plot.entryComment || "-"}</div>${crearEjecucionHTML(aoiId, plot)}`;
+
+          let statusSeleccionado = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)]?.status || "Normal";
+          d.querySelectorAll(".field-book-exec-status").forEach(statusBtn => {
+            statusBtn.addEventListener("click", () => {
+              statusSeleccionado = statusBtn.dataset.status;
+              const cfg = estadosEjecucion[statusSeleccionado];
+              d.querySelectorAll(".field-book-exec-status").forEach(b => {
+                const c = estadosEjecucion[b.dataset.status];
+                const activo = b.dataset.status === statusSeleccionado;
+                b.style.borderColor = activo ? c.color : "#d4ded8";
+                b.style.background = activo ? c.fondo : "#fff";
+                b.style.color = activo ? c.color : "#536159";
+              });
+            });
+          });
+
+          d.querySelector("#fieldBookSaveExecution")?.addEventListener("click", () => {
+            const comment = d.querySelector("#fieldBookExecutionComment")?.value || "";
+            guardarEvento(aoiId, plot.range, plot.column, statusSeleccionado, comment);
+            const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)];
+            aplicarMarcaBoton(btn, evento);
+            const msg = d.querySelector("#fieldBookExecutionMsg");
+            if (msg) {
+              msg.textContent = "✓ Guardado localmente en LAB";
+              msg.style.color = "#0b6b3a";
+              msg.style.fontWeight = "800";
+            }
+          });
+        });
+      });
       return;
     }
 
