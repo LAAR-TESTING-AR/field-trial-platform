@@ -141,11 +141,15 @@
   }
 
   const estadosEjecucion = {
-    Normal: { simbolo: "✓", color: "#178047", fondo: "#e9f7ef" },
     Refilled: { simbolo: "R", color: "#995c00", fondo: "#fff3d6" },
     Lost: { simbolo: "X", color: "#8b2d2d", fondo: "#fdeaea" },
-    Shifted: { simbolo: "↔", color: "#315d91", fondo: "#eaf2fb" },
     Observation: { simbolo: "!", color: "#674d9b", fondo: "#f2edfb" }
+  };
+
+  const shiftConfig = {
+    simbolo: "↕",
+    color: "#315d91",
+    fondo: "#eaf2fb"
   };
 
   function claveEvento(aoiId, range, column) {
@@ -168,23 +172,45 @@
   function guardarEvento(aoiId, range, column, status, comment) {
     const eventos = leerEventos(aoiId);
     const key = claveEvento(aoiId, range, column);
-    if (!status || status === "Normal") {
-      if (status === "Normal" && String(comment || "").trim()) {
-        eventos[key] = { status: "Normal", comment: String(comment || "").trim(), updatedAt: new Date().toISOString() };
-      } else {
-        delete eventos[key];
-      }
-    } else {
-      eventos[key] = { status, comment: String(comment || "").trim(), updatedAt: new Date().toISOString() };
-    }
+    if (!status) delete eventos[key];
+    else eventos[key] = { status, comment: String(comment || "").trim(), updatedAt: new Date().toISOString() };
     localStorage.setItem(claveStorage(aoiId), JSON.stringify(eventos));
+  }
+
+  function restaurarNormal(aoiId, range, column) {
+    guardarEvento(aoiId, range, column, "", "");
+  }
+
+  function claveShiftStorage(aoiId) {
+    return `fieldBookLabBlockShifts:${aoiId}`;
+  }
+
+  function leerBlockShifts(aoiId) {
+    try { return JSON.parse(localStorage.getItem(claveShiftStorage(aoiId)) || "[]"); }
+    catch (error) { return []; }
+  }
+
+  function guardarBlockShifts(aoiId, shifts) {
+    localStorage.setItem(claveShiftStorage(aoiId), JSON.stringify(shifts));
+  }
+
+  function shiftParaPlot(aoiId, range, column) {
+    return leerBlockShifts(aoiId).find(shift =>
+      Number(shift.column) === Number(column) &&
+      Number(range) >= Number(shift.startRange) &&
+      Number(range) <= Number(shift.endRange)
+    ) || null;
+  }
+
+  function eliminarShift(aoiId, shiftId) {
+    guardarBlockShifts(aoiId, leerBlockShifts(aoiId).filter(item => item.id !== shiftId));
   }
 
   function aplicarMarcaBoton(boton, evento) {
     boton.querySelector(".field-book-status-mark")?.remove();
     boton.style.position = "relative";
     if (!evento?.status) return;
-    const cfg = estadosEjecucion[evento.status];
+    const cfg = evento.status === "Shifted" ? shiftConfig : estadosEjecucion[evento.status];
     if (!cfg) return;
     const marca = document.createElement("span");
     marca.className = "field-book-status-mark";
@@ -193,23 +219,69 @@
     boton.appendChild(marca);
   }
 
-  function crearEjecucionHTML(aoiId, plot) {
+  function crearEjecucionHTML(aoiId, plot, layout) {
     if (!plot) return "";
     const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)] || {};
-    const actual = evento.status || "Normal";
+    const shift = shiftParaPlot(aoiId, plot.range, plot.column);
+    const actualRange = shift ? Number(plot.range) + Number(shift.offset) : Number(plot.range);
+    const actualColumn = Number(plot.column);
+    const fuera = shift && (actualRange < Number(layout.rangeMin) || actualRange > Number(layout.rangeMax));
     const botones = Object.keys(estadosEjecucion).map(status => {
       const cfg = estadosEjecucion[status];
-      const activo = status === actual;
+      const activo = status === evento.status;
       return `<button type="button" class="field-book-exec-status" data-status="${status}" style="padding:7px 8px;border:1px solid ${activo ? cfg.color : '#d4ded8'};border-radius:7px;background:${activo ? cfg.fondo : '#fff'};color:${activo ? cfg.color : '#536159'};font-size:10px;font-weight:900;cursor:pointer;white-space:nowrap">${cfg.simbolo} ${status}</button>`;
     }).join("");
+    const restore = evento.status ? `<button id="fieldBookRestoreNormal" type="button" style="width:100%;margin-top:7px;padding:7px;border:1px solid #c7d4cc;border-radius:7px;background:#fff;color:#536159;font-weight:800;font-size:10px;cursor:pointer">↺ RESTORE TO NORMAL</button>` : "";
+    const shiftInfo = shift ? `<div style="margin:8px 0;padding:8px;border-radius:7px;background:${shiftConfig.fondo};color:${shiftConfig.color};font-size:10px"><b>BLOCK SHIFT ${shift.offset > 0 ? '+' : ''}${shift.offset}</b><br>Planned: ${plot.range}-${plot.column}<br>Actual: ${actualRange}-${actualColumn}${fuera ? '<br><b>⚠ Outside planned layout</b>' : ''}<br>Range ${shift.startRange}-${shift.endRange} · Column ${shift.column}</div><button id="fieldBookRemoveShift" data-shift-id="${shift.id}" type="button" style="width:100%;padding:7px;border:1px solid #9fb8d5;border-radius:7px;background:#fff;color:#315d91;font-weight:800;font-size:10px;cursor:pointer">↺ REMOVE BLOCK SHIFT</button>` : "";
     return `
       <div id="fieldBookExecution" style="margin-top:12px;padding-top:11px;border-top:1px solid #dce6e0">
         <span class="section-label">PLANTING EXECUTION · LAB</span>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;margin:7px 0 9px">${botones}</div>
+        <div style="margin-top:6px;color:#6c7a72;font-size:10px">${evento.status ? `Current issue: <b>${evento.status}</b>` : "No issues registered · Normal by default"}</div>
+        ${shiftInfo}
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 9px">${botones}<button type="button" id="fieldBookShiftBlock" style="padding:7px 8px;border:1px solid ${shiftConfig.color};border-radius:7px;background:#fff;color:${shiftConfig.color};font-size:10px;font-weight:900;cursor:pointer">↕ SHIFT BLOCK</button></div>
         <textarea id="fieldBookExecutionComment" rows="3" placeholder="Comentario de ejecución..." style="width:100%;box-sizing:border-box;resize:vertical;padding:8px;border:1px solid #c7d4cc;border-radius:7px;font:inherit;font-size:11px">${evento.comment || ""}</textarea>
-        <button id="fieldBookSaveExecution" type="button" style="width:100%;margin-top:7px;padding:8px;border:0;border-radius:7px;background:#0b6b3a;color:#fff;font-weight:900;font-size:11px;cursor:pointer">GUARDAR EN LAB</button>
-        <div id="fieldBookExecutionMsg" style="margin-top:5px;color:#6c7a72;font-size:9px">Guardado local en este navegador. No sincroniza con SharePoint.</div>
+        <button id="fieldBookSaveExecution" type="button" style="width:100%;margin-top:7px;padding:8px;border:0;border-radius:7px;background:#0b6b3a;color:#fff;font-weight:900;font-size:11px;cursor:pointer">GUARDAR INCIDENCIA</button>
+        ${restore}
+        <div id="fieldBookExecutionMsg" style="margin-top:5px;color:#6c7a72;font-size:9px">Solo se guardan excepciones. Normal no genera registro.</div>
       </div>`;
+  }
+
+  function abrirShiftBlock(aoiId, plot, layout, porCoord, refrescar) {
+    document.getElementById("fieldBookShiftModal")?.remove();
+    const maxInColumn = Math.max(...[...porCoord.values()].filter(p => Number(p.column) === Number(plot.column)).map(p => Number(p.range)));
+    const minInColumn = Math.min(...[...porCoord.values()].filter(p => Number(p.column) === Number(plot.column)).map(p => Number(p.range)));
+    const overlay = document.createElement("div");
+    overlay.id = "fieldBookShiftModal";
+    overlay.style.cssText = "position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:16px";
+    overlay.innerHTML = `<div style="width:min(500px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:14px;padding:16px;box-shadow:0 20px 55px rgba(0,0,0,.28)">
+      <span class="section-label">SHIFT BLOCK · LAB</span><h3 style="margin:5px 0 4px">Column ${plot.column} · From Range ${plot.range}</h3>
+      <p style="margin:0 0 12px;color:#6c7a72;font-size:11px">Desplaza esta parcela y todas las siguientes de la misma columna.</p>
+      <label style="font-size:10px;font-weight:800;color:#536159">DIRECTION / OFFSET</label>
+      <select id="fieldBookShiftOffset" style="width:100%;margin:5px 0 10px;padding:8px;border:1px solid #c7d4cc;border-radius:7px"><option value="1">+1 Range</option><option value="-1">-1 Range</option><option value="2">+2 Ranges</option><option value="-2">-2 Ranges</option></select>
+      <div id="fieldBookShiftPreview" style="padding:10px;background:#f7faf8;border:1px solid #d9e3dd;border-radius:8px;font-size:10px;line-height:1.55"></div>
+      <textarea id="fieldBookShiftComment" rows="3" placeholder="Comentario del salto..." style="width:100%;box-sizing:border-box;margin-top:10px;padding:8px;border:1px solid #c7d4cc;border-radius:7px"></textarea>
+      <div style="display:flex;gap:7px;margin-top:10px"><button id="fieldBookShiftCancel" style="flex:1;padding:8px;border:1px solid #c7d4cc;border-radius:7px;background:#fff;font-weight:800">CANCEL</button><button id="fieldBookShiftApply" style="flex:1;padding:8px;border:0;border-radius:7px;background:#315d91;color:#fff;font-weight:900">APPLY SHIFT</button></div>
+    </div>`;
+    document.body.appendChild(overlay);
+    const offsetEl = overlay.querySelector("#fieldBookShiftOffset");
+    const preview = () => {
+      const offset = Number(offsetEl.value);
+      const endRange = offset > 0 ? maxInColumn : minInColumn;
+      const start = Number(plot.range);
+      const affected = [...porCoord.values()].filter(p => Number(p.column)===Number(plot.column) && (offset > 0 ? Number(p.range)>=start : Number(p.range)<=start)).sort((a,b)=>Number(a.range)-Number(b.range));
+      const lines = affected.map(p => { const to=Number(p.range)+offset; const out=to<Number(layout.rangeMin)||to>Number(layout.rangeMax); return `${p.range}-${p.column} → ${to}-${p.column}${out?' ⚠ outside layout':''}`; });
+      previewEl.innerHTML = `<b>${affected.length} parcelas afectadas</b><br>${lines.join('<br>')}`;
+      overlay.dataset.endRange=String(endRange);
+      overlay.dataset.affected=String(affected.length);
+    };
+    const previewEl=overlay.querySelector("#fieldBookShiftPreview");
+    offsetEl.addEventListener("change",preview); preview();
+    overlay.querySelector("#fieldBookShiftCancel").onclick=()=>overlay.remove();
+    overlay.querySelector("#fieldBookShiftApply").onclick=()=>{
+      const offset=Number(offsetEl.value); const shifts=leerBlockShifts(aoiId);
+      shifts.push({id:`shift-${Date.now()}`,column:Number(plot.column),startRange:Number(plot.range),endRange:Number(overlay.dataset.endRange),offset,comment:overlay.querySelector("#fieldBookShiftComment").value.trim(),createdAt:new Date().toISOString()});
+      guardarBlockShifts(aoiId,shifts); overlay.remove(); refrescar();
+    };
   }
 
   function renderizarAoi(
@@ -243,7 +315,11 @@
       const eventosIniciales = leerEventos(aoiId);
       contenido.querySelectorAll(".field-book-real-plot").forEach(btn => {
         const plotInicial = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
-        if (plotInicial) aplicarMarcaBoton(btn, eventosIniciales[claveEvento(aoiId, plotInicial.range, plotInicial.column)]);
+        if (plotInicial) {
+          const eventoIndividual = eventosIniciales[claveEvento(aoiId, plotInicial.range, plotInicial.column)];
+          const shift = shiftParaPlot(aoiId, plotInicial.range, plotInicial.column);
+          aplicarMarcaBoton(btn, eventoIndividual || (shift ? { status: "Shifted" } : null));
+        }
 
         btn.addEventListener("click", () => {
           const plot = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
@@ -257,9 +333,9 @@
           btn.style.outline = "3px solid #0b6b3a";
           btn.style.outlineOffset = "1px";
 
-          d.innerHTML = `<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:9px;line-height:1.6"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>Germplasm ID:</b> ${plot.germplasmId ?? "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>EUDQ:</b> ${plot.eudq || "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Comment:</b> ${plot.entryComment || "-"}</div>${crearEjecucionHTML(aoiId, plot)}`;
+          d.innerHTML = `<strong style="color:#174c31">Range ${plot.range} · Column ${plot.column}</strong><div style="margin-top:9px;line-height:1.6"><b>Experiment:</b> ${plot.experimentName || "-"}<br><b>Germplasm:</b> ${plot.germplasmName || "-"}<br><b>Germplasm ID:</b> ${plot.germplasmId ?? "-"}<br><b>EU ID:</b> ${plot.euId ?? "-"}<br><b>EUDQ:</b> ${plot.eudq || "-"}<br><b>Rep:</b> ${plot.rep ?? "-"}<br><b>Comment:</b> ${plot.entryComment || "-"}</div>${crearEjecucionHTML(aoiId, plot, layout)}`;
 
-          let statusSeleccionado = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)]?.status || "Normal";
+          let statusSeleccionado = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)]?.status || "";
           d.querySelectorAll(".field-book-exec-status").forEach(statusBtn => {
             statusBtn.addEventListener("click", () => {
               statusSeleccionado = statusBtn.dataset.status;
@@ -285,6 +361,21 @@
               msg.style.color = "#0b6b3a";
               msg.style.fontWeight = "800";
             }
+          });
+
+          d.querySelector("#fieldBookRestoreNormal")?.addEventListener("click", () => {
+            restaurarNormal(aoiId, plot.range, plot.column);
+            aplicarMarcaBoton(btn, null);
+            btn.click();
+          });
+
+          d.querySelector("#fieldBookRemoveShift")?.addEventListener("click", e => {
+            eliminarShift(aoiId, e.currentTarget.dataset.shiftId);
+            renderizarAoi(aoiId);
+          });
+
+          d.querySelector("#fieldBookShiftBlock")?.addEventListener("click", () => {
+            abrirShiftBlock(aoiId, plot, layout, porCoord, () => renderizarAoi(aoiId));
           });
         });
       });
