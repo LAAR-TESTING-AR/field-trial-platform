@@ -294,6 +294,117 @@
     };
   }
 
+  const checklistTemplate = [
+    { id:"PRE_COORD", section:"Antes de sembrar", label:"Coordenadas verificadas" },
+    { id:"PRE_MAP", section:"Antes de sembrar", label:"Plano de localidad disponible" },
+    { id:"PRE_DIM", section:"Antes de sembrar", label:"Largo y ancho verificados" },
+    { id:"PRE_LOT", section:"Antes de sembrar", label:"Lote / cuadra confirmados" },
+    { id:"PRE_EPP", section:"Antes de sembrar", label:"EPP completo" },
+    { id:"PRE_STAKES", section:"Antes de sembrar", label:"Estacas colocadas" },
+    { id:"CFG_SLIP", section:"Configuración", label:"Patinamiento de sembradora controlado" },
+    { id:"CFG_FERT", section:"Configuración", label:"Estado y dosis de fertilizante verificados" },
+    { id:"CFG_SENSOR", section:"Configuración", label:"Sensores verificados" },
+    { id:"CFG_DENS", section:"Configuración", label:"Densidad por configuración verificada" },
+    { id:"CFG_SPLIT", section:"Configuración", label:"Splitter / bloqueo verificado" },
+    { id:"CFG_DEPTH", section:"Configuración", label:"Profundidad de siembra verificada" },
+    { id:"CLS_STREETS", section:"Ejecución y cierre", label:"Calles verificadas" },
+    { id:"CLS_FLAGS", section:"Ejecución y cierre", label:"Banderas y carteles colocados" },
+    { id:"CLS_LAYOUT", section:"Ejecución y cierre", label:"Plano final revisado" },
+    { id:"CLS_ISSUES", section:"Ejecución y cierre", label:"Incidencias registradas" }
+  ];
+
+  function claveChecklistStorage(aoiId) { return `fieldBookLabChecklist:${aoiId}`; }
+  function leerChecklist(aoiId) {
+    try { return JSON.parse(localStorage.getItem(claveChecklistStorage(aoiId)) || "{}"); }
+    catch (error) { return {}; }
+  }
+  function guardarChecklist(aoiId, respuestas) {
+    localStorage.setItem(claveChecklistStorage(aoiId), JSON.stringify(respuestas));
+  }
+  function claveVisitStorage(aoiId) { return `fieldBookLabVisit:${aoiId}`; }
+  function leerVisit(aoiId) {
+    try { return JSON.parse(localStorage.getItem(claveVisitStorage(aoiId)) || "{}"); }
+    catch (error) { return {}; }
+  }
+  function guardarVisit(aoiId, visit) {
+    localStorage.setItem(claveVisitStorage(aoiId), JSON.stringify(visit));
+  }
+
+  function metricasChecklist(aoiId) {
+    const respuestas = leerChecklist(aoiId);
+    const valores = checklistTemplate.map(item => respuestas[item.id]?.status || "Pending");
+    return {
+      total: checklistTemplate.length,
+      completed: valores.filter(x => x && x !== "Pending").length,
+      ok: valores.filter(x => x === "OK").length,
+      observations: valores.filter(x => x === "Observation").length,
+      problems: valores.filter(x => x === "Problem").length,
+      na: valores.filter(x => x === "N/A").length,
+      pending: valores.filter(x => x === "Pending").length
+    };
+  }
+
+  function metricasIssues(aoiId) {
+    const eventos = Object.values(leerEventos(aoiId));
+    const shifts = leerBlockShifts(aoiId);
+    return {
+      refilled: eventos.filter(x => x.status === "Refilled").length,
+      lost: eventos.filter(x => x.status === "Lost").length,
+      observations: eventos.filter(x => x.status === "Observation").length,
+      shifts: shifts.length,
+      total: eventos.length + shifts.length
+    };
+  }
+
+  function crearOverviewHTML(aoiId, layout) {
+    const loc = obtenerLocationSetting(aoiId) || {};
+    const visit = leerVisit(aoiId);
+    const checklist = metricasChecklist(aoiId);
+    const issues = metricasIssues(aoiId);
+    const status = visit.status || "Not started";
+    const statusColor = status === "Completed" ? "#0b6b3a" : status === "In progress" ? "#995c00" : "#6c7a72";
+    return `
+      <section style="padding:16px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9">
+        <div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap">
+          <div><span class="section-label">FIELD BOOK OVERVIEW</span><h3 style="margin:5px 0 3px">${loc.Location || aoiId}</h3><div style="color:#6c7a72;font-size:11px">${aoiId} · ${loc.Config || "-"} · ${loc.Crop || "-"}</div></div>
+          <span style="padding:7px 10px;border-radius:999px;background:#fff;color:${statusColor};border:1px solid ${statusColor}55;font-size:10px;font-weight:900">${status.toUpperCase()}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:9px;margin-top:14px">
+          <div style="padding:13px;border:1px solid #d9e3dd;border-radius:10px;background:#fff"><span style="font-size:9px;color:#6c7a72;font-weight:900">PLOTS</span><strong style="display:block;margin-top:4px;font-size:23px">${layout.plotRecordCount || 0}</strong></div>
+          <div style="padding:13px;border:1px solid #d9e3dd;border-radius:10px;background:#fff"><span style="font-size:9px;color:#6c7a72;font-weight:900">BUFFER</span><strong style="display:block;margin-top:4px;font-size:23px">${layout.bufferCount || 0}</strong></div>
+          <div style="padding:13px;border:1px solid #d9e3dd;border-radius:10px;background:#fff"><span style="font-size:9px;color:#6c7a72;font-weight:900">ISSUES</span><strong style="display:block;margin-top:4px;font-size:23px">${issues.total}</strong></div>
+          <div style="padding:13px;border:1px solid #d9e3dd;border-radius:10px;background:#fff"><span style="font-size:9px;color:#6c7a72;font-weight:900">CHECKLIST</span><strong style="display:block;margin-top:4px;font-size:23px">${checklist.completed}/${checklist.total}</strong></div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
+          <button id="fieldBookStartVisit" type="button" style="padding:9px 13px;border:0;border-radius:8px;background:#174c31;color:#fff;font-size:10px;font-weight:900;cursor:pointer">${status === "Not started" ? "START FIELD BOOK" : "CONTINUE FIELD BOOK"}</button>
+          <button id="fieldBookCompleteVisit" type="button" ${status === "Completed" ? "disabled" : ""} style="padding:9px 13px;border:1px solid #174c31;border-radius:8px;background:#fff;color:#174c31;font-size:10px;font-weight:900;cursor:pointer;opacity:${status === "Completed" ? ".45" : "1"}">COMPLETE FIELD BOOK</button>
+        </div>
+        <div style="margin-top:14px;padding:12px;border-radius:9px;background:#fff;border:1px solid #d9e3dd;color:#6c7a72;font-size:11px;line-height:1.5">
+          <b style="color:#174c31">Demo local:</b> Layout, checklist, incidencias y estado de visita se guardan en este navegador. La próxima etapa conecta estos mismos datos con SharePoint DEV.
+        </div>
+      </section>`;
+  }
+
+  function crearChecklistHTML(aoiId) {
+    const respuestas = leerChecklist(aoiId);
+    const metrics = metricasChecklist(aoiId);
+    const sections = [...new Set(checklistTemplate.map(x => x.section))];
+    const sectionHTML = sections.map(section => `
+      <section style="margin-top:15px"><h4 style="margin:0 0 7px;color:#174c31;font-size:11px">${section.toUpperCase()}</h4>
+        <div style="display:grid;gap:7px">${checklistTemplate.filter(x => x.section === section).map(item => {
+          const response = respuestas[item.id] || {};
+          return `<div class="field-book-check-row" data-check-id="${item.id}" style="padding:10px;border:1px solid #d9e3dd;border-radius:9px;background:#fff">
+            <div style="display:grid;grid-template-columns:minmax(190px,1fr) 145px;gap:9px;align-items:center">
+              <strong style="font-size:11px;color:#34473c">${item.label}</strong>
+              <select class="field-book-check-status" style="padding:7px;border:1px solid #c7d4cc;border-radius:7px;font-size:10px"><option value="Pending" ${!response.status || response.status === "Pending" ? "selected" : ""}>Pending</option><option value="OK" ${response.status === "OK" ? "selected" : ""}>✓ OK</option><option value="Observation" ${response.status === "Observation" ? "selected" : ""}>! Observation</option><option value="Problem" ${response.status === "Problem" ? "selected" : ""}>X Problem</option><option value="N/A" ${response.status === "N/A" ? "selected" : ""}>N/A</option></select>
+            </div>
+            <input class="field-book-check-comment" value="${String(response.comment || "").replace(/"/g,"&quot;")}" placeholder="Comentario opcional..." style="width:100%;box-sizing:border-box;margin-top:7px;padding:7px;border:1px solid #d9e3dd;border-radius:7px;font-size:10px">
+          </div>`;
+        }).join("")}</div>
+      </section>`).join("");
+    return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">PLANTING CHECKLIST</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px"><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Completed</small><b style="display:block;font-size:20px">${metrics.completed}/${metrics.total}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Observations</small><b style="display:block;font-size:20px">${metrics.observations}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Problems</small><b style="display:block;font-size:20px">${metrics.problems}</b></div><div style="padding:10px;background:#fff;border:1px solid #d9e3dd;border-radius:9px"><small>Pending</small><b style="display:block;font-size:20px">${metrics.pending}</b></div></div>${sectionHTML}<button id="fieldBookSaveChecklist" type="button" style="width:100%;margin-top:14px;padding:10px;border:0;border-radius:8px;background:#0b6b3a;color:#fff;font-size:11px;font-weight:900;cursor:pointer">SAVE CHECKLIST</button><div id="fieldBookChecklistMsg" style="margin-top:6px;color:#6c7a72;font-size:9px">Guardado local en LAB.</div></section>`;
+  }
+
   function crearIssuesHTML(aoiId, layout) {
     const eventos = leerEventos(aoiId);
     const shifts = leerBlockShifts(aoiId);
@@ -323,10 +434,10 @@
   }
 
   function activarVistaFieldBook(vista) {
-    const layoutView=document.getElementById("fieldBookLayoutView"); const issuesView=document.getElementById("fieldBookIssuesView"); const layoutTab=document.getElementById("fieldBookTabLayout"); const issuesTab=document.getElementById("fieldBookTabIssues"); const issues=vista==="issues";
-    if(layoutView) layoutView.hidden=issues; if(issuesView) issuesView.hidden=!issues;
-    if(layoutTab){layoutTab.style.background=issues?"#fff":"#174c31";layoutTab.style.color=issues?"#536159":"#fff";}
-    if(issuesTab){issuesTab.style.background=issues?"#174c31":"#fff";issuesTab.style.color=issues?"#fff":"#536159";}
+    const views = { overview:"fieldBookOverviewView", layout:"fieldBookLayoutView", checklist:"fieldBookChecklistView", issues:"fieldBookIssuesView" };
+    const tabs = { overview:"fieldBookTabOverview", layout:"fieldBookTabLayout", checklist:"fieldBookTabChecklist", issues:"fieldBookTabIssues" };
+    Object.entries(views).forEach(([name,id]) => { const el=document.getElementById(id); if(el) el.hidden=name!==vista; });
+    Object.entries(tabs).forEach(([name,id]) => { const el=document.getElementById(id); if(el){const active=name===vista;el.style.background=active?"#174c31":"#fff";el.style.color=active?"#fff":"#536159";el.style.borderColor=active?"#174c31":"#c8d5ce";} });
   }
 
   function refrescarIssuesEnPantalla(aoiId, layout) {
@@ -365,7 +476,7 @@
       for (let r = layout.rangeMax; r >= layout.rangeMin; r--) ranges.push(r);
       const header = columnas.map(c => `<div style="width:44px;min-width:44px;text-align:center;font-size:9px;font-weight:800;color:#6c7a72">${c}</div>`).join("");
       const filas = ranges.map(r => `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center"><div style="position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:center;background:#eef6f1;color:#174c31;font-size:10px;font-weight:900;padding:9px 0;border-radius:5px">R${r}</div>${columnas.map(c => { const plot=porCoord.get(`${r}|${c}`); if(!plot) return `<div style="width:44px;min-width:44px;height:28px;border:1px dashed #e2e9e5;border-radius:4px"></div>`; const esBuffer = plot.type === "BUFFER" || String(plot.experimentName || "").toLowerCase() === "buffer"; const color = esBuffer ? "#e2e5e3" : (colorPorExperimento.get(plot.experimentName)||"#e7ece9"); return `<button class="field-book-real-plot" data-range="${r}" data-column="${c}" type="button" style="width:44px;min-width:44px;height:28px;border:1px solid #bfcac3;border-radius:4px;background:${color};font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap">${r}-${c}</button>`; }).join("")}</div>`).join("");
-      contenido.innerHTML = `<div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:14px"><div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${layoutReal.trial?.year || "-"} · Season ${layoutReal.trial?.season || "-"}</div></div><span style="padding:6px 9px;border-radius:999px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900;height:max-content">REAL LAYOUT · READ ONLY</span></div><div style="display:flex;gap:7px;margin-bottom:12px"><button id="fieldBookTabLayout" type="button" style="padding:8px 15px;border:1px solid #174c31;border-radius:8px;background:#174c31;color:#fff;font-size:10px;font-weight:900;cursor:pointer">LAYOUT</button><button id="fieldBookTabIssues" type="button" style="padding:8px 15px;border:1px solid #c8d5ce;border-radius:8px;background:#fff;color:#536159;font-size:10px;font-weight:900;cursor:pointer">ISSUES</button></div><div id="fieldBookLayoutView" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:16px"><section style="min-width:0;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">LAYOUT</span><h3 style="margin:5px 0">Plano interactivo</h3><p style="color:#6c7a72;font-size:12px">Range ${layout.rangeMin}-${layout.rangeMax} · Column ${layout.columnMin}-${layout.columnMax} · ${layout.plotRecordCount} parcelas · ${experimentos.length} experimentos</p><div style="overflow:auto;max-height:68vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div></section><aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff;max-height:76vh;overflow:auto">
+      contenido.innerHTML = `<div style="padding:18px"><div style="display:flex;justify-content:space-between;gap:15px;margin-bottom:14px"><div><span class="section-label">AOI</span><h2 style="margin:0;color:#174c31">${aoiId}</h2><div style="margin-top:5px;color:#6c7a72;font-size:12px">${layoutReal.trial?.year || "-"} · Season ${layoutReal.trial?.season || "-"}</div></div><span style="padding:6px 9px;border-radius:999px;background:#e7f5ec;color:#0b6b3a;font-size:10px;font-weight:900;height:max-content">REAL LAYOUT · READ ONLY</span></div><div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap"><button id="fieldBookTabOverview" type="button" style="padding:8px 15px;border:1px solid #174c31;border-radius:8px;background:#174c31;color:#fff;font-size:10px;font-weight:900;cursor:pointer">OVERVIEW</button><button id="fieldBookTabLayout" type="button" style="padding:8px 15px;border:1px solid #c8d5ce;border-radius:8px;background:#fff;color:#536159;font-size:10px;font-weight:900;cursor:pointer">LAYOUT</button><button id="fieldBookTabChecklist" type="button" style="padding:8px 15px;border:1px solid #c8d5ce;border-radius:8px;background:#fff;color:#536159;font-size:10px;font-weight:900;cursor:pointer">CHECKLIST</button><button id="fieldBookTabIssues" type="button" style="padding:8px 15px;border:1px solid #c8d5ce;border-radius:8px;background:#fff;color:#536159;font-size:10px;font-weight:900;cursor:pointer">ISSUES</button></div><div id="fieldBookOverviewView">${crearOverviewHTML(aoiId, layout)}</div><div id="fieldBookLayoutView" hidden style="display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,320px);gap:16px"><section style="min-width:0;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">LAYOUT</span><h3 style="margin:5px 0">Plano interactivo</h3><p style="color:#6c7a72;font-size:12px">Range ${layout.rangeMin}-${layout.rangeMax} · Column ${layout.columnMin}-${layout.columnMax} · ${layout.plotRecordCount} parcelas · ${experimentos.length} experimentos</p><div style="overflow:auto;max-height:68vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div></section><aside style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#fff;max-height:76vh;overflow:auto">
             <section style="padding:12px;border:1px solid #bfd4c7;border-radius:9px;background:#f8fbf9">
               <span class="section-label">PLOT DETAIL</span>
               <div id="fieldBookRealDetail" style="margin-top:8px;color:#6c7a72;font-size:12px">Tocá una parcela para ver sus datos.</div>
@@ -374,9 +485,14 @@
             <section>${crearPlantingSetupHTML(aoiId)}</section>
             <div style="height:1px;background:#e4ebe7;margin:16px 0"></div>
             <section>${crearLocationSetupHTML(aoiId)}</section>
-          </aside></div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}</div></div>`;
+          </aside></div><div id="fieldBookChecklistView" hidden>${crearChecklistHTML(aoiId)}</div><div id="fieldBookIssuesView" hidden>${crearIssuesHTML(aoiId, layout)}</div></div>`;
+      document.getElementById("fieldBookTabOverview")?.addEventListener("click",()=>activarVistaFieldBook("overview"));
       document.getElementById("fieldBookTabLayout")?.addEventListener("click",()=>activarVistaFieldBook("layout"));
+      document.getElementById("fieldBookTabChecklist")?.addEventListener("click",()=>activarVistaFieldBook("checklist"));
       document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>activarVistaFieldBook("issues"));
+      document.getElementById("fieldBookStartVisit")?.addEventListener("click",()=>{const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"In progress",startedAt:v.startedAt||new Date().toISOString()});renderizarAoi(aoiId);});
+      document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",()=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"Completed",startedAt:v.startedAt||new Date().toISOString(),completedAt:new Date().toISOString()});renderizarAoi(aoiId);});
+      document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",()=>{const respuestas={};contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});guardarChecklist(aoiId,respuestas);const view=document.getElementById("fieldBookChecklistView");if(view)view.innerHTML=crearChecklistHTML(aoiId);renderizarAoi(aoiId);setTimeout(()=>activarVistaFieldBook("checklist"),0);});
       contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
         activarVistaFieldBook("layout");
         const target=contenido.querySelector(`.field-book-real-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
