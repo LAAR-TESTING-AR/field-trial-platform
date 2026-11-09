@@ -4,8 +4,9 @@
   console.log("Field Book Lab iniciado");
 
   // DEV endpoint. Pegá solamente en tu copia local la URL HTTP POST completa del Flow.
-  const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/ef182fa33c7641119a505f001c75d26d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=204aw2OnGEWn_3_wjvstCX9BI5YKxdhpTWpf1F2r6Pw";
 
+const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/ef182fa33c7641119a505f001c75d26d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=204aw2OnGEWn_3_wjvstCX9BI5YKxdhpTWpf1F2r6Pw";
+    
   function endpointConfigurado(){return Boolean(FIELD_BOOK_SAVE_URL && !FIELD_BOOK_SAVE_URL.includes("PEGAR_URL_FLOW_AQUI"));}
   async function guardarEnSharePoint(payload){if(!endpointConfigurado())throw new Error("Falta configurar FIELD_BOOK_SAVE_URL");const response=await fetch(FIELD_BOOK_SAVE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const text=await response.text();let data={};try{data=text?JSON.parse(text):{};}catch(_){data={raw:text};}if(!response.ok||data.success===false)throw new Error(data.error||data.message||`HTTP ${response.status}`);return data;}
   function crearVisitId(aoiId){const ts=new Date().toISOString().replace(/[-:]/g,"").replace(/\..+/,"");return `${aoiId}-${ts}`;}
