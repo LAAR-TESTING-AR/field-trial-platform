@@ -3,6 +3,13 @@
 
   console.log("Field Book Lab iniciado");
 
+  // DEV endpoint. Pegá solamente en tu copia local la URL HTTP POST completa del Flow.
+  const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/ef182fa33c7641119a505f001c75d26d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=204aw2OnGEWn_3_wjvstCX9BI5YKxdhpTWpf1F2r6Pw";
+
+  function endpointConfigurado(){return Boolean(FIELD_BOOK_SAVE_URL && !FIELD_BOOK_SAVE_URL.includes("PEGAR_URL_FLOW_AQUI"));}
+  async function guardarEnSharePoint(payload){if(!endpointConfigurado())throw new Error("Falta configurar FIELD_BOOK_SAVE_URL");const response=await fetch(FIELD_BOOK_SAVE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const text=await response.text();let data={};try{data=text?JSON.parse(text):{};}catch(_){data={raw:text};}if(!response.ok||data.success===false)throw new Error(data.error||data.message||`HTTP ${response.status}`);return data;}
+  function crearVisitId(aoiId){const ts=new Date().toISOString().replace(/[-:]/g,"").replace(/\..+/,"");return `${aoiId}-${ts}`;}
+
   const selectorAoi =
     document.getElementById("fieldBookAoi");
 
@@ -337,6 +344,8 @@
     localStorage.setItem(claveVisitStorage(aoiId), JSON.stringify(visit));
   }
 
+  async function guardarVisitRemota(aoiId,visitStatus){const loc=obtenerLocationSetting(aoiId)||{};const local=leerVisit(aoiId);const visitId=local.visitId||crearVisitId(aoiId);const startedAt=local.startedAt||new Date().toISOString();const completedAt=visitStatus==="Completed"?new Date().toISOString():null;await guardarEnSharePoint({type:"visit",visitId,season:loc.Season||"",aoiId,location:loc.Location||"",config:loc.Config||"",visitStatus,comment:"",startedAt,completedAt});return{...local,visitId,status:visitStatus,startedAt,completedAt};}
+
   function metricasChecklist(aoiId) {
     const respuestas = leerChecklist(aoiId);
     const valores = checklistTemplate.map(item => respuestas[item.id]?.status || "Pending");
@@ -563,8 +572,8 @@
       document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("issues"); });
       conectarIssuesMap(aoiId, layoutReal);
       activarVistaFieldBook("overview");
-      document.getElementById("fieldBookStartVisit")?.addEventListener("click",()=>{const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"In progress",startedAt:v.startedAt||new Date().toISOString()});renderizarAoi(aoiId);});
-      document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",()=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const v=leerVisit(aoiId);guardarVisit(aoiId,{...v,status:"Completed",startedAt:v.startedAt||new Date().toISOString(),completedAt:new Date().toISOString()});renderizarAoi(aoiId);});
+      document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
+      document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="COMPLETING...";try{const v=await guardarVisitRemota(aoiId,"Completed");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo completar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",()=>{const respuestas={};contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});guardarChecklist(aoiId,respuestas);const view=document.getElementById("fieldBookChecklistView");if(view)view.innerHTML=crearChecklistHTML(aoiId);renderizarAoi(aoiId);setTimeout(()=>activarVistaFieldBook("checklist"),0);});
       contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
         activarVistaFieldBook("issues");
