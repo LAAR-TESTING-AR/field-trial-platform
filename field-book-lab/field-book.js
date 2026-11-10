@@ -302,10 +302,14 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
     const previewEl=overlay.querySelector("#fieldBookShiftPreview");
     offsetEl.addEventListener("change",preview); preview();
     overlay.querySelector("#fieldBookShiftCancel").onclick=()=>overlay.remove();
-    overlay.querySelector("#fieldBookShiftApply").onclick=()=>{
+    overlay.querySelector("#fieldBookShiftApply").onclick=async()=>{
+      const applyBtn=overlay.querySelector("#fieldBookShiftApply");
+      applyBtn.disabled=true; applyBtn.textContent="SAVING...";
       const offset=Number(offsetEl.value); const shifts=leerBlockShifts(aoiId);
-      shifts.push({id:`shift-${Date.now()}`,column:Number(plot.column),startRange:Number(plot.range),endRange:Number(overlay.dataset.endRange),offset,comment:overlay.querySelector("#fieldBookShiftComment").value.trim(),createdAt:new Date().toISOString()});
-      guardarBlockShifts(aoiId,shifts); overlay.remove(); refrescar();
+      const shift={id:`shift-${Date.now()}`,column:Number(plot.column),startRange:Number(plot.range),endRange:Number(overlay.dataset.endRange),offset,comment:overlay.querySelector("#fieldBookShiftComment").value.trim(),createdAt:new Date().toISOString()};
+      shifts.push(shift); guardarBlockShifts(aoiId,shifts);
+      try { await guardarBlockShiftRemoto(aoiId,shift); overlay.remove(); refrescar(); }
+      catch(error) { console.error(error); overlay.remove(); refrescar(); alert(`Shift guardado localmente, pendiente de sincronización: ${error.message}`); }
     };
   }
 
@@ -346,6 +350,27 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
   }
 
   async function guardarVisitRemota(aoiId,visitStatus){const loc=obtenerLocationSetting(aoiId)||{};const local=leerVisit(aoiId);const visitId=local.visitId||crearVisitId(aoiId);const startedAt=local.startedAt||new Date().toISOString();const completedAt=visitStatus==="Completed"?new Date().toISOString():null;await guardarEnSharePoint({type:"visit",visitId,season:loc.Season||"",aoiId,location:loc.Location||"",config:loc.Config||"",visitStatus,comment:"",startedAt,completedAt});return{...local,visitId,status:visitStatus,startedAt,completedAt};}
+
+  function contextoRemoto(aoiId) {
+    const visit = leerVisit(aoiId);
+    const loc = obtenerLocationSetting(aoiId) || {};
+    if (!visit.visitId) throw new Error("Field Book no tiene VisitId activo");
+    return { visitId:visit.visitId, season:loc.Season || "", aoiId, location:loc.Location || "", config:loc.Config || "" };
+  }
+
+  async function guardarPlotEventRemoto(aoiId, range, column, status, comment) {
+    await guardarEnSharePoint({ type:"plotEvent", ...contextoRemoto(aoiId), range:Number(range), column:Number(column), status, comment:String(comment || "") });
+  }
+
+  async function guardarBlockShiftRemoto(aoiId, shift) {
+    await guardarEnSharePoint({ type:"blockShift", ...contextoRemoto(aoiId), shiftId:shift.id, column:Number(shift.column), startRange:Number(shift.startRange), endRange:Number(shift.endRange), offset:Number(shift.offset), comment:String(shift.comment || "") });
+  }
+
+  async function guardarChecklistRemoto(aoiId, respuestas) {
+    const contexto = contextoRemoto(aoiId);
+    const items = checklistTemplate.map(item => ({ item, response: respuestas[item.id] || { status:"Pending", comment:"" } }));
+    await Promise.all(items.map(({item,response}) => guardarEnSharePoint({ type:"checklist", ...contexto, checkId:item.id, section:item.section, label:item.label, checkStatus:response.status || "Pending", comment:String(response.comment || "") })));
+  }
 
   function metricasChecklist(aoiId) {
     const respuestas = leerChecklist(aoiId);
@@ -575,7 +600,13 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
       activarVistaFieldBook("overview");
       document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="COMPLETING...";try{const v=await guardarVisitRemota(aoiId,"Completed");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo completar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
-      document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",()=>{const respuestas={};contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});guardarChecklist(aoiId,respuestas);const view=document.getElementById("fieldBookChecklistView");if(view)view.innerHTML=crearChecklistHTML(aoiId);renderizarAoi(aoiId);setTimeout(()=>activarVistaFieldBook("checklist"),0);});
+      document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",async(event)=>{
+        const btn=event.currentTarget; btn.disabled=true; btn.textContent="SAVING CHECKLIST...";
+        const respuestas={}; contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});
+        guardarChecklist(aoiId,respuestas);
+        try { await guardarChecklistRemoto(aoiId,respuestas); renderizarAoi(aoiId); setTimeout(()=>{activarVistaFieldBook("checklist");const msg=document.getElementById("fieldBookChecklistMsg");if(msg){msg.textContent="✓ Checklist sincronizado con SharePoint DEV";msg.style.color="#0b6b3a";msg.style.fontWeight="800";}},0); }
+        catch(error) { console.error(error); renderizarAoi(aoiId); setTimeout(()=>activarVistaFieldBook("checklist"),0); alert(`Checklist guardado localmente, pendiente de sincronización: ${error.message}`); }
+      });
       contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
         activarVistaFieldBook("issues");
         const target=contenido.querySelector(`.field-book-issues-plot[data-range="${issueButton.dataset.range}"][data-column="${issueButton.dataset.column}"]`);
@@ -623,30 +654,29 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
             });
           });
 
-          d.querySelector("#fieldBookSaveExecution")?.addEventListener("click", () => {
+          d.querySelector("#fieldBookSaveExecution")?.addEventListener("click", async(event) => {
+            const saveBtn=event.currentTarget; const original=saveBtn.textContent; saveBtn.disabled=true; saveBtn.textContent="SAVING...";
             const comment = d.querySelector("#fieldBookExecutionComment")?.value || "";
+            if (!statusSeleccionado) { saveBtn.disabled=false; saveBtn.textContent=original; alert("Seleccioná Refilled, Lost u Observation."); return; }
             guardarEvento(aoiId, plot.range, plot.column, statusSeleccionado, comment);
             refrescarIssuesEnPantalla(aoiId, layout);
-            const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)];
-            aplicarMarcaBoton(btn, evento);
+            const evento = leerEventos(aoiId)[claveEvento(aoiId, plot.range, plot.column)]; aplicarMarcaBoton(btn, evento);
             const msg = d.querySelector("#fieldBookExecutionMsg");
-            if (msg) {
-              msg.textContent = "✓ Guardado localmente en LAB";
-              msg.style.color = "#0b6b3a";
-              msg.style.fontWeight = "800";
-            }
+            try { await guardarPlotEventRemoto(aoiId,plot.range,plot.column,statusSeleccionado,comment); if(msg){msg.textContent="✓ Sincronizado con SharePoint DEV";msg.style.color="#0b6b3a";msg.style.fontWeight="800";} }
+            catch(error) { console.error(error); if(msg){msg.textContent="⚠ Guardado local · Pending sync";msg.style.color="#995c00";msg.style.fontWeight="800";} }
+            saveBtn.disabled=false; saveBtn.textContent=original;
           });
 
-          d.querySelector("#fieldBookRestoreNormal")?.addEventListener("click", () => {
-            restaurarNormal(aoiId, plot.range, plot.column);
-            refrescarIssuesEnPantalla(aoiId, layout);
-            aplicarMarcaBoton(btn, null);
+          d.querySelector("#fieldBookRestoreNormal")?.addEventListener("click", async() => {
+            restaurarNormal(aoiId, plot.range, plot.column); refrescarIssuesEnPantalla(aoiId, layout); aplicarMarcaBoton(btn, null);
+            try { await guardarPlotEventRemoto(aoiId,plot.range,plot.column,"Normal",""); } catch(error) { console.error(error); alert("Restaurado localmente; sincronización pendiente."); }
             btn.click();
           });
 
-          d.querySelector("#fieldBookRemoveShift")?.addEventListener("click", e => {
-            eliminarShift(aoiId, e.currentTarget.dataset.shiftId);
-            renderizarAoi(aoiId);
+          d.querySelector("#fieldBookRemoveShift")?.addEventListener("click", async e => {
+            const shiftId=e.currentTarget.dataset.shiftId; const shift=leerBlockShifts(aoiId).find(item=>item.id===shiftId);
+            eliminarShift(aoiId,shiftId); renderizarAoi(aoiId);
+            if(shift){try{await guardarBlockShiftRemoto(aoiId,{...shift,offset:0,comment:`REMOVED · ${shift.comment||""}`});}catch(error){console.error(error);alert("Shift removido localmente; sincronización pendiente.");}}
           });
 
           d.querySelector("#fieldBookShiftBlock")?.addEventListener("click", () => {
