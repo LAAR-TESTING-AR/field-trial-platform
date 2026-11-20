@@ -524,6 +524,93 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
     return `<section style="padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">FIELD EXECUTION SUMMARY</span><div style="display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;margin-top:8px">${cards}</div><div style="margin-top:10px;padding:10px 12px;border-radius:9px;background:#174c31;color:#fff;display:flex;justify-content:space-between;align-items:center"><strong style="font-size:11px">TOTAL ISSUES</strong><strong style="font-size:22px">${total}</strong></div>${total ? individualHTML+shiftHTML : `<div style="margin-top:18px;padding:28px;text-align:center;border:1px dashed #cbd7d0;border-radius:10px;color:#6c7a72;font-size:12px">No hay incidencias registradas en esta AOI.</div>`}</section>`;
   }
 
+  let fieldBookAoiActivo = "";
+
+  function elementosCabeceraFieldBook() {
+    return {
+      warning: document.querySelector(".lab-warning"),
+      header: document.querySelector(".field-book-header"),
+      selector: document.querySelector(".field-book-selector")
+    };
+  }
+
+  function mostrarCabeceraPrincipal(mostrar) {
+    const elementos = elementosCabeceraFieldBook();
+    [elementos.warning, elementos.header, elementos.selector].forEach(el => {
+      if (el) el.style.display = mostrar ? "" : "none";
+    });
+    document.body.classList.toggle("field-book-module-open", !mostrar);
+  }
+
+  function ocultarVistasFieldBook() {
+    ["fieldBookOverviewView","fieldBookLayoutView","fieldBookChecklistView","fieldBookIssuesView"].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.hidden = true;
+      el.style.display = "none";
+    });
+  }
+
+  function abrirModuloFieldBook(vista) {
+    const home = document.getElementById("fieldBookModuleHome");
+    const toolbar = document.getElementById("fieldBookModuleToolbar");
+    const titulo = document.getElementById("fieldBookModuleTitle");
+    if (home) home.style.display = "none";
+    if (toolbar) toolbar.style.display = "flex";
+    mostrarCabeceraPrincipal(false);
+    if (titulo) {
+      titulo.textContent = ({overview:"Overview",layout:"Field Map",checklist:"Checklist",issues:"Issues"})[vista] || "Field Book";
+    }
+    activarVistaFieldBook(vista);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function volverInicioFieldBook() {
+    ocultarVistasFieldBook();
+    const home = document.getElementById("fieldBookModuleHome");
+    const toolbar = document.getElementById("fieldBookModuleToolbar");
+    if (toolbar) toolbar.style.display = "none";
+    if (home) home.style.display = "block";
+    mostrarCabeceraPrincipal(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function crearHomeModularFieldBook(aoiId, layout, procesoIniciado) {
+    const loc = obtenerLocationSetting(aoiId) || {};
+    const visit = leerVisit(aoiId);
+    const checklist = metricasChecklist(aoiId);
+    const issues = metricasIssues(aoiId);
+    const estado = visit.status || "Not started";
+    const shell = contenido.firstElementChild;
+    if (!shell) return;
+
+    const cabeceraAoi = shell.children[0];
+    const tabs = shell.children[1];
+    if (cabeceraAoi) cabeceraAoi.style.display = "none";
+    if (tabs) tabs.style.display = "none";
+
+    const toolbar = document.createElement("div");
+    toolbar.id = "fieldBookModuleToolbar";
+    toolbar.style.cssText = "display:none;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;padding:9px 12px;border:1px solid #cddbd3;border-radius:11px;background:#fff;box-shadow:0 4px 15px rgba(23,76,49,.07);position:sticky;top:6px;z-index:50";
+    toolbar.innerHTML = `<button id="fieldBookBackHome" type="button" style="min-height:38px;padding:8px 12px;border:1px solid #174c31;border-radius:9px;background:#fff;color:#174c31;font-size:10px;font-weight:900;cursor:pointer">← FIELD BOOK</button><div style="text-align:center"><strong id="fieldBookModuleTitle" style="display:block;color:#174c31;font-size:15px">Field Book</strong><span style="color:#6c7a72;font-size:9px">${aoiId} · ${loc.Location || ""}</span></div><span style="padding:6px 9px;border-radius:999px;background:${navigator.onLine ? '#e7f5ec' : '#fff3d6'};color:${navigator.onLine ? '#0b6b3a' : '#995c00'};font-size:9px;font-weight:900">${navigator.onLine ? '● ONLINE' : '○ OFFLINE'}</span>`;
+
+    const home = document.createElement("section");
+    home.id = "fieldBookModuleHome";
+    home.innerHTML = `<div style="padding:19px;border:1px solid #cddbd3;border-radius:14px;background:linear-gradient(135deg,#f7fbf8 0%,#edf7f1 100%);box-shadow:0 7px 24px rgba(23,76,49,.08)"><span class="section-label">ACTIVE FIELD BOOK</span><div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-top:5px"><div><h2 style="margin:0;color:#174c31;font-size:24px">${loc.Location || aoiId}</h2><div style="margin-top:5px;color:#5f7167;font-size:12px">${aoiId} · ${loc.Crop || '-'} · ${loc.Season || '-'}</div></div><span style="padding:7px 11px;border-radius:999px;background:#fff;border:1px solid #cddbd3;color:#174c31;font-size:10px;font-weight:900">${estado.toUpperCase()}</span></div><p style="margin:12px 0 0;max-width:700px;color:#66786e;font-size:11px;line-height:1.5">Select a workspace to continue with planting execution.</p></div><div class="field-book-module-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:14px"><button class="field-book-module-card" data-module="overview" type="button" style="min-height:150px;padding:18px;text-align:left;border:1px solid #cddbd3;border-radius:14px;background:#fff;box-shadow:0 5px 17px rgba(23,76,49,.07);cursor:pointer"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:11px;background:#e7f5ec;color:#0b6b3a;font-size:19px;font-weight:900">▦</span><h3 style="margin:13px 0 4px;color:#174c31;font-size:17px">Overview</h3><p style="margin:0;color:#6c7a72;font-size:11px;line-height:1.45">Status, setup and execution progress.</p><strong style="display:block;margin-top:13px;color:#0b6b3a;font-size:10px">${estado.toUpperCase()} →</strong></button><button class="field-book-module-card" data-module="layout" type="button" ${procesoIniciado ? '' : 'disabled'} style="min-height:150px;padding:18px;text-align:left;border:1px solid #174c31;border-radius:14px;background:linear-gradient(135deg,#174c31,#0b6b3a);box-shadow:0 7px 22px rgba(23,76,49,.19);cursor:${procesoIniciado ? 'pointer' : 'not-allowed'};opacity:${procesoIniciado ? '1' : '.48'}"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:11px;background:rgba(255,255,255,.14);color:#fff;font-size:19px;font-weight:900">▦</span><h3 style="margin:13px 0 4px;color:#fff;font-size:17px">Field Map</h3><p style="margin:0;color:#dcece3;font-size:11px;line-height:1.45">Interactive map, plot events and block shifts.</p><strong style="display:block;margin-top:13px;color:#fff;font-size:10px">${layout.plotRecordCount || 0} PLOTS · ${issues.total} ISSUES →</strong></button><button class="field-book-module-card" data-module="checklist" type="button" ${procesoIniciado ? '' : 'disabled'} style="min-height:150px;padding:18px;text-align:left;border:1px solid #cddbd3;border-radius:14px;background:#fff;box-shadow:0 5px 17px rgba(23,76,49,.07);cursor:${procesoIniciado ? 'pointer' : 'not-allowed'};opacity:${procesoIniciado ? '1' : '.48'}"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:11px;background:#eaf2fb;color:#315d91;font-size:19px;font-weight:900">✓</span><h3 style="margin:13px 0 4px;color:#174c31;font-size:17px">Checklist</h3><p style="margin:0;color:#6c7a72;font-size:11px;line-height:1.45">Planting controls, GPS coordinates and signature.</p><strong style="display:block;margin-top:13px;color:#315d91;font-size:10px">${checklist.completed}/${checklist.total} COMPLETED →</strong></button><button class="field-book-module-card" data-module="issues" type="button" ${procesoIniciado ? '' : 'disabled'} style="min-height:150px;padding:18px;text-align:left;border:1px solid #cddbd3;border-radius:14px;background:#fff;box-shadow:0 5px 17px rgba(23,76,49,.07);cursor:${procesoIniciado ? 'pointer' : 'not-allowed'};opacity:${procesoIniciado ? '1' : '.48'}"><span style="display:inline-flex;width:38px;height:38px;align-items:center;justify-content:center;border-radius:11px;background:#fff3d6;color:#995c00;font-size:19px;font-weight:900">!</span><h3 style="margin:13px 0 4px;color:#174c31;font-size:17px">Issues</h3><p style="margin:0;color:#6c7a72;font-size:11px;line-height:1.45">Review exceptions, comments and shifts.</p><strong style="display:block;margin-top:13px;color:#995c00;font-size:10px">${issues.total} REGISTERED →</strong></button></div>`;
+
+    shell.insertBefore(toolbar, shell.firstChild);
+    shell.insertBefore(home, toolbar.nextSibling);
+    toolbar.querySelector("#fieldBookBackHome")?.addEventListener("click", volverInicioFieldBook);
+    home.querySelectorAll(".field-book-module-card").forEach(card => {
+      card.addEventListener("click", () => {
+        if (card.disabled) return;
+        abrirModuloFieldBook(card.dataset.module);
+      });
+    });
+    fieldBookAoiActivo = aoiId;
+    volverInicioFieldBook();
+  }
+
   function activarVistaFieldBook(vista) {
     const views = { overview:"fieldBookOverviewView", layout:"fieldBookLayoutView", checklist:"fieldBookChecklistView", issues:"fieldBookIssuesView" };
     const tabs = { overview:"fieldBookTabOverview", layout:"fieldBookTabLayout", checklist:"fieldBookTabChecklist", issues:"fieldBookTabIssues" };
@@ -563,7 +650,7 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
 
   function reabrirFieldMapEnPlot(aoiId, range, column) {
     renderizarAoi(aoiId);
-    activarVistaFieldBook("layout");
+    abrirModuloFieldBook("layout");
 
     const target = contenido.querySelector(
       `.field-book-real-plot[data-range="${range}"][data-column="${column}"]`
@@ -621,15 +708,15 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
       document.getElementById("fieldBookTabChecklist")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("checklist"); });
       document.getElementById("fieldBookTabIssues")?.addEventListener("click",()=>{ if (procesoIniciado) activarVistaFieldBook("issues"); });
       conectarIssuesMap(aoiId, layoutReal);
-      activarVistaFieldBook("overview");
+      crearHomeModularFieldBook(aoiId, layout, procesoIniciado);
       document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="COMPLETING...";try{const v=await guardarVisitRemota(aoiId,"Completed");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo completar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",async(event)=>{
         const btn=event.currentTarget; btn.disabled=true; btn.textContent="SAVING CHECKLIST...";
         const respuestas={}; contenido.querySelectorAll(".field-book-check-row").forEach(row=>{respuestas[row.dataset.checkId]={status:row.querySelector(".field-book-check-status")?.value||"Pending",comment:row.querySelector(".field-book-check-comment")?.value?.trim()||"",updatedAt:new Date().toISOString()};});
         guardarChecklist(aoiId,respuestas);
-        try { await guardarChecklistRemoto(aoiId,respuestas); renderizarAoi(aoiId); setTimeout(()=>{activarVistaFieldBook("checklist");const msg=document.getElementById("fieldBookChecklistMsg");if(msg){msg.textContent="✓ Checklist sincronizado con SharePoint DEV";msg.style.color="#0b6b3a";msg.style.fontWeight="800";}},0); }
-        catch(error) { console.error(error); renderizarAoi(aoiId); setTimeout(()=>activarVistaFieldBook("checklist"),0); alert(`Checklist guardado localmente, pendiente de sincronización: ${error.message}`); }
+        try { await guardarChecklistRemoto(aoiId,respuestas); renderizarAoi(aoiId); setTimeout(()=>{abrirModuloFieldBook("checklist");const msg=document.getElementById("fieldBookChecklistMsg");if(msg){msg.textContent="✓ Checklist sincronizado con SharePoint DEV";msg.style.color="#0b6b3a";msg.style.fontWeight="800";}},0); }
+        catch(error) { console.error(error); renderizarAoi(aoiId); setTimeout(()=>abrirModuloFieldBook("checklist"),0); alert(`Checklist guardado localmente, pendiente de sincronización: ${error.message}`); }
       });
       contenido.querySelectorAll(".field-book-issue-link").forEach(issueButton=>issueButton.addEventListener("click",()=>{
         activarVistaFieldBook("issues");
