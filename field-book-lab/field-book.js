@@ -555,6 +555,24 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
     if(estabaVisible) activarVistaFieldBook("issues");
   }
 
+  function reabrirFieldMapEnPlot(aoiId, range, column) {
+    renderizarAoi(aoiId);
+    activarVistaFieldBook("layout");
+
+    const target = contenido.querySelector(
+      `.field-book-real-plot[data-range="${range}"][data-column="${column}"]`
+    );
+
+    if (!target) return;
+
+    target.click();
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "center"
+    });
+  }
+
   function renderizarAoi(
     aoiId
   ) {
@@ -675,12 +693,12 @@ const FIELD_BOOK_SAVE_URL = "https://defaultdb5054808ec6495cb57932c58ed84a.01.en
 
           d.querySelector("#fieldBookRemoveShift")?.addEventListener("click", async e => {
             const shiftId=e.currentTarget.dataset.shiftId; const shift=leerBlockShifts(aoiId).find(item=>item.id===shiftId);
-            eliminarShift(aoiId,shiftId); renderizarAoi(aoiId);
+            eliminarShift(aoiId,shiftId); reabrirFieldMapEnPlot(aoiId, plot.range, plot.column);
             if(shift){try{await guardarBlockShiftRemoto(aoiId,{...shift,offset:0,comment:`REMOVED · ${shift.comment||""}`});}catch(error){console.error(error);alert("Shift removido localmente; sincronización pendiente.");}}
           });
 
           d.querySelector("#fieldBookShiftBlock")?.addEventListener("click", () => {
-            abrirShiftBlock(aoiId, plot, layout, porCoord, () => renderizarAoi(aoiId));
+            abrirShiftBlock(aoiId, plot, layout, porCoord, () => reabrirFieldMapEnPlot(aoiId, plot.range, plot.column));
           });
         });
       });
