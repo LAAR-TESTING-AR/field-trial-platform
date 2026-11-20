@@ -3,8 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Field Book Lab</title>
+  <title>Field Book | Field Trial Platform</title>
   <link rel="stylesheet" href="field-book.css">
+  <style>
+    body.field-book-module-open .field-book-app {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    body.field-book-module-open .field-book-content {
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+
+    body.field-book-module-open #fieldBookContent > div {
+      padding: 0 !important;
+    }
+
+    .field-book-module-card {
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .field-book-module-card:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(23,76,49,.13) !important;
+    }
+
+    @media (max-width: 760px) {
+      .field-book-module-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.field-book-module-open #fieldBookLayoutView {
+        grid-template-columns: 1fr !important;
+      }
+
+      body.field-book-module-open #fieldBookLayoutView > aside {
+        max-height: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
   <header class="lab-header">
