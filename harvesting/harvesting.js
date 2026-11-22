@@ -88,10 +88,10 @@ mapa.on("baselayerchange", function (evento) {
 });
 let sitios = [];
 const URL_FLOW_HARVESTING =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/dc94f4d4d0ff4904866c8726a48a1185/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GWTEp8PeVDOFIAa1f77dCmmr8NgXRGk0aSRdP_lOPyY";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/77fcb112ef044dda8a6ed412e7face04/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=3laRGr7Ocgxxz9OgGdnzjh5gXk0SU8PlwBjVfQ3d_5U";
 
 const URL_FLOW_HARVESTING_STATUS =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/0be6fa76f3e44cd9ab0e46432305f00d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=whw1mJ8Yz1FfldkoiP7i1Z5HDMz0iK_I_Na0Xu3sDig";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/29/workflows/7ed54ad8db034f78bf04786f129cd07f/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=skpQ0H4GMdetB0jhjb6RXmOhGAFto-GRvkBCHrDWXcM";
 
 const YLDLIM_OPTIONS = [
   "Common Rust", "Northern Leaf Blight", "Gray Leaf Spot", "Fusarium Stalk Rot",
@@ -104,13 +104,13 @@ const YLDLIM_OPTIONS = [
 ];
 
 const URL_FLOW_PLANNING =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/09/workflows/f9679e187c0b4d3d837a55d18fd9f608/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0nhZHl2vRMJWQYe4tEuF1p7TN3BZ3yq7LE2XBY5quGE";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/03/workflows/bce1aa67c32d47599e18bc8c604608b6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=vxsfRjf_Yw05nY4jw4RDGvdp7KCYKGgPNu3Ghslyc8o";
 const URL_FLOW_PLANNING_GET =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/24/workflows/af587c26aece442f80e564de5760ef4c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pLrdlfm9Ppj7utl9RMcw8iR_ZoL5h75LICgKvIykcPE";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/28/workflows/45858f1b195f44aabdf05de5aff5ae2a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yzgO6s8xb5yAZ62JJ7PXdCN-U0HfCPo0gqldBQ7mzfA";
 const URL_FLOW_PLANNING_DELETE =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/29/workflows/bf37955d8b4e4564ace52d7d377ea427/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IIeyWIwFS9mFfY6Jj4x0iXPPdNZFhfdgYtLeTHrRMhw";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/26/workflows/80cb0d266bc644e1baf702a72ad6aa95/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EaWVB4TS2DVvgyVyOnzIrmPf4S7mWAK_GtIZmVBpS1Y";
 const URL_FLOW_PLANNING_UPDATE =
-  "https://defaultdb5054808ec6495cb57932c58ed84a.01.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/bf43c54ef2f844cb97c4cc1025ec47e6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=28XOoj6pFx3-AUyCvx2RYqr6rCJa_WhpPyrjIi93DpY";
+  "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/15/workflows/ae7fefa0e98c4e0a9f0d2cb4b7c76e33/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=XpLoc_awAbFz5i5e_t0c8fWhGUTjXZeWNWezPxi9QBA";
 
 let modalCosecha;
 let modalFechaCosecha;
