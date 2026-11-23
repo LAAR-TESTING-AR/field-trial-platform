@@ -136,7 +136,7 @@ console.log(
       try {
         const respuesta =
           await fetch(
-            URL_FLOW_HARVESTING,
+            window.FTP_CONFIG.getFlowUrl("harvestingDate"),
             {
               method: "POST",
               headers: {
