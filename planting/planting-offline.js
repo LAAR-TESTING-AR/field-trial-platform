@@ -136,7 +136,7 @@ async function sincronizarSiembrasPendientes() {
       try {
         const respuesta =
           await fetch(
-            URL_FLOW_SIEMBRA,
+            window.FTP_CONFIG.getFlowUrl("plantingDate"),
             {
               method: "POST",
               headers: {
