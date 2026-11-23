@@ -2,7 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "fieldTrialMapCoordinatePowerAutomateUrl";
-  const OFFICIAL_SYNC_URL = "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/01/workflows/5333e46ac57746ec99ac8ac5b65d9558/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=l2QyxwVllrZNVV3wyd-VlHm83Dzs6uLIL6_fN3Chat0";
+  const OFFICIAL_SYNC_URL = window.FTP_CONFIG.getFlowUrl("fieldCoordinateSync");
   let sincronizacionEnCurso = false;
 
   // La URL oficial se aplica automaticamente y reemplaza configuraciones antiguas.
