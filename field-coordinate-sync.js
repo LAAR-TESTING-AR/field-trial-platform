@@ -2,10 +2,18 @@
   "use strict";
 
   const STORAGE_KEY = "fieldTrialMapCoordinatePowerAutomateUrl";
+  const OFFICIAL_SYNC_URL = "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/01/workflows/5333e46ac57746ec99ac8ac5b65d9558/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=l2QyxwVllrZNVV3wyd-VlHm83Dzs6uLIL6_fN3Chat0";
   let sincronizacionEnCurso = false;
 
+  // La URL oficial se aplica automaticamente y reemplaza configuraciones antiguas.
+  window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+
   function obtenerUrl() {
-    return String(window.localStorage.getItem(STORAGE_KEY) || "").trim();
+    const actual = String(window.localStorage.getItem(STORAGE_KEY) || "").trim();
+    if (actual !== OFFICIAL_SYNC_URL) {
+      window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+    }
+    return OFFICIAL_SYNC_URL;
   }
 
   function tieneUrlConfigurada() {
@@ -44,31 +52,24 @@
   }
 
   function borrarUrl() {
-    window.localStorage.removeItem(STORAGE_KEY);
-
+    window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
     window.dispatchEvent(
       new CustomEvent("fieldcoordinates:sync-config-updated", {
-        detail: { configured: false }
+        detail: { configured: true, managed: true }
       })
     );
+    return true;
   }
 
   function configurarConDialogo() {
-    const ingresada = window.prompt(
-      "Pegá la URL HTTP de Power Automate para sincronizar coordenadas. Quedará guardada solamente en este dispositivo.",
-      obtenerUrl()
+    window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+    window.dispatchEvent(
+      new CustomEvent("fieldcoordinates:sync-config-updated", {
+        detail: { configured: true, managed: true }
+      })
     );
-
-    if (ingresada === null) return false;
-
-    try {
-      guardarUrl(ingresada);
-      window.alert("Sincronización de coordenadas configurada correctamente.");
-      return true;
-    } catch (error) {
-      window.alert(error?.message || "No fue posible guardar la URL.");
-      return false;
-    }
+    window.alert("La sincronizacion de coordenadas ya esta configurada automaticamente.");
+    return true;
   }
 
   function construirPayload(registro) {
