@@ -394,17 +394,17 @@ mapa.on("baselayerchange", function (evento) {
 });
 let sitios = [];
 const URL_FLOW_SIEMBRA =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/20/workflows/8cb7feb5ec2a46a28d5c8d7dbb2acd4a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=UelEfPzAWKRhm-ik3WlImcbcbhulwP8yBiVDQiraAZc";
+  window.FTP_CONFIG.getFlowUrl("plantingDate");
 const URL_FLOW_PLANTING_STATUS =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/02/workflows/a43d2457b058477daf00def0e48d1dc2/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=6-8f0tavSfjaRR8_-lsckwdh2nOYhrKzwV3V-Z0wf0I";
+  window.FTP_CONFIG.getFlowUrl("plantingStatus");
 const URL_FLOW_PLANNING =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/546fdcdaea88447bae329715a0451940/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_VbpcIOJlOKBwMhhBSAVufZb0EEZMVTbZ7c0om_3150";
+  window.FTP_CONFIG.getFlowUrl("planningCreate");
 const URL_FLOW_PLANNING_GET =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/12/workflows/76a5bae973bc4989a6177f314746c897/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=lk93WPXZSAAc6m-Xn9wim0Ct7DNTWQMGYiO7MTvLZI8";
+  window.FTP_CONFIG.getFlowUrl("planningGet");
 const URL_FLOW_PLANNING_DELETE =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/fd95fcd010b6445abbd5069290c04743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uOx-ZsjXKcXD4NNJIxuXIHbezNv5mHzYfTxZy0F_WM0";
+  window.FTP_CONFIG.getFlowUrl("planningDelete");
 const URL_FLOW_PLANNING_UPDATE =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/3fde3339ccb441afab9e71a66cf590e1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=b1PNHjS-zFGgHMI6wBY427Hlso8uywPfBUUaiNQ1VxQ";
+  window.FTP_CONFIG.getFlowUrl("planningUpdate");
 let modalSiembra;
 let modalFechaSiembra;
 let modalPlanter;
