@@ -382,3 +382,53 @@ body {
     .field-book-sync-controls { width: 100%; justify-content: space-between; }
     .field-book-sync-state { flex: 1; text-align: center; }
   }
+
+
+/* =========================
+   SHIFT BLOCK GESTUAL
+========================= */
+.field-book-real-plot { touch-action: pan-x pan-y; }
+.field-book-real-plot.fb-shift-selected {
+  outline: 3px solid #315d91 !important;
+  outline-offset: 1px !important;
+  box-shadow: inset 0 0 0 2px #fff, 0 0 0 2px #315d9140 !important;
+  filter: saturate(1.15);
+}
+.field-book-real-plot.fb-shift-preview {
+  outline: 3px dashed #0b6b3a !important;
+  outline-offset: 1px !important;
+  background-image: linear-gradient(135deg, transparent 35%, rgba(11,107,58,.20) 35%, rgba(11,107,58,.20) 65%, transparent 65%) !important;
+}
+.field-book-real-plot.fb-shift-overlap {
+  outline-color: #c47a00 !important;
+  box-shadow: inset 0 0 0 3px rgba(255,193,7,.35) !important;
+}
+.fb-shift-gesture-bar {
+  position: fixed; left: 50%; bottom: 18px; z-index: 10020; transform: translateX(-50%);
+  width: min(720px, calc(100vw - 24px)); display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding: 11px 13px; border: 1px solid #9fb8d5; border-radius: 12px; background:#fff; color:#315d91;
+  box-shadow:0 14px 38px rgba(30,61,94,.24);
+}
+.fb-shift-gesture-bar b { display:block; font-size:12px; }
+.fb-shift-gesture-bar span { display:block; margin-top:2px; color:#617386; font-size:10px; }
+.fb-shift-gesture-actions { display:flex; gap:7px; }
+.fb-shift-gesture-actions button { min-height:36px; padding:7px 10px; border:1px solid #315d91; border-radius:8px; background:#fff; color:#315d91; font-size:10px; font-weight:900; cursor:pointer; }
+.fb-shift-gesture-actions button:last-child { background:#315d91; color:#fff; }
+.fb-shift-confirm-overlay { position:fixed; inset:0; z-index:10030; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(0,0,0,.44); }
+.fb-shift-confirm-card { width:min(520px,100%); max-height:90vh; overflow:auto; padding:17px; border-radius:14px; background:#fff; box-shadow:0 22px 58px rgba(0,0,0,.30); }
+.fb-shift-confirm-card h3 { margin:5px 0 11px; color:#174c31; }
+.fb-shift-confirm-grid { display:grid; grid-template-columns:1fr auto; gap:7px 16px; padding:11px; border:1px solid #d9e3dd; border-radius:9px; background:#f8fbf9; font-size:11px; }
+.fb-shift-confirm-grid span { color:#6c7a72; }
+.fb-shift-confirm-grid b { color:#26352d; text-align:right; }
+.fb-shift-confirm-grid .is-warning { color:#995c00; }
+.fb-shift-confirm-grid .is-danger { color:#8b2d2d; }
+.fb-shift-confirm-card p { color:#6c7a72; font-size:10px; line-height:1.45; }
+.fb-shift-confirm-card textarea { width:100%; box-sizing:border-box; resize:vertical; padding:8px; border:1px solid #c7d4cc; border-radius:8px; font:inherit; font-size:11px; }
+.fb-shift-confirm-actions { display:flex; gap:8px; margin-top:11px; }
+.fb-shift-confirm-actions button { flex:1; min-height:39px; border:1px solid #9fb8d5; border-radius:8px; background:#fff; color:#315d91; font-size:10px; font-weight:900; cursor:pointer; }
+.fb-shift-confirm-actions button:last-child { border-color:#315d91; background:#315d91; color:#fff; }
+@media (max-width:700px) {
+  .fb-shift-gesture-bar { align-items:stretch; flex-direction:column; bottom:10px; }
+  .fb-shift-gesture-actions button { flex:1; }
+  .fb-shift-confirm-card { padding:14px; }
+}
