@@ -327,3 +327,58 @@ body {
   }
 
 }
+
+
+  /* =========================
+     FIELD BOOK SYNC QUEUE
+  ========================= */
+  .field-book-sync-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+  }
+  .field-book-sync-state {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .field-book-sync-state[data-mode="pending"] { background: #fff3d6; color: #7a5600; }
+  .field-book-sync-state[data-mode="synced"] { background: #e7f5ec; color: #0b6b3a; }
+  .field-book-sync-state[data-mode="offline"] { background: #f3e4ff; color: #5a3cc6; }
+  .field-book-sync-button {
+    position: relative;
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 8px;
+    background: #fff;
+    color: #5435d8;
+    font-size: 10px;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .field-book-sync-button:disabled { opacity: 0.68; cursor: default; }
+  .field-book-sync-count {
+    display: inline-flex;
+    min-width: 17px;
+    height: 17px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #995c00;
+    color: #fff;
+    font-size: 9px;
+  }
+  @media (max-width: 700px) {
+    .lab-header { flex-wrap: wrap; }
+    .field-book-sync-controls { width: 100%; justify-content: space-between; }
+    .field-book-sync-state { flex: 1; text-align: center; }
+  }
