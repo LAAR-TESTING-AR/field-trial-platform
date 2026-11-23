@@ -1,371 +1,298 @@
-const CACHE_NAME = "field-trial-platform-v20261020";
-const BASE_PATH = "/field-trial-platform/";
+<!DOCTYPE html>
+<html lang="es">
 
-const APP_SHELL = [
-  BASE_PATH,
-  `${BASE_PATH}index.html`,
-  
-  `${BASE_PATH}platform.html`,
-  `${BASE_PATH}platform.js`,
-  `${BASE_PATH}Sitios_test.csv`,
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  `${BASE_PATH}planting/`,
-  `${BASE_PATH}planting/index.html`,
-  `${BASE_PATH}planting/planting.css`,
-  `${BASE_PATH}planting/planting.js`,
-  `${BASE_PATH}planting/planting-offline.js`,
-  `${BASE_PATH}viewer.html`,
-  `${BASE_PATH}offline.html`,
-  `${BASE_PATH}manifest.webmanifest`,
-  `${BASE_PATH}manifest-viewer.webmanifest`,
-  `${BASE_PATH}manifest-selector.js`,
+  <title>Field Trial Platform</title>
 
-  `${BASE_PATH}style.css`,
-  `${BASE_PATH}summary-toolbar.css`,
-  `${BASE_PATH}foto-access-addon.css`,
-  `${BASE_PATH}popup-mobile-addon.css`,
-  `${BASE_PATH}drop-trial-addon.css`,
-  `${BASE_PATH}filtros-dependientes-v3.css`,
-  `${BASE_PATH}field-photo-capture.css`,
-  `${BASE_PATH}field-photo-history.css`,
-  `${BASE_PATH}field-coordinate-capture.css`,
-  `${BASE_PATH}field-coordinate-pending.css`,
-  `${BASE_PATH}field-coordinate-sync-ui.css`,
-  `${BASE_PATH}pwa-ui.css`,
-  
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
 
-  `${BASE_PATH}app-mode.js`,
-  `${BASE_PATH}app-viewer-controls.js`,
-  `${BASE_PATH}header-app.css`,
-  `${BASE_PATH}app.js`,
-  `${BASE_PATH}field-access-status.js`,
-  `${BASE_PATH}drop-trial-addon.js`,
-  `${BASE_PATH}summary-toolbar.js`,
-  `${BASE_PATH}foto-access-addon.js`,
-  `${BASE_PATH}popup-mobile-addon.js`,
-  `${BASE_PATH}filtros-dependientes-v3.js`,
+  <style>
 
-  `${BASE_PATH}field-photo-capture.js`,
-  `${BASE_PATH}field-photo-popup-integration.js`,
-  `${BASE_PATH}field-photo-sync.js`,
-  `${BASE_PATH}field-photo-pending.js`,
-  `${BASE_PATH}field-photo-sync-ui.js`,
-  `${BASE_PATH}field-photo-history.js`,
-  `${BASE_PATH}field-photo-history-ui.js`,
-  `${BASE_PATH}field-photo-history-viewer.js`,
-  `${BASE_PATH}field-photo-timeline-icons.js`,
+    *{
+      box-sizing:border-box;
+    }
 
-  `${BASE_PATH}field-coordinate-storage.js`,
-  `${BASE_PATH}field-coordinate-capture.js`,
-  `${BASE_PATH}field-coordinate-popup-integration.js`,
-  `${BASE_PATH}field-coordinate-pending.js`,
-  `${BASE_PATH}field-coordinate-sync.js`,
-  `${BASE_PATH}field-coordinate-sync-ui.js`,
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-family:'Segoe UI',Arial,sans-serif;
 
-  `${BASE_PATH}pwa-ui.js`,
+      background:
+      repeating-linear-gradient(
+        -12deg,
+        rgba(255,255,255,0.05) 0px,
+        rgba(255,255,255,0.05) 4px,
+        transparent 4px,
+        transparent 42px
+      ),
+      linear-gradient(
+        135deg,
+        #0b6b3a 0%,
+        #157a43 55%,
+        #22884c 100%
+      );
+    }
 
-  `${BASE_PATH}icon-192.png`,
-  `${BASE_PATH}icon-512.png`,
-  `${BASE_PATH}apple-touch-icon.png`
-];
+    .login-box{
+      width:430px;
+      background:#ffffff;
+      border-radius:22px;
+      padding:40px;
+      text-align:center;
+      box-shadow:0 18px 45px rgba(0,0,0,.25);
+    }
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    .logo{
+      width:120px;
+      height:auto;
+      margin-bottom:10px;
+    }
+
+    h1{
+      margin:0;
+      color:#0b6b3a;
+      font-size:28px;
+      font-weight:700;
+    }
+
+    .campaign{
+      color:#0b6b3a;
+      font-weight:600;
+      margin-top:8px;
+      margin-bottom:8px;
+    }
+
+    .subtitle{
+      color:#666;
+      font-size:13px;
+      margin-bottom:30px;
+    }
+
+    input{
+      width:100%;
+      padding:14px;
+      border:1px solid #d5d5d5;
+      border-radius:10px;
+      font-size:15px;
+      margin-bottom:15px;
+    }
+
+    input:focus{
+      outline:none;
+      border-color:#0b6b3a;
+    }
+
+    button{
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      background:#0b6b3a;
+      color:white;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      transition:.2s;
+    }
+
+    button:hover{
+      background:#095a31;
+      transform:translateY(-1px);
+    }
+
+    #mensaje{
+      margin-top:15px;
+      color:#b00020;
+      min-height:20px;
+      font-size:14px;
+    }
+
+    .footer{
+      margin-top:25px;
+      color:#888;
+      font-size:11px;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="login-box">
+
+    <img src="icon-512.png"
+         alt="Field Trial Platform"
+         class="logo">
+
+    <h1>Field Trial Platform
+
+    <div class="subtitle">
+      Research Argentina · Trial Management Platform
+    </div>
+
+    <input
+      type="email"
+      id="email"
+      placeholder="Ingrese su email corporativo o externo">
+
+    <button id="loginButton" type="button">
+      Ingresar
+    </button>
+
+    <div id="mensaje"></div>
+
+    <div class="footer">
+      Secure Access · Powered by Research Argentina
+    </div>
+
+  </div>
+  <script src="ftp-config.js?v=1"></script>
+  <script>
+    const FLOW_URL = window.FTP_CONFIG.getFlowUrl("validateUser");
+
+const loggedIn =
+  localStorage.getItem(
+    "loggedIn"
   );
-});
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    Promise.all([
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames
-            .filter(cacheName => cacheName !== CACHE_NAME)
-            .map(cacheName => caches.delete(cacheName))
+const userRole =
+  localStorage.getItem(
+    "userRole"
+  );
+
+if (
+  loggedIn === "true" &&
+  userRole
+) {
+
+  if (
+    userRole.toLowerCase() ===
+    "viewer"
+  ) {
+
+    window.location.href =
+      "viewer.html";
+
+  } else {
+
+    window.location.href =
+      "platform.html";
+
+  }
+
+}
+    
+    async function login(){
+
+      const email =
+        document.getElementById("email")
+        .value
+        .trim()
+        .toLowerCase();
+
+      const mensaje =
+        document.getElementById("mensaje");
+
+      if(!email){
+        mensaje.textContent =
+          "Ingrese un email.";
+        return;
+      }
+
+      try{
+
+        const response = await fetch(
+          FLOW_URL,
+          {
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+              email:email
+            })
+          }
         );
-      }),
-      self.clients.claim()
-    ])
-  );
-});
 
-self.addEventListener("message", event => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
-  }
-});
+        const data =
+          await response.json();
 
-self.addEventListener("fetch", event => {
-  const request = event.request;
-  const url = new URL(request.url);
-
-  if (request.method !== "GET") {
-    return;
-  }
-
-  /*
-   * Navegación:
-   * Red primero y cada página se guarda
-   * utilizando su propia dirección.
-   */
- if (request.mode === "navigate") {
-
-  const claveNavegacion =
-    url.pathname;
-
-  event.respondWith(
-
-    fetch(request, {
-      cache: "no-store"
-    })
-
-      .then(response => {
+        let role = data.role;
 
         if (
-          !response ||
-          !response.ok
-        ) {
+          role &&
+          typeof role === "object"
+        ){
+          role =
+            role.Value ||
+            role.value ||
+            "";
+        }
 
+        role =
+          String(role || "")
+          .trim();
+
+        if(!role){
           throw new Error(
-            "No fue posible actualizar la pagina"
+            "Rol no recibido"
           );
-
         }
 
-        const copia =
-          response.clone();
-
-        event.waitUntil(
-
-          caches
-            .open(CACHE_NAME)
-            .then(cache => {
-
-              return cache.put(
-                claveNavegacion,
-                copia
-              );
-
-            })
-
+        localStorage.setItem(
+          "loggedIn",
+          "true"
         );
 
-        return response;
-
-      })
-
-      .catch(async () => {
-
-        const paginaSolicitada =
-          await caches.match(
-            claveNavegacion,
-            {
-              ignoreSearch: true
-            }
-          );
-
-        if (paginaSolicitada) {
-          return paginaSolicitada;
-        }
-
-        if (
-          url.pathname ===
-          `${BASE_PATH}planting/`
-        ) {
-
-          const paginaSowing =
-            await caches.match(
-              `${BASE_PATH}planting/index.html`
-            );
-
-          if (paginaSowing) {
-            return paginaSowing;
-          }
-
-        }
-
-        return (
-          await caches.match(
-            `${BASE_PATH}platform.html`
-          )
-        ) || (
-          await caches.match(
-            `${BASE_PATH}offline.html`
-          )
+        localStorage.setItem(
+          "userEmail",
+          email
         );
 
-      })
+        localStorage.setItem(
+          "userRole",
+          role
+        );
 
-  );
-
-  return;
-
-}
-
-
-  /* Sitios_test.csv: red primero y clave fija sin parametros. */
-  if (url.pathname.endsWith("/Sitios_test.csv")) {
-    const claveSitios = `${BASE_PATH}Sitios_test.csv`;
-
-    event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then(response => {
-          if (!response || !response.ok) {
-            throw new Error("No fue posible actualizar Sitios_test.csv");
-          }
-
-          const copia = response.clone();
-
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(claveSitios, copia);
-            })
-          );
-
-          return response;
-        })
-        .catch(() => caches.match(claveSitios))
-    );
-
-    return;
-  }
-
-  /* AccessPhotos.csv: red primero y clave fija sin parametros. */
-  if (url.pathname.endsWith("/AccessPhotos.csv")) {
-    const claveFotos = `${BASE_PATH}AccessPhotos.csv`;
-
-    event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then(response => {
-          if (!response || !response.ok) {
-            throw new Error("No fue posible actualizar AccessPhotos.csv");
-          }
-
-          const copia = response.clone();
-
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(claveFotos, copia);
-            })
-          );
-
-          return response;
-        })
-        .catch(() => caches.match(claveFotos))
-    );
-
-    return;
-  }
-/* version.json: siempre red primero */
-if (url.pathname.endsWith("/version.json")) {
-
-  event.respondWith(
-    fetch(request, {
-      cache: "no-store"
-    })
-  );
-
-  return;
-
-}
-  /* JavaScript y CSS locales: red primero para recibir cambios nuevos. */
-  if (
-    url.origin === self.location.origin &&
-    (url.pathname.endsWith(".js") || url.pathname.endsWith(".css"))
-  ) {
-    event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then(response => {
-          if (!response || !response.ok) {
-            throw new Error("No fue posible actualizar el recurso");
-          }
-
-          const copia = response.clone();
-
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(url.pathname, copia);
-            })
-          );
-
-          return response;
-        })
-        .catch(() => {
-          return caches.match(url.pathname, {
-            ignoreSearch: true
-          });
-        })
-    );
-
-    return;
-  }
-
-  /* Fotografias publicas: red primero y cache como respaldo. */
-  if (
-    url.pathname.includes("/images/access/") ||
-    url.pathname.includes("/images/trial/")
-  ) {
-    event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then(response => {
-          if (!response || !response.ok) {
-            throw new Error("No fue posible descargar la fotografia");
-          }
-
-          const copia = response.clone();
-
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(request, copia);
-            })
-          );
-
-          return response;
-        })
-        .catch(() => {
-          return caches.match(request, {
-            ignoreSearch: true
-          });
-        })
-    );
-
-    return;
-  }
-
-  /* Iconos y otros recursos: cache primero y red como alternativa. */
-  event.respondWith(
-    caches
-      .match(request, {
-        ignoreSearch: true
-      })
-      .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
+        
+        if(
+          role.toLowerCase() ===
+          "viewer"
+        ){
+          window.location.href =
+            "viewer.html";
+        }else{
+          window.location.href =
+            "platform.html";
         }
 
-        return fetch(request).then(response => {
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type === "opaque"
-          ) {
-            return response;
-          }
+      }catch(error){
 
-          const copia = response.clone();
+        console.error(error);
 
-          event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(request, copia);
-            })
-          );
+        mensaje.textContent =
+          "No fue posible validar el usuario.";
 
-          return response;
-        });
-      })
-  );
-});
+      }
+
+    }
+
+    document
+      .getElementById("loginButton")
+      .addEventListener(
+        "click",
+        login
+      );
+
+  </script>
+
+</body>
+</html>
