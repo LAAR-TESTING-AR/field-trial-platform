@@ -1786,7 +1786,8 @@ function crearPopup(sitio, estado) {
 
 if (
   estado === "NO PLANIFICADO" ||
-  estado === "PLANIFICADO"
+  estado === "PLANIFICADO" ||
+  estado === "IN PROCESS"
 ) {
 
   const esViewer =
