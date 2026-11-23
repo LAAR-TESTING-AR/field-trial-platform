@@ -8,7 +8,156 @@
 const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/10/workflows/98c6ecc5302e48fba99d4eabb6790747/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E-vDpXW7I2ZV2npkaw6NsQDuHtw_BtjJiaQudQF-HXg";
     
   function endpointConfigurado(){return Boolean(FIELD_BOOK_SAVE_URL && !FIELD_BOOK_SAVE_URL.includes("PEGAR_URL_FLOW_AQUI"));}
+
+  const FIELD_BOOK_SYNC_QUEUE_KEY = "fieldBookSyncQueue:v1";
+  let fieldBookSyncEnCurso = false;
+
+  function leerSyncQueue() {
+    try {
+      const value = JSON.parse(localStorage.getItem(FIELD_BOOK_SYNC_QUEUE_KEY) || "[]");
+      return Array.isArray(value) ? value : [];
+    } catch (error) {
+      console.warn("Field Book: no se pudo leer la cola de sincronizacion", error);
+      return [];
+    }
+  }
+
+  function guardarSyncQueue(queue) {
+    localStorage.setItem(FIELD_BOOK_SYNC_QUEUE_KEY, JSON.stringify(queue));
+    actualizarSyncUI();
+  }
+
+  function claveOperacion(payload) {
+    const type = String(payload?.type || "unknown");
+    if (type === "visit") return `visit|${payload.visitId}`;
+    if (type === "plotEvent") return `plotEvent|${payload.visitId}|${payload.range}|${payload.column}`;
+    if (type === "blockShift") return `blockShift|${payload.visitId}|${payload.shiftId}`;
+    if (type === "checklist") return `checklist|${payload.visitId}|${payload.checkId}`;
+    return `${type}|${payload.visitId || payload.aoiId || "global"}|${Date.now()}`;
+  }
+
+  function encolarPayload(payload) {
+    const queue = leerSyncQueue();
+    const operationKey = claveOperacion(payload);
+    const now = new Date().toISOString();
+    const requestId = (crypto?.randomUUID?.() || `fb-${Date.now()}-${Math.random().toString(16).slice(2)}`);
+    const item = {
+      id: requestId,
+      operationKey,
+      payload: { ...payload, clientRequestId: requestId },
+      status: "pending",
+      attempts: 0,
+      createdAt: now,
+      updatedAt: now,
+      lastError: ""
+    };
+    const existingIndex = queue.findIndex(entry => entry.operationKey === operationKey);
+    if (existingIndex >= 0) {
+      item.createdAt = queue[existingIndex].createdAt || now;
+      queue[existingIndex] = item;
+    } else {
+      queue.push(item);
+    }
+    guardarSyncQueue(queue);
+    return item;
+  }
+
+  function pendientesSyncCount() {
+    return leerSyncQueue().length;
+  }
+
+  function actualizarSyncUI(message = "") {
+    const count = pendientesSyncCount();
+    const badge = document.getElementById("fieldBookSyncCount");
+    const button = document.getElementById("fieldBookSyncButton");
+    const state = document.getElementById("fieldBookSyncState");
+    if (badge) {
+      badge.textContent = String(count);
+      badge.hidden = count === 0;
+    }
+    if (button) {
+      button.disabled = fieldBookSyncEnCurso || count === 0 || !navigator.onLine;
+      button.textContent = fieldBookSyncEnCurso ? "SYNCING..." : count ? `SYNC PENDING (${count})` : "SYNCED";
+    }
+    if (state) {
+      state.textContent = message || (navigator.onLine ? (count ? `${count} pending` : "All synced") : `${count} pending · Offline`);
+      state.dataset.mode = navigator.onLine ? (count ? "pending" : "synced") : "offline";
+    }
+  }
+
+  function montarSyncUI() {
+    const header = document.querySelector(".lab-header");
+    if (!header || document.getElementById("fieldBookSyncButton")) return;
+    const controls = document.createElement("div");
+    controls.className = "field-book-sync-controls";
+    controls.innerHTML = `
+      <span id="fieldBookSyncState" class="field-book-sync-state">Checking sync...</span>
+      <button id="fieldBookSyncButton" class="field-book-sync-button" type="button">
+        SYNCED
+        <span id="fieldBookSyncCount" class="field-book-sync-count" hidden>0</span>
+      </button>`;
+    header.appendChild(controls);
+    controls.querySelector("#fieldBookSyncButton")?.addEventListener("click", async () => {
+      await sincronizarPendientes({ manual: true });
+    });
+    actualizarSyncUI();
+  }
+
   async function guardarEnSharePoint(payload){if(!endpointConfigurado())throw new Error("Falta configurar FIELD_BOOK_SAVE_URL");const response=await fetch(FIELD_BOOK_SAVE_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});const text=await response.text();let data={};try{data=text?JSON.parse(text):{};}catch(_){data={raw:text};}if(!response.ok||data.success===false)throw new Error(data.error||data.message||`HTTP ${response.status}`);return data;}
+
+  async function sincronizarPendientes({ manual = false } = {}) {
+    if (fieldBookSyncEnCurso) return { synced: 0, failed: 0, remaining: pendientesSyncCount() };
+    if (!navigator.onLine) {
+      actualizarSyncUI("Offline · Sync pending");
+      if (manual) alert("Sin conexion. Los cambios continuan guardados localmente.");
+      return { synced: 0, failed: 0, remaining: pendientesSyncCount() };
+    }
+    fieldBookSyncEnCurso = true;
+    actualizarSyncUI("Syncing...");
+    let synced = 0;
+    let failed = 0;
+    const snapshot = leerSyncQueue();
+    for (let index = 0; index < snapshot.length; index += 1) {
+      const current = snapshot[index];
+      actualizarSyncUI(`Syncing ${index + 1}/${snapshot.length}...`);
+      try {
+        await guardarEnSharePoint(current.payload);
+        const liveQueue = leerSyncQueue().filter(entry => entry.id !== current.id);
+        guardarSyncQueue(liveQueue);
+        synced += 1;
+      } catch (error) {
+        const liveQueue = leerSyncQueue();
+        const liveItem = liveQueue.find(entry => entry.id === current.id);
+        if (liveItem) {
+          liveItem.status = "error";
+          liveItem.attempts = Number(liveItem.attempts || 0) + 1;
+          liveItem.updatedAt = new Date().toISOString();
+          liveItem.lastError = String(error?.message || error);
+          guardarSyncQueue(liveQueue);
+        }
+        failed += 1;
+        console.warn("Field Book sync pendiente", current.operationKey, error);
+      }
+    }
+    fieldBookSyncEnCurso = false;
+    const remaining = pendientesSyncCount();
+    actualizarSyncUI(remaining ? `${remaining} pending` : "All synced");
+    if (manual) {
+      if (!remaining) alert(`Sincronizacion completa. ${synced} registro(s) enviado(s).`);
+      else alert(`Sincronizacion parcial. ${synced} enviado(s), ${remaining} pendiente(s).`);
+    }
+    return { synced, failed, remaining };
+  }
+
+  async function guardarConCola(payload) {
+    const item = encolarPayload(payload);
+    if (!navigator.onLine) throw new Error("Sin conexion. Guardado localmente y pendiente de sincronizacion.");
+    await sincronizarPendientes();
+    const pendiente = leerSyncQueue().find(entry => entry.id === item.id);
+    if (pendiente) throw new Error(pendiente.lastError || "Guardado localmente y pendiente de sincronizacion.");
+    return { success: true, queued: false };
+  }
+
   function crearVisitId(aoiId){const ts=new Date().toISOString().replace(/[-:]/g,"").replace(/\..+/,"");return `${aoiId}-${ts}`;}
 
   const selectorAoi =
@@ -24,6 +173,16 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
     return;
   }
+    montarSyncUI();
+    window.addEventListener("online", () => {
+      actualizarSyncUI("Online · Syncing pending...");
+      sincronizarPendientes();
+    });
+    window.addEventListener("offline", () => actualizarSyncUI());
+    setTimeout(() => {
+      actualizarSyncUI();
+      if (navigator.onLine && pendientesSyncCount()) sincronizarPendientes();
+    }, 400);
 
   // Datos embebidos opcionales para pruebas con doble clic (file://).
   // Si existe window.FIELD_BOOK_LAYOUTS, Field Book usa esos datos sin fetch.
@@ -355,7 +514,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     localStorage.setItem(claveVisitStorage(aoiId), JSON.stringify(visit));
   }
 
-  async function guardarVisitRemota(aoiId,visitStatus){const loc=obtenerLocationSetting(aoiId)||{};const local=leerVisit(aoiId);const visitId=local.visitId||crearVisitId(aoiId);const startedAt=local.startedAt||new Date().toISOString();const completedAt=visitStatus==="Completed"?new Date().toISOString():null;await guardarEnSharePoint({type:"visit",visitId,season:loc.Season||"",aoiId,location:loc.Location||"",config:loc.Config||"",visitStatus,comment:"",startedAt,completedAt});return{...local,visitId,status:visitStatus,startedAt,completedAt};}
+  async function guardarVisitRemota(aoiId,visitStatus){const loc=obtenerLocationSetting(aoiId)||{};const local=leerVisit(aoiId);const visitId=local.visitId||crearVisitId(aoiId);const startedAt=local.startedAt||new Date().toISOString();const completedAt=visitStatus==="Completed"?new Date().toISOString():null;const payload={type:"visit",visitId,season:loc.Season||"",aoiId,location:loc.Location||"",config:loc.Config||"",visitStatus,comment:"",startedAt,completedAt};let syncPending=false;try{await guardarConCola(payload);}catch(error){syncPending=true;console.warn("Visita guardada localmente; sincronizacion pendiente",error);}return{...local,visitId,status:visitStatus,startedAt,completedAt,syncPending};}
 
   function contextoRemoto(aoiId) {
     const visit = leerVisit(aoiId);
@@ -365,17 +524,24 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   }
 
   async function guardarPlotEventRemoto(aoiId, range, column, status, comment) {
-    await guardarEnSharePoint({ type:"plotEvent", ...contextoRemoto(aoiId), range:Number(range), column:Number(column), status, comment:String(comment || "") });
+    await guardarConCola({ type:"plotEvent", ...contextoRemoto(aoiId), range:Number(range), column:Number(column), status, comment:String(comment || "") });
   }
 
   async function guardarBlockShiftRemoto(aoiId, shift) {
-    await guardarEnSharePoint({ type:"blockShift", ...contextoRemoto(aoiId), shiftId:shift.id, column:Number(shift.column), startRange:Number(shift.startRange), endRange:Number(shift.endRange), offset:Number(shift.offset), comment:String(shift.comment || "") });
+    await guardarConCola({ type:"blockShift", ...contextoRemoto(aoiId), shiftId:shift.id, column:Number(shift.column), startRange:Number(shift.startRange), endRange:Number(shift.endRange), offset:Number(shift.offset), comment:String(shift.comment || "") });
   }
 
   async function guardarChecklistRemoto(aoiId, respuestas) {
     const contexto = contextoRemoto(aoiId);
-    const items = checklistTemplate.map(item => ({ item, response: respuestas[item.id] || { status:"Pending", comment:"" } }));
-    await Promise.all(items.map(({item,response}) => guardarEnSharePoint({ type:"checklist", ...contexto, checkId:item.id, section:item.section, label:item.label, checkStatus:response.status || "Pending", comment:String(response.comment || "") })));
+    const payloads = checklistTemplate.map(item => {
+      const response = respuestas[item.id] || { status:"Pending", comment:"" };
+      return { type:"checklist", ...contexto, checkId:item.id, section:item.section, label:item.label, checkStatus:response.status || "Pending", comment:String(response.comment || "") };
+    });
+    const operationKeys = payloads.map(payload => encolarPayload(payload).operationKey);
+    if (!navigator.onLine) throw new Error("Checklist guardado localmente y pendiente de sincronizacion.");
+    await sincronizarPendientes();
+    const remaining = new Set(leerSyncQueue().map(item => item.operationKey));
+    if (operationKeys.some(key => remaining.has(key))) throw new Error("Checklist guardado localmente; quedan elementos pendientes de sincronizacion.");
   }
 
   function metricasChecklist(aoiId) {
