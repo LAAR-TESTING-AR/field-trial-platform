@@ -2,12 +2,18 @@
   "use strict";
 
   const STORAGE_KEY = "fieldTrialMapPowerAutomateUrl";
+  const OFFICIAL_SYNC_URL = "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/03/workflows/4dce494347f74b7d90893f0888e48d54/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=llvxFD-Tt4ZYIuDDanapWR3l8plxbpBXIrjMCkYVYFA";
   let sincronizacionEnCurso = false;
 
+  // La URL oficial se aplica automaticamente y reemplaza configuraciones antiguas.
+  window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+
   function obtenerUrl() {
-    return String(
-      window.localStorage.getItem(STORAGE_KEY) || ""
-    ).trim();
+    const actual = String(window.localStorage.getItem(STORAGE_KEY) || "").trim();
+    if (actual !== OFFICIAL_SYNC_URL) {
+      window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+    }
+    return OFFICIAL_SYNC_URL;
   }
 
   function tieneUrlConfigurada() {
@@ -54,40 +60,24 @@
   }
 
   function borrarUrl() {
-    window.localStorage.removeItem(STORAGE_KEY);
-
+    window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
     window.dispatchEvent(
       new CustomEvent("fieldphotos:sync-config-updated", {
-        detail: { configured: false }
+        detail: { configured: true, managed: true }
       })
     );
-
-    console.log("Configuración local de sincronización eliminada.");
+    return true;
   }
 
   function configurarConDialogo() {
-    const actual = obtenerUrl();
-
-    const ingresada = window.prompt(
-      "Pegá la URL HTTP de Power Automate para este dispositivo. La dirección quedará guardada solamente de forma local.",
-      actual
+    window.localStorage.setItem(STORAGE_KEY, OFFICIAL_SYNC_URL);
+    window.dispatchEvent(
+      new CustomEvent("fieldphotos:sync-config-updated", {
+        detail: { configured: true, managed: true }
+      })
     );
-
-    if (ingresada === null) return false;
-
-    try {
-      guardarUrl(ingresada);
-      window.alert(
-        "Sincronización configurada correctamente en este dispositivo."
-      );
-      return true;
-    } catch (error) {
-      window.alert(
-        error?.message ||
-          "No fue posible guardar la URL de sincronización."
-      );
-      return false;
-    }
+    window.alert("La sincronizacion de fotografias ya esta configurada automaticamente.");
+    return true;
   }
 
   function blobADataUrl(blob) {
