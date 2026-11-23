@@ -154,10 +154,9 @@
     </div>
 
   </div>
-
+  <script src="ftp-config.js?v=1"></script>
   <script>
-
-    const FLOW_URL = "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/31/workflows/abdd40febb9142d0ae4b3e81cfe6bcc6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=MFLpu2HG5DdLVa0hEH4eJ72uPZQjZf3jO4rKh9iKIUI";
+    const FLOW_URL = window.FTP_CONFIG.getFlowUrl("validateUser");
 
 const loggedIn =
   localStorage.getItem(
@@ -297,3 +296,4 @@ if (
 
 </body>
 </html>
+  
