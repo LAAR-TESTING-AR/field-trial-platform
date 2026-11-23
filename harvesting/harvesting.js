@@ -88,10 +88,10 @@ mapa.on("baselayerchange", function (evento) {
 });
 let sitios = [];
 const URL_FLOW_HARVESTING =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/02/workflows/1c92da44272b4c2a8a3dd0c961a0dde5/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=wCDk-2CQq-6BJ2aJCWuPhBBUx4A9s8Bkt8nTsPUBwO0";
+  window.FTP_CONFIG.getFlowUrl("harvestingDate");
 
 const URL_FLOW_HARVESTING_STATUS =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/8acd73c5ca4b425db78215f3056c820a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=13ntIDcZG6UPcGHjt-EtKmZjUF5_QJwiXBSaHnP2QYI";
+  window.FTP_CONFIG.getFlowUrl("harvestingStatus");
 
 const YLDLIM_OPTIONS = [
   "Common Rust", "Northern Leaf Blight", "Gray Leaf Spot", "Fusarium Stalk Rot",
@@ -104,13 +104,13 @@ const YLDLIM_OPTIONS = [
 ];
 
 const URL_FLOW_PLANNING =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/546fdcdaea88447bae329715a0451940/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_VbpcIOJlOKBwMhhBSAVufZb0EEZMVTbZ7c0om_3150";
+  window.FTP_CONFIG.getFlowUrl("planningCreate");
 const URL_FLOW_PLANNING_GET =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/12/workflows/76a5bae973bc4989a6177f314746c897/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=lk93WPXZSAAc6m-Xn9wim0Ct7DNTWQMGYiO7MTvLZI8";
+  window.FTP_CONFIG.getFlowUrl("planningGet");
 const URL_FLOW_PLANNING_DELETE =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/08/workflows/fd95fcd010b6445abbd5069290c04743/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uOx-ZsjXKcXD4NNJIxuXIHbezNv5mHzYfTxZy0F_WM0";
+  window.FTP_CONFIG.getFlowUrl("planningDelete");
 const URL_FLOW_PLANNING_UPDATE =
-  "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/18/workflows/3fde3339ccb441afab9e71a66cf590e1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=b1PNHjS-zFGgHMI6wBY427Hlso8uywPfBUUaiNQ1VxQ";
+  window.FTP_CONFIG.getFlowUrl("planningUpdate");
 
 let modalCosecha;
 let modalFechaCosecha;
