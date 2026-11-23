@@ -5,7 +5,7 @@
   const REFRESH_ATTEMPTS = 5;
   const REFRESH_DELAY_MS = 2500;
   const UPDATE_COMMENT_URL =
-    "https://d59e7251f125ea8db6dba166e9e0fe.e2.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/79368205893545f293ec007f0edb0b09/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=rZ_afYUMaPHRHLzfQRXwkPR-pOh4JsNdI8gAwP4V-VA";
+    window.FTP_CONFIG.getFlowUrl("fieldPhotoUpdateComment");
 
   let registros = [];
   let cargaPromise = null;
