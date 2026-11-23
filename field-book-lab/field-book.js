@@ -478,6 +478,263 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     };
   }
 
+
+  /* =========================================================
+     SHIFT BLOCK GESTUAL - una sola maquinada / una sola Column
+  ========================================================= */
+  function habilitarShiftGestual(aoiId, layout, porCoord) {
+    const plots = [...contenido.querySelectorAll(".field-book-real-plot")];
+    if (!plots.length) return;
+
+    const state = {
+      mode: "idle", // idle | selecting | selected | moving
+      pointerId: null,
+      column: null,
+      startRange: null,
+      endRange: null,
+      offset: 0,
+      startY: 0,
+      moved: false,
+      longPressTimer: null,
+      suppressClickUntil: 0
+    };
+
+    const rangeOf = el => Number(el?.dataset?.range);
+    const columnOf = el => Number(el?.dataset?.column);
+    const plotAtPoint = (x, y) => document.elementFromPoint(x, y)?.closest?.(".field-book-real-plot") || null;
+    const selectedBounds = () => ({
+      from: Math.min(Number(state.startRange), Number(state.endRange)),
+      to: Math.max(Number(state.startRange), Number(state.endRange))
+    });
+    const selectedPlots = () => {
+      const { from, to } = selectedBounds();
+      return plots.filter(el => columnOf(el) === Number(state.column) && rangeOf(el) >= from && rangeOf(el) <= to);
+    };
+
+    function clearClasses() {
+      plots.forEach(el => el.classList.remove("fb-shift-selected", "fb-shift-preview", "fb-shift-overlap"));
+    }
+    function clearGesture() {
+      clearTimeout(state.longPressTimer);
+      state.longPressTimer = null;
+      clearClasses();
+      state.mode = "idle";
+      state.pointerId = null;
+      state.column = null;
+      state.startRange = null;
+      state.endRange = null;
+      state.offset = 0;
+      state.moved = false;
+      document.getElementById("fieldBookShiftGestureBar")?.remove();
+    }
+    function markSelection() {
+      plots.forEach(el => el.classList.remove("fb-shift-selected"));
+      selectedPlots().forEach(el => el.classList.add("fb-shift-selected"));
+    }
+    function updateSelection(target) {
+      if (!target || columnOf(target) !== Number(state.column)) return;
+      state.endRange = rangeOf(target);
+      markSelection();
+    }
+    function previewOffset(offset) {
+      state.offset = Number(offset) || 0;
+      plots.forEach(el => el.classList.remove("fb-shift-preview", "fb-shift-overlap"));
+      if (!state.offset) return { overlaps: 0, outside: 0 };
+      const originals = new Set(selectedPlots().map(el => `${rangeOf(el)}|${columnOf(el)}`));
+      let overlaps = 0;
+      let outside = 0;
+      selectedPlots().forEach(el => {
+        const targetRange = rangeOf(el) + state.offset;
+        const targetKey = `${targetRange}|${state.column}`;
+        if (targetRange < Number(layout.rangeMin) || targetRange > Number(layout.rangeMax)) {
+          outside += 1;
+          return;
+        }
+        const target = plots.find(p => rangeOf(p) === targetRange && columnOf(p) === Number(state.column));
+        if (target) target.classList.add("fb-shift-preview");
+        const occupied = porCoord.get(targetKey);
+        if (occupied && !originals.has(targetKey)) {
+          overlaps += 1;
+          target?.classList.add("fb-shift-overlap");
+        }
+      });
+      return { overlaps, outside };
+    }
+
+    function showSelectionBar() {
+      document.getElementById("fieldBookShiftGestureBar")?.remove();
+      const { from, to } = selectedBounds();
+      const count = selectedPlots().length;
+      const bar = document.createElement("div");
+      bar.id = "fieldBookShiftGestureBar";
+      bar.className = "fb-shift-gesture-bar";
+      bar.innerHTML = `
+        <div><b>SHIFT BLOCK</b><span>Column ${state.column} · Range ${from}-${to} · ${count} plots</span></div>
+        <div class="fb-shift-gesture-actions">
+          <button type="button" data-action="cancel">CANCEL</button>
+          <button type="button" data-action="help">DRAG BLOCK ↕</button>
+        </div>`;
+      document.body.appendChild(bar);
+      bar.querySelector('[data-action="cancel"]').onclick = clearGesture;
+      bar.querySelector('[data-action="help"]').onclick = () => {
+        alert("Drag any selected plot vertically. The movement snaps to complete Ranges. Release to preview and confirm the Shift Block.");
+      };
+    }
+
+    function openConfirm() {
+      if (!state.offset) { state.mode = "selected"; showSelectionBar(); return; }
+      const info = previewOffset(state.offset);
+      const { from, to } = selectedBounds();
+      document.getElementById("fieldBookShiftGestureConfirm")?.remove();
+      const overlay = document.createElement("div");
+      overlay.id = "fieldBookShiftGestureConfirm";
+      overlay.className = "fb-shift-confirm-overlay";
+      const destinationFrom = from + state.offset;
+      const destinationTo = to + state.offset;
+      overlay.innerHTML = `<div class="fb-shift-confirm-card">
+        <span class="section-label">SHIFT BLOCK · PREVIEW</span>
+        <h3>Column ${state.column}</h3>
+        <div class="fb-shift-confirm-grid">
+          <span>Selected ranges</span><b>${from}-${to}</b>
+          <span>Movement</span><b>${state.offset > 0 ? "+" : ""}${state.offset}</b>
+          <span>Actual position</span><b>${destinationFrom}-${destinationTo}</b>
+          <span>Plots shifted</span><b>${selectedPlots().length}</b>
+          <span>Overlaps</span><b class="${info.overlaps ? 'is-warning' : ''}">${info.overlaps}</b>
+          <span>Outside layout</span><b class="${info.outside ? 'is-danger' : ''}">${info.outside}</b>
+        </div>
+        <p>Overlap and outside-layout positions are allowed and remain traceable. Existing destination plots are never deleted.</p>
+        <textarea id="fieldBookShiftGestureComment" rows="3" placeholder="Shift comment..."></textarea>
+        <div class="fb-shift-confirm-actions"><button data-action="back">BACK</button><button data-action="confirm">CONFIRM SHIFT</button></div>
+      </div>`;
+      document.body.appendChild(overlay);
+      overlay.querySelector('[data-action="back"]').onclick = () => { overlay.remove(); previewOffset(0); state.mode="selected"; showSelectionBar(); };
+      overlay.querySelector('[data-action="confirm"]').onclick = async event => {
+        const btn = event.currentTarget;
+        btn.disabled = true; btn.textContent = "SAVING...";
+        const comment = overlay.querySelector("#fieldBookShiftGestureComment").value.trim();
+        const shift = {
+          id: `shift-${Date.now()}`,
+          column: Number(state.column),
+          startRange: from,
+          endRange: to,
+          offset: Number(state.offset),
+          comment,
+          createdAt: new Date().toISOString()
+        };
+        const shifts = leerBlockShifts(aoiId);
+        shifts.push(shift);
+        guardarBlockShifts(aoiId, shifts);
+        try {
+          await guardarBlockShiftRemoto(aoiId, shift);
+          overlay.remove(); clearGesture();
+          reabrirFieldMapEnPlot(aoiId, from, state.column || shift.column);
+        } catch (error) {
+          console.error(error);
+          overlay.remove(); clearGesture();
+          reabrirFieldMapEnPlot(aoiId, from, shift.column);
+          alert(`Shift guardado localmente, pendiente de sincronización: ${error.message}`);
+        }
+      };
+    }
+
+    function beginSelection(el, event) {
+      state.mode = "selecting";
+      state.pointerId = event.pointerId;
+      state.column = columnOf(el);
+      state.startRange = rangeOf(el);
+      state.endRange = state.startRange;
+      state.startY = event.clientY;
+      state.moved = true;
+      markSelection();
+      state.suppressClickUntil = Date.now() + 700;
+      navigator.vibrate?.(18);
+    }
+
+    plots.forEach(el => {
+      el.addEventListener("click", event => {
+        if (Date.now() < state.suppressClickUntil || state.mode === "selected" || state.mode === "moving") {
+          event.preventDefault(); event.stopImmediatePropagation();
+        }
+      }, true);
+
+      el.addEventListener("pointerdown", event => {
+        if (event.button != null && event.button !== 0) return;
+        if (state.mode === "selected" && el.classList.contains("fb-shift-selected")) {
+          state.mode = "moving";
+          state.pointerId = event.pointerId;
+          state.startY = event.clientY;
+          state.offset = 0;
+          state.suppressClickUntil = Date.now() + 900;
+          event.preventDefault();
+          return;
+        }
+        if (state.mode !== "idle") return;
+        state.pointerId = event.pointerId;
+        state.startY = event.clientY;
+        state.moved = false;
+        if (event.pointerType === "mouse") {
+          // Mouse: selection starts as soon as the pointer is dragged.
+          state.column = columnOf(el); state.startRange = rangeOf(el); state.endRange = state.startRange;
+        } else {
+          // Touch/pen: long press prevents accidental selection while scrolling.
+          state.longPressTimer = setTimeout(() => beginSelection(el, event), 420);
+        }
+      });
+    });
+
+    document.addEventListener("pointermove", event => {
+      if (state.pointerId !== event.pointerId) return;
+      if (state.mode === "idle" && event.pointerType === "mouse" && state.column != null) {
+        if (Math.abs(event.clientY - state.startY) > 5) {
+          const original = plots.find(p => columnOf(p)===Number(state.column) && rangeOf(p)===Number(state.startRange));
+          if (original) beginSelection(original, event);
+        }
+      }
+      if (state.mode === "selecting") {
+        event.preventDefault();
+        const target = plotAtPoint(event.clientX, event.clientY);
+        updateSelection(target);
+        return;
+      }
+      if (state.mode === "moving") {
+        event.preventDefault();
+        const sample = selectedPlots()[0];
+        const cellStep = Math.max(31, (sample?.getBoundingClientRect().height || 34) + 3);
+        // Range values increase upward on the rendered map.
+        const offset = -Math.round((event.clientY - state.startY) / cellStep);
+        previewOffset(offset);
+      }
+    }, { passive: false });
+
+    document.addEventListener("pointerup", event => {
+      if (state.pointerId !== event.pointerId) return;
+      clearTimeout(state.longPressTimer); state.longPressTimer = null;
+      if (state.mode === "selecting") {
+        state.mode = "selected";
+        state.pointerId = null;
+        state.suppressClickUntil = Date.now() + 700;
+        showSelectionBar();
+        return;
+      }
+      if (state.mode === "moving") {
+        state.pointerId = null;
+        state.suppressClickUntil = Date.now() + 700;
+        openConfirm();
+        return;
+      }
+      // Tap without drag/long press remains a normal plot click.
+      state.pointerId = null;
+      state.column = null; state.startRange = null; state.endRange = null;
+    });
+
+    document.addEventListener("pointercancel", event => {
+      if (state.pointerId !== event.pointerId) return;
+      clearTimeout(state.longPressTimer); state.longPressTimer = null;
+      if (state.mode === "selecting" || state.mode === "moving") clearGesture();
+      else { state.pointerId=null; state.column=null; state.startRange=null; state.endRange=null; }
+    });
+  }
+
   const checklistTemplate = [
     { id:"PRE_COORD", section:"Antes de sembrar", label:"Coordenadas verificadas" },
     { id:"PRE_MAP", section:"Antes de sembrar", label:"Plano de localidad disponible" },
@@ -960,6 +1217,8 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
           });
         });
       });
+      // Shift Block gestual: selección y desplazamiento vertical limitado a una sola Column.
+      habilitarShiftGestual(aoiId, layout, porCoord);
       return;
     }
 
