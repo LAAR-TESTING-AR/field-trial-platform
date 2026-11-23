@@ -790,7 +790,19 @@ function obtenerPlantingStatus(sitio) {
 async function actualizarEstadoPlanting(sitio, plantingStatus) {
   const response = await fetch(URL_FLOW_PLANTING_STATUS, {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({aoiId:limpiarTexto(sitio["AOI ID"]),plantingStatus})});
   if (!response.ok) throw new Error("Error actualizando Planting status");
+  // Actualizacion optimista local: no esperamos a que Base Sitios regenere el CSV.
+  // Puede ocurrir que `sitio` sea una referencia temporal usada por el popup;
+  // actualizamos tambien el registro canonico dentro de `sitios` por AOI ID.
+  const aoiIdActualizado = limpiarTexto(sitio["AOI ID"]);
   sitio["Planting status"] = plantingStatus;
+  sitios.forEach(item => {
+    if (limpiarTexto(item?.["AOI ID"]) === aoiIdActualizado) {
+      item["Planting status"] = plantingStatus;
+    }
+  });
+  // Cierra cualquier popup generado con el estado anterior y reconstruye
+  // marcadores/popups inmediatamente con el nuevo estado local.
+  mapa.closePopup();
   actualizarVista();
 }
 function abrirEstadoPlanting(sitio) {
