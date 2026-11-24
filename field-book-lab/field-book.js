@@ -1076,21 +1076,34 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     const coordinates = [2,3,1,4].map(corner => `
       <button type="button" class="fb-check-coordinate" data-corner="${corner}" ${checklistReadOnly ? "disabled" : ""} style="min-height:112px;padding:13px;text-align:left;border:1px solid #cedbd3;border-radius:13px;background:#fff;box-shadow:0 4px 13px rgba(23,76,49,.05);cursor:${checklistReadOnly?'default':'pointer'}">
         <span style="display:flex;justify-content:space-between;align-items:center"><b style="color:#174c31;font-size:12px">CORNER ${corner}</b><span style="font-size:15px">⌖</span></span>
-        <span class="fb-coordinate-value" style="display:block;margin-top:14px;color:#7b8981;font-size:10px;line-height:1.6">No location captured</span>
-        <strong style="display:block;margin-top:9px;color:#0b6b3a;font-size:9px">USE CURRENT LOCATION</strong>
+        <span class="fb-coordinate-value" style="display:block;margin-top:10px;color:#7b8981;font-size:10px;line-height:1.6">Waiting for location...</span>
+        <div class="fb-coordinate-manual" style="display:none;margin-top:8px" onclick="event.stopPropagation()">
+          <input class="fb-coordinate-lat" inputmode="decimal" placeholder="Latitude e.g. -25.123456" style="width:100%;box-sizing:border-box;padding:7px;border:1px solid #cad6cf;border-radius:7px;font-size:9px">
+          <input class="fb-coordinate-lon" inputmode="decimal" placeholder="Longitude e.g. -64.123456" style="width:100%;box-sizing:border-box;margin-top:5px;padding:7px;border:1px solid #cad6cf;border-radius:7px;font-size:9px">
+          <button type="button" class="fb-coordinate-save-manual" style="width:100%;margin-top:5px;padding:6px;border:0;border-radius:7px;background:#174c31;color:#fff;font-size:8px;font-weight:900">SAVE MANUAL</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:9px" onclick="event.stopPropagation()"><button type="button" class="fb-coordinate-auto" style="flex:1;padding:6px;border:1px solid #0b6b3a;border-radius:7px;background:#e7f5ec;color:#0b6b3a;font-size:8px;font-weight:900">📍 GPS</button><button type="button" class="fb-coordinate-manual-toggle" style="flex:1;padding:6px;border:1px solid #7b8981;border-radius:7px;background:#fff;color:#536159;font-size:8px;font-weight:900">✎ MANUAL</button></div>
       </button>`).join("");
     const sections = [...new Set(checklistTemplate.map(x => x.section))];
     const sectionHTML = sections.map(section => {
       const cards = checklistTemplate.filter(x => x.section === section && x.id !== "CLS_ISSUES").map(item => {
         const response = respuestas[item.id] || { status:"Pending", comment:"" };
         const st = statusStyle(response.status || "Pending");
-        return `<button type="button" class="field-book-check-row field-book-check-card" data-check-id="${item.id}" data-status="${response.status || 'Pending'}" ${checklistReadOnly ? "disabled" : ""} style="min-height:108px;padding:14px;text-align:left;border:2px solid ${st.border};border-radius:13px;background:${st.bg};box-shadow:0 4px 13px rgba(23,76,49,.05);cursor:${checklistReadOnly?'default':'pointer'};position:relative">
-          <span style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><strong style="color:#263d31;font-size:11px;line-height:1.35">${itemLabel(item.label)}</strong><b style="min-width:27px;height:27px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:${st.color};color:#fff;font-size:14px">${st.mark}</b></span>
-          <span class="fb-check-card-status" style="display:block;margin-top:12px;color:${st.color};font-size:9px;font-weight:950;letter-spacing:.04em">${st.label}</span>
-          <span class="fb-check-card-comment" style="display:block;margin-top:6px;color:#6c7a72;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${response.comment ? response.comment : "Tap to update"}</span>
+        const needsComment = response.status === "Observation" || response.status === "Problem" || Boolean(response.comment);
+        return `<div class="field-book-check-row field-book-check-card" data-check-id="${item.id}" data-status="${response.status || 'Pending'}" style="min-height:122px;padding:13px;border:2px solid ${st.border};border-radius:13px;background:${st.bg};box-shadow:0 4px 13px rgba(23,76,49,.05);position:relative">
+          <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><strong style="color:#263d31;font-size:11px;line-height:1.35">${itemLabel(item.label)}</strong><b style="min-width:27px;height:27px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:${st.color};color:#fff;font-size:14px">${st.mark}</b></div>
+          <div class="fb-check-actions" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:12px">
+            <button type="button" data-status="OK" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #68a97c;border-radius:7px;background:${response.status==='OK'?'#0b6b3a':'#fff'};color:${response.status==='OK'?'#fff':'#0b6b3a'};font-size:8px;font-weight:950;cursor:pointer">✓ OK</button>
+            <button type="button" data-status="Observation" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #d8a72b;border-radius:7px;background:${response.status==='Observation'?'#d8a72b':'#fff'};color:${response.status==='Observation'?'#fff':'#8a6400'};font-size:8px;font-weight:950;cursor:pointer">! OBS</button>
+            <button type="button" data-status="Problem" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #ca6b6b;border-radius:7px;background:${response.status==='Problem'?'#9b2f2f':'#fff'};color:${response.status==='Problem'?'#fff':'#9b2f2f'};font-size:8px;font-weight:950;cursor:pointer">× PROB</button>
+            <button type="button" data-status="N/A" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #aeb9b2;border-radius:7px;background:${response.status==='N/A'?'#66736b':'#fff'};color:${response.status==='N/A'?'#fff':'#66736b'};font-size:8px;font-weight:950;cursor:pointer">N/A</button>
+          </div>
+          <div class="fb-check-comment-wrap" style="display:${needsComment?'block':'none'};margin-top:8px">
+            <textarea class="field-book-check-comment" rows="2" placeholder="Comment..." ${checklistReadOnly?'disabled':''} style="width:100%;box-sizing:border-box;padding:7px;border:1px solid #cad6cf;border-radius:7px;background:#fff;font-size:9px;resize:vertical">${String(response.comment || '').replace(/</g,'&lt;')}</textarea>
+          </div>
+          <button type="button" class="fb-check-comment-toggle" ${checklistReadOnly?'disabled':''} style="margin-top:7px;padding:0;border:0;background:transparent;color:#607067;font-size:8px;font-weight:800;cursor:pointer">${needsComment?'HIDE COMMENT':'+ COMMENT'}</button>
           <input type="hidden" class="field-book-check-status" value="${response.status || 'Pending'}">
-          <input type="hidden" class="field-book-check-comment" value="${String(response.comment || '').replace(/"/g,'&quot;')}">
-        </button>`;
+        </div>`;
       }).join("");
       return `<section style="margin-top:18px"><div style="display:flex;align-items:center;gap:9px;margin-bottom:9px"><span style="width:7px;height:7px;border-radius:50%;background:#0b6b3a"></span><b style="color:#174c31;font-size:10px;letter-spacing:.08em">${sectionNames[section] || section.toUpperCase()}</b></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">${cards}</div></section>`;
     }).join("");
@@ -1351,37 +1364,63 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       conectarIssuesMap(aoiId, layoutReal);
       crearHomeModularFieldBook(aoiId, layout, procesoIniciado);
       document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
-      document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){alert(`Checklist pendiente: ${m.pending} ítems.`);return;}const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="COMPLETING...";try{const v=await guardarVisitRemota(aoiId,"Completed");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo completar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
+      document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){const accepted=window.confirm(`Hay ${m.pending} ítems del Checklist pendientes.
+
+Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán registrados como responsabilidad del operario.
+
+¿Confirmás cerrar Field Book?`);if(!accepted)return;}const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="COMPLETING...";try{const v=await guardarVisitRemota(aoiId,"Completed");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo completar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       contenido.querySelectorAll(".field-book-check-card").forEach(card => {
-        card.addEventListener("click", () => {
-          if (card.disabled) return;
-          const statuses = ["Pending","OK","Observation","Problem","N/A"];
-          const current = card.querySelector(".field-book-check-status")?.value || "Pending";
-          const choice = window.prompt(`Status for ${card.querySelector("strong")?.textContent || card.dataset.checkId}\n\nType one of: OK, Observation, Problem, N/A, Pending`, current);
-          if (choice === null) return;
-          const match = statuses.find(x => x.toLowerCase() === String(choice).trim().toLowerCase());
-          if (!match) { alert("Use: OK, Observation, Problem, N/A or Pending"); return; }
-          const commentInput = card.querySelector(".field-book-check-comment");
-          const comment = window.prompt("Optional comment:", commentInput?.value || "");
-          card.querySelector(".field-book-check-status").value = match;
-          if (comment !== null && commentInput) commentInput.value = comment.trim();
-          // Re-render keeps the card colors and metrics coherent while preserving local unsaved edits.
+        const saveDraftAndRefresh = () => {
           const draft = leerChecklist(aoiId);
-          contenido.querySelectorAll(".field-book-check-row").forEach(row => { draft[row.dataset.checkId] = { status:row.querySelector(".field-book-check-status")?.value || "Pending", comment:row.querySelector(".field-book-check-comment")?.value || "", updatedAt:new Date().toISOString() }; });
-          guardarChecklist(aoiId,draft);
-          renderizarAoi(aoiId); setTimeout(()=>abrirModuloFieldBook("checklist"),0);
+          contenido.querySelectorAll(".field-book-check-row").forEach(row => {
+            draft[row.dataset.checkId] = {
+              status: row.querySelector(".field-book-check-status")?.value || "Pending",
+              comment: row.querySelector(".field-book-check-comment")?.value?.trim() || "",
+              updatedAt: new Date().toISOString()
+            };
+          });
+          guardarChecklist(aoiId, draft);
+          renderizarAoi(aoiId);
+          setTimeout(()=>abrirModuloFieldBook("checklist"),0);
+        };
+        card.querySelectorAll("[data-status]").forEach(action => {
+          action.addEventListener("click", event => {
+            event.stopPropagation();
+            const status = action.dataset.status;
+            card.querySelector(".field-book-check-status").value = status;
+            const wrap = card.querySelector(".fb-check-comment-wrap");
+            if (wrap && (status === "Observation" || status === "Problem")) wrap.style.display = "block";
+            if (status === "OK" || status === "N/A") saveDraftAndRefresh();
+            else {
+              card.dataset.status = status;
+              card.querySelector(".field-book-check-comment")?.focus();
+            }
+          });
         });
+        card.querySelector(".fb-check-comment-toggle")?.addEventListener("click", event => {
+          event.stopPropagation();
+          const wrap = card.querySelector(".fb-check-comment-wrap");
+          if (!wrap) return;
+          wrap.style.display = wrap.style.display === "none" ? "block" : "none";
+          if (wrap.style.display === "block") card.querySelector(".field-book-check-comment")?.focus();
+        });
+        card.querySelector(".field-book-check-comment")?.addEventListener("change", saveDraftAndRefresh);
       });
+      const coordStorageKey = `fieldBookChecklistCoordinates:${aoiId}`;
+      const readCoords = () => { try { return JSON.parse(localStorage.getItem(coordStorageKey) || "{}"); } catch (_) { return {}; } };
+      const saveCoord = (corner, data) => { const all=readCoords(); all[corner]=data; localStorage.setItem(coordStorageKey,JSON.stringify(all)); };
       contenido.querySelectorAll(".fb-check-coordinate").forEach(btn => {
-        btn.addEventListener("click", () => {
-          if (btn.disabled) return;
-          if (!navigator.geolocation) { alert("Geolocation is not available on this device."); return; }
-          const value = btn.querySelector(".fb-coordinate-value"); value.textContent = "Capturing location...";
-          navigator.geolocation.getCurrentPosition(pos => {
-            const { latitude, longitude, accuracy } = pos.coords;
-            value.innerHTML = `Lat ${latitude.toFixed(6)}<br>Lon ${longitude.toFixed(6)}<br>Accuracy ±${Math.round(accuracy)} m`;
-          }, err => { value.textContent = `Could not capture GPS: ${err.message}`; }, { enableHighAccuracy:true, timeout:15000, maximumAge:0 });
-        });
+        const corner=btn.dataset.corner;
+        const value=btn.querySelector(".fb-coordinate-value");
+        const stored=readCoords()[corner];
+        const renderCoord=data=>{ if(!data){value.textContent="Location unavailable";return;} value.innerHTML=`Lat ${Number(data.latitude).toFixed(6)}<br>Lon ${Number(data.longitude).toFixed(6)}${data.accuracy!=null?`<br>Accuracy ±${Math.round(data.accuracy)} m`:"<br>Manual coordinate"}`; };
+        if(stored) renderCoord(stored);
+        const capture=()=>{ if(!navigator.geolocation){value.textContent="GPS unavailable · use MANUAL";return;} value.textContent="Capturing GPS..."; navigator.geolocation.getCurrentPosition(pos=>{const data={latitude:pos.coords.latitude,longitude:pos.coords.longitude,accuracy:pos.coords.accuracy,source:"gps",timestamp:new Date().toISOString()};saveCoord(corner,data);renderCoord(data);},err=>{value.textContent=`GPS unavailable (${err.message}) · use MANUAL`;},{enableHighAccuracy:true,timeout:12000,maximumAge:0}); };
+        btn.querySelector(".fb-coordinate-auto")?.addEventListener("click",capture);
+        btn.querySelector(".fb-coordinate-manual-toggle")?.addEventListener("click",()=>{const box=btn.querySelector(".fb-coordinate-manual");box.style.display=box.style.display==="none"?"block":"none";});
+        btn.querySelector(".fb-coordinate-save-manual")?.addEventListener("click",()=>{const latitude=Number(String(btn.querySelector(".fb-coordinate-lat").value).replace(",","."));const longitude=Number(String(btn.querySelector(".fb-coordinate-lon").value).replace(",","."));if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude > 90||longitude < -180||longitude > 180){alert("Revisá latitud y longitud. Latitud: -90 a 90. Longitud: -180 a 180.");return;}const data={latitude,longitude,accuracy:null,source:"manual",timestamp:new Date().toISOString()};saveCoord(corner,data);renderCoord(data);btn.querySelector(".fb-coordinate-manual").style.display="none";});
+        // Intento automático al abrir Checklist si todavía no posee coordenada.
+        if(!stored) setTimeout(capture, 150 + ([2,3,1,4].indexOf(Number(corner))*250));
       });
       document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",async(event)=>{
         const btn=event.currentTarget; btn.disabled=true; btn.textContent="SAVING CHECKLIST...";
