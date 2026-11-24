@@ -6,6 +6,9 @@
   // DEV endpoint. Pegá solamente en tu copia local la URL HTTP POST completa del Flow.
 
 const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/10/workflows/98c6ecc5302e48fba99d4eabb6790747/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=E-vDpXW7I2ZV2npkaw6NsQDuHtw_BtjJiaQudQF-HXg";
+
+  // DEV read endpoint: Field Book Data DEV. Paste the complete HTTP POST URL here.
+  const FIELD_BOOK_DATA_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/13/workflows/74bbd77cb3f44335b476f5afa2a1d61c/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=yVKDbXApzywVF7Fp3eS0_rEPocHaPW034WaA9dJrX2w";
     
   function endpointConfigurado(){return Boolean(FIELD_BOOK_SAVE_URL && !FIELD_BOOK_SAVE_URL.includes("PEGAR_URL_FLOW_AQUI"));}
 
@@ -184,9 +187,115 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       if (navigator.onLine && pendientesSyncCount()) sincronizarPendientes();
     }, 400);
 
-  // Datos embebidos opcionales para pruebas con doble clic (file://).
-  // Si existe window.FIELD_BOOK_LAYOUTS, Field Book usa esos datos sin fetch.
+  // Layouts activos. Se cargan desde Field Book Data DEV (CSV de SharePoint).
+  // Mantiene compatibilidad con window.FIELD_BOOK_LAYOUTS si existiera una copia local de prueba.
   const layoutsEmbebidos = window.FIELD_BOOK_LAYOUTS || {};
+
+  function endpointDatosConfigurado() {
+    return Boolean(
+      FIELD_BOOK_DATA_URL &&
+      !FIELD_BOOK_DATA_URL.includes("PEGAR_URL_FIELD_BOOK_DATA_DEV_AQUI")
+    );
+  }
+
+  function esBufferRow(row) {
+    const exp = normalizar(row?.ExperimentName);
+    const entry = normalizar(row?.Entry);
+    const euId = normalizar(row?.EUId);
+    return (
+      !exp || exp === "buffer" ||
+      entry === "0" || entry === "buffer" ||
+      euId === "0" || euId === "buffer"
+    );
+  }
+
+  function convertirFilasEnLayouts(rows) {
+    const porAoi = new Map();
+
+    rows.forEach(row => {
+      const aoiId = String(row?.TrialName || "").trim();
+      const range = Number.parseInt(String(row?.Range ?? "").trim(), 10);
+      const column = Number.parseInt(String(row?.Column ?? "").trim(), 10);
+      if (!aoiId || !Number.isFinite(range) || !Number.isFinite(column)) return;
+
+      if (!porAoi.has(aoiId)) porAoi.set(aoiId, []);
+      porAoi.get(aoiId).push({ ...row, __range: range, __column: column });
+    });
+
+    porAoi.forEach((aoiRows, aoiId) => {
+      const plots = aoiRows.map(row => {
+        const buffer = esBufferRow(row);
+        return {
+          range: row.__range,
+          column: row.__column,
+          type: buffer ? "BUFFER" : "EXPERIMENT",
+          experimentName: buffer ? "Buffer" : String(row.ExperimentName || "").trim(),
+          germplasmName: buffer ? "Buffer" : String(row.GermplasmName || "").trim(),
+          germplasmId: null,
+          eudq: String(row.EUDQ || "").trim(),
+          euId: buffer ? "Buffer" : String(row.EUId ?? "").trim(),
+          entryComment: String(row.EntryComment || "").trim(),
+          rep: buffer ? "Buffer" : String(row.Rep ?? "").trim(),
+          entry: buffer ? "Buffer" : String(row.Entry ?? "").trim(),
+          siid: buffer ? "Buffer" : String(row.SIID ?? "").trim(),
+          year: String(row.Year ?? "").trim(),
+          season: String(row.Season ?? "").trim()
+        };
+      });
+
+      const ranges = plots.map(plot => plot.range);
+      const columns = plots.map(plot => plot.column);
+      const experimentNames = [];
+      plots.forEach(plot => {
+        const name = plot.type === "BUFFER" ? "Buffer" : plot.experimentName;
+        if (name && !experimentNames.includes(name)) experimentNames.push(name);
+      });
+
+      layoutsEmbebidos[aoiId] = {
+        aoiId,
+        layout: {
+          rangeMin: Math.min(...ranges),
+          rangeMax: Math.max(...ranges),
+          columnMin: Math.min(...columns),
+          columnMax: Math.max(...columns)
+        },
+        experiments: experimentNames.map(name => ({
+          name,
+          type: normalizar(name) === "buffer" ? "BUFFER" : "EXPERIMENT"
+        })),
+        plots
+      };
+    });
+
+    return layoutsEmbebidos;
+  }
+
+  async function cargarLayoutsDesdeSharePoint() {
+    if (!endpointDatosConfigurado()) {
+      throw new Error("Falta configurar FIELD_BOOK_DATA_URL");
+    }
+
+    const response = await fetch(FIELD_BOOK_DATA_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ aoiId: "ALL" })
+    });
+
+    const text = await response.text();
+    let rows;
+    try { rows = text ? JSON.parse(text) : []; }
+    catch (_) { throw new Error("Field Book Data DEV no devolvió JSON válido"); }
+
+    if (!response.ok) {
+      throw new Error(`Field Book Data DEV respondió HTTP ${response.status}`);
+    }
+    if (!Array.isArray(rows)) {
+      throw new Error("Field Book Data DEV no devolvió una matriz");
+    }
+
+    convertirFilasEnLayouts(rows);
+    return rows;
+  }
   const settingsEmbebidos = window.FIELD_BOOK_SETTINGS || { experimentSettings: [], locationSettings: [] };
 
   function normalizar(valor) { return String(valor ?? "").trim().toLowerCase(); }
@@ -205,16 +314,21 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   }
 
   function completarSelectorAoi() {
-    const existentes = new Set([...selectorAoi.options].map(option => option.value).filter(Boolean));
-    (settingsEmbebidos.locationSettings || []).forEach(item => {
-      const aoiId = String(item.AOI_ID || "").trim();
-      if (!aoiId || existentes.has(aoiId)) return;
-      const option = document.createElement("option");
-      option.value = aoiId;
-      option.textContent = `${aoiId} · ${item.Location || ""}`;
-      selectorAoi.appendChild(option);
-      existentes.add(aoiId);
-    });
+    selectorAoi.innerHTML = '<option value="">Seleccionar AOI</option>';
+
+    const settingsPorAoi = new Map(
+      (settingsEmbebidos.locationSettings || []).map(item => [normalizar(item.AOI_ID), item])
+    );
+
+    Object.keys(layoutsEmbebidos)
+      .sort((a, b) => a.localeCompare(b))
+      .forEach(aoiId => {
+        const item = settingsPorAoi.get(normalizar(aoiId));
+        const option = document.createElement("option");
+        option.value = aoiId;
+        option.textContent = item?.Location ? `${aoiId} · ${item.Location}` : aoiId;
+        selectorAoi.appendChild(option);
+      });
   }
 
   const datosDemo = {
@@ -1443,7 +1557,31 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     `;
   }
 
-  completarSelectorAoi();
+  async function iniciarFieldBookData() {
+    selectorAoi.disabled = true;
+    selectorAoi.innerHTML = '<option value="">Cargando AOI desde SharePoint...</option>';
+
+    try {
+      await cargarLayoutsDesdeSharePoint();
+      completarSelectorAoi();
+      selectorAoi.disabled = false;
+
+      if (!Object.keys(layoutsEmbebidos).length) {
+        selectorAoi.innerHTML = '<option value="">No se encontraron AOI</option>';
+        selectorAoi.disabled = true;
+      }
+    } catch (error) {
+      console.error("Field Book: error cargando layouts", error);
+      selectorAoi.innerHTML = '<option value="">Error cargando AOI</option>';
+      selectorAoi.disabled = true;
+      contenido.innerHTML = `
+        <div class="empty-state">
+          <strong>No se pudieron cargar los layouts</strong>
+          <span>${error.message}</span>
+        </div>
+      `;
+    }
+  }
 
   selectorAoi.addEventListener(
     "change",
@@ -1475,5 +1613,8 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       );
     }
   );
+
+
+  iniciarFieldBookData();
 
 })();
