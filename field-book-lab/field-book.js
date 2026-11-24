@@ -602,6 +602,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
     const state = {
       mode: "idle", // idle | selecting | selected | moving
+      selectionMode: "individual", // individual | machine
       pointerId: null,
       column: null,
       startRange: null,
@@ -620,9 +621,16 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       from: Math.min(Number(state.startRange), Number(state.endRange)),
       to: Math.max(Number(state.startRange), Number(state.endRange))
     });
+    const machineColumns = () => {
+      const selectedColumn = Number(state.column);
+      const first = selectedColumn % 2 === 0 ? selectedColumn - 1 : selectedColumn;
+      return [first, first + 1];
+    };
+    const activeColumns = () => state.selectionMode === "machine" ? machineColumns() : [Number(state.column)];
     const selectedPlots = () => {
       const { from, to } = selectedBounds();
-      return plots.filter(el => columnOf(el) === Number(state.column) && rangeOf(el) >= from && rangeOf(el) <= to);
+      const columns = activeColumns();
+      return plots.filter(el => columns.includes(columnOf(el)) && rangeOf(el) >= from && rangeOf(el) <= to);
     };
 
     function clearClasses() {
@@ -659,12 +667,13 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       let outside = 0;
       selectedPlots().forEach(el => {
         const targetRange = rangeOf(el) + state.offset;
-        const targetKey = `${targetRange}|${state.column}`;
+        const targetColumn = columnOf(el);
+        const targetKey = `${targetRange}|${targetColumn}`;
         if (targetRange < Number(layout.rangeMin) || targetRange > Number(layout.rangeMax)) {
           outside += 1;
           return;
         }
-        const target = plots.find(p => rangeOf(p) === targetRange && columnOf(p) === Number(state.column));
+        const target = plots.find(p => rangeOf(p) === targetRange && columnOf(p) === targetColumn);
         if (target) target.classList.add("fb-shift-preview");
         const occupied = porCoord.get(targetKey);
         if (occupied && !originals.has(targetKey)) {
@@ -682,16 +691,32 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       const bar = document.createElement("div");
       bar.id = "fieldBookShiftGestureBar";
       bar.className = "fb-shift-gesture-bar";
+      const cols = activeColumns();
+      const columnLabel = cols.length === 2 ? `Columns ${cols[0]}-${cols[1]}` : `Column ${cols[0]}`;
       bar.innerHTML = `
-        <div><b>SHIFT BLOCK</b><span>Column ${state.column} · Range ${from}-${to} · ${count} plots</span></div>
+        <div><b>SHIFT BLOCK</b><span>${columnLabel} · Range ${from}-${to} · ${count} plots</span></div>
         <div class="fb-shift-gesture-actions">
+          <button type="button" data-action="individual" style="${state.selectionMode === 'individual' ? 'background:#174c31;color:#fff;' : ''}">INDIVIDUAL</button>
+          <button type="button" data-action="machine" style="${state.selectionMode === 'machine' ? 'background:#174c31;color:#fff;' : ''}">MAQUINADA</button>
           <button type="button" data-action="cancel">CANCEL</button>
           <button type="button" data-action="help">DRAG BLOCK ↕</button>
         </div>`;
       document.body.appendChild(bar);
+      bar.querySelector('[data-action="individual"]').onclick = () => {
+        state.selectionMode = "individual";
+        markSelection();
+        showSelectionBar();
+      };
+      bar.querySelector('[data-action="machine"]').onclick = () => {
+        state.selectionMode = "machine";
+        markSelection();
+        showSelectionBar();
+      };
       bar.querySelector('[data-action="cancel"]').onclick = clearGesture;
       bar.querySelector('[data-action="help"]').onclick = () => {
-        alert("Drag any selected plot vertically. The movement snaps to complete Ranges. Release to preview and confirm the Shift Block.");
+        alert(state.selectionMode === "machine"
+          ? `Maquinada fija: Columns ${activeColumns()[0]}-${activeColumns()[1]}. Arrastrá verticalmente una parcela seleccionada para mover ambas columnas juntas.`
+          : "Individual: arrastrá verticalmente la selección para mover una sola columna.");
       };
     }
 
@@ -707,7 +732,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       const destinationTo = to + state.offset;
       overlay.innerHTML = `<div class="fb-shift-confirm-card">
         <span class="section-label">SHIFT BLOCK · PREVIEW</span>
-        <h3>Column ${state.column}</h3>
+        <h3>${state.selectionMode === "machine" ? `Columns ${activeColumns()[0]}-${activeColumns()[1]}` : `Column ${state.column}`}</h3>
         <div class="fb-shift-confirm-grid">
           <span>Selected ranges</span><b>${from}-${to}</b>
           <span>Movement</span><b>${state.offset > 0 ? "+" : ""}${state.offset}</b>
@@ -726,26 +751,31 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         const btn = event.currentTarget;
         btn.disabled = true; btn.textContent = "SAVING...";
         const comment = overlay.querySelector("#fieldBookShiftGestureComment").value.trim();
-        const shift = {
-          id: `shift-${Date.now()}`,
-          column: Number(state.column),
+        const timestamp = Date.now();
+        const newShifts = activeColumns().map((column, index) => ({
+          id: `shift-${timestamp}-${index}`,
+          column: Number(column),
           startRange: from,
           endRange: to,
           offset: Number(state.offset),
           comment,
           createdAt: new Date().toISOString()
-        };
+        }));
         const shifts = leerBlockShifts(aoiId);
-        shifts.push(shift);
+        shifts.push(...newShifts);
         guardarBlockShifts(aoiId, shifts);
         try {
-          await guardarBlockShiftRemoto(aoiId, shift);
+          for (const shift of newShifts) {
+            await guardarBlockShiftRemoto(aoiId, shift);
+          }
+          const firstShift = newShifts[0];
           overlay.remove(); clearGesture();
-          reabrirFieldMapEnPlot(aoiId, from, state.column || shift.column);
+          reabrirFieldMapEnPlot(aoiId, from, firstShift.column);
         } catch (error) {
           console.error(error);
+          const firstShift = newShifts[0];
           overlay.remove(); clearGesture();
-          reabrirFieldMapEnPlot(aoiId, from, shift.column);
+          reabrirFieldMapEnPlot(aoiId, from, firstShift.column);
           alert(`Shift guardado localmente, pendiente de sincronización: ${error.message}`);
         }
       };
