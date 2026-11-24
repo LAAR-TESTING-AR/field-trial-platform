@@ -530,9 +530,13 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
         // Perímetro punteado persistente de la nueva posición del bloque desplazado.
         btn.style.borderTopStyle = range === to ? "dashed" : btn.style.borderTopStyle;
+        btn.style.borderTopWidth = range === to ? "3px" : btn.style.borderTopWidth;
         btn.style.borderBottomStyle = range === from ? "dashed" : btn.style.borderBottomStyle;
+        btn.style.borderBottomWidth = range === from ? "3px" : btn.style.borderBottomWidth;
         btn.style.borderLeftStyle = hasSiblingLeft ? btn.style.borderLeftStyle : "dashed";
+        btn.style.borderLeftWidth = hasSiblingLeft ? btn.style.borderLeftWidth : "3px";
         btn.style.borderRightStyle = hasSiblingRight ? btn.style.borderRightStyle : "dashed";
+        btn.style.borderRightWidth = hasSiblingRight ? btn.style.borderRightWidth : "3px";
         btn.style.borderTopColor = range === to ? "#d3a900" : btn.style.borderTopColor;
         btn.style.borderBottomColor = range === from ? "#d3a900" : btn.style.borderBottomColor;
         btn.style.borderLeftColor = hasSiblingLeft ? btn.style.borderLeftColor : "#d3a900";
