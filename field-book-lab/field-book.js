@@ -1074,16 +1074,21 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     };
     const itemLabel = label => String(label || "").replace(" verificados","").replace(" verificada","").replace(" verificado","").replace(" colocados","");
     const coordinates = [2,3,1,4].map(corner => `
-      <button type="button" class="fb-check-coordinate" data-corner="${corner}" ${checklistReadOnly ? "disabled" : ""} style="min-height:112px;padding:13px;text-align:left;border:1px solid #cedbd3;border-radius:13px;background:#fff;box-shadow:0 4px 13px rgba(23,76,49,.05);cursor:${checklistReadOnly?'default':'pointer'}">
-        <span style="display:flex;justify-content:space-between;align-items:center"><b style="color:#174c31;font-size:12px">CORNER ${corner}</b><span style="font-size:15px">⌖</span></span>
-        <span class="fb-coordinate-value" style="display:block;margin-top:10px;color:#7b8981;font-size:10px;line-height:1.6">Waiting for location...</span>
-        <div class="fb-coordinate-manual" style="display:none;margin-top:8px" onclick="event.stopPropagation()">
-          <input class="fb-coordinate-lat" inputmode="decimal" placeholder="Latitude e.g. -25.123456" style="width:100%;box-sizing:border-box;padding:7px;border:1px solid #cad6cf;border-radius:7px;font-size:9px">
-          <input class="fb-coordinate-lon" inputmode="decimal" placeholder="Longitude e.g. -64.123456" style="width:100%;box-sizing:border-box;margin-top:5px;padding:7px;border:1px solid #cad6cf;border-radius:7px;font-size:9px">
-          <button type="button" class="fb-coordinate-save-manual" style="width:100%;margin-top:5px;padding:6px;border:0;border-radius:7px;background:#174c31;color:#fff;font-size:8px;font-weight:900">SAVE MANUAL</button>
+      <div class="fb-check-coordinate" data-corner="${corner}" style="min-width:0;padding:11px;border:1px solid #cedbd3;border-radius:11px;background:#fff;box-shadow:0 3px 9px rgba(23,76,49,.04)">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="color:#174c31;font-size:10px">CORNER ${corner}</b><span style="color:#174c31;font-size:13px">⌖</span></div>
+        <div class="fb-coordinate-value" style="min-height:29px;margin-top:7px;color:#6f7e76;font-size:8.5px;line-height:1.4">No coordinate</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px">
+          <button type="button" class="fb-coordinate-auto" ${checklistReadOnly ? "disabled" : ""} style="padding:6px 4px;border:1px solid #0b6b3a;border-radius:6px;background:#e7f5ec;color:#0b6b3a;font-size:8px;font-weight:900;cursor:pointer">📍 GPS</button>
+          <button type="button" class="fb-coordinate-manual-toggle" ${checklistReadOnly ? "disabled" : ""} style="padding:6px 4px;border:1px solid #9caaa2;border-radius:6px;background:#fff;color:#536159;font-size:8px;font-weight:900;cursor:pointer">✎ MANUAL</button>
         </div>
-        <div style="display:flex;gap:6px;margin-top:9px" onclick="event.stopPropagation()"><button type="button" class="fb-coordinate-auto" style="flex:1;padding:6px;border:1px solid #0b6b3a;border-radius:7px;background:#e7f5ec;color:#0b6b3a;font-size:8px;font-weight:900">📍 GPS</button><button type="button" class="fb-coordinate-manual-toggle" style="flex:1;padding:6px;border:1px solid #7b8981;border-radius:7px;background:#fff;color:#536159;font-size:8px;font-weight:900">✎ MANUAL</button></div>
-      </button>`).join("");
+        <div class="fb-coordinate-manual" style="display:none;margin-top:6px;padding-top:6px;border-top:1px solid #edf2ef">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <input class="fb-coordinate-lat" inputmode="decimal" placeholder="Latitude" style="min-width:0;width:100%;box-sizing:border-box;padding:5px;border:1px solid #cad6cf;border-radius:6px;font-size:8px">
+            <input class="fb-coordinate-lon" inputmode="decimal" placeholder="Longitude" style="min-width:0;width:100%;box-sizing:border-box;padding:5px;border:1px solid #cad6cf;border-radius:6px;font-size:8px">
+          </div>
+          <button type="button" class="fb-coordinate-save-manual" style="width:100%;margin-top:4px;padding:5px;border:0;border-radius:6px;background:#174c31;color:#fff;font-size:8px;font-weight:900">SAVE</button>
+        </div>
+      </div>`).join("");
     const sections = [...new Set(checklistTemplate.map(x => x.section))];
     const sectionHTML = sections.map(section => {
       const cards = checklistTemplate.filter(x => x.section === section && x.id !== "CLS_ISSUES").map(item => {
@@ -1111,7 +1116,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap"><div><span class="section-label">PLANTING CHECKLIST</span><h2 style="margin:4px 0 0;color:#173f2b;font-size:22px">${aoiId}</h2></div><span style="padding:7px 10px;border-radius:999px;background:#fff;border:1px solid #cddbd3;color:#174c31;font-size:9px;font-weight:900">${pct}% COMPLETE</span></div>
       <div style="margin-top:13px;height:8px;border-radius:999px;background:#dde7e1;overflow:hidden"><div style="width:${pct}%;height:100%;background:#0b6b3a"></div></div>
       <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:9px;color:#536159;font-size:9px;font-weight:850"><span>✓ ${metrics.completed} completed</span><span style="color:#8a6400">! ${metrics.observations} observations</span><span style="color:#9b2f2f">× ${metrics.problems} problems</span><span>○ ${metrics.pending} pending</span></div>
-      <section style="margin-top:18px;padding:14px;border:1px solid #d5dfd9;border-radius:14px;background:#f0f6f2"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b style="color:#174c31;font-size:10px;letter-spacing:.08em">FIELD COORDINATES</b><div style="margin-top:3px;color:#748078;font-size:9px">Capture the four corners from the device GPS</div></div><span style="color:#174c31;font-size:17px">⌖</span></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px">${coordinates}</div></section>
+      <section style="margin-top:14px;padding:11px;border:1px solid #d5dfd9;border-radius:12px;background:#f0f6f2"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><b style="color:#174c31;font-size:10px;letter-spacing:.08em">FIELD COORDINATES</b><div style="margin-top:2px;color:#748078;font-size:8.5px">GPS or manual entry</div></div><span style="color:#174c31;font-size:15px">⌖</span></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:8px;max-width:660px">${coordinates}</div></section>
       ${sectionHTML}
       ${checklistReadOnly ? `<div style="margin-top:16px;padding:10px;border-radius:9px;background:#eaf4ed;color:#0b6b3a;font-size:10px;font-weight:900;text-align:center">FIELD BOOK COMPLETED · CHECKLIST READ ONLY</div>` : `<button id="fieldBookSaveChecklist" type="button" style="width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;background:#0b6b3a;color:#fff;font-size:11px;font-weight:950;cursor:pointer;box-shadow:0 6px 16px rgba(11,107,58,.16)">SAVE CHECKLIST</button>`}
       <div id="fieldBookChecklistMsg" style="margin-top:7px;color:#6c7a72;font-size:9px;text-align:center">Saved locally in LAB.</div>
@@ -1419,8 +1424,7 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
         btn.querySelector(".fb-coordinate-auto")?.addEventListener("click",capture);
         btn.querySelector(".fb-coordinate-manual-toggle")?.addEventListener("click",()=>{const box=btn.querySelector(".fb-coordinate-manual");box.style.display=box.style.display==="none"?"block":"none";});
         btn.querySelector(".fb-coordinate-save-manual")?.addEventListener("click",()=>{const latitude=Number(String(btn.querySelector(".fb-coordinate-lat").value).replace(",","."));const longitude=Number(String(btn.querySelector(".fb-coordinate-lon").value).replace(",","."));if(!Number.isFinite(latitude)||!Number.isFinite(longitude)||latitude < -90||latitude > 90||longitude < -180||longitude > 180){alert("Revisá latitud y longitud. Latitud: -90 a 90. Longitud: -180 a 180.");return;}const data={latitude,longitude,accuracy:null,source:"manual",timestamp:new Date().toISOString()};saveCoord(corner,data);renderCoord(data);btn.querySelector(".fb-coordinate-manual").style.display="none";});
-        // Intento automático al abrir Checklist si todavía no posee coordenada.
-        if(!stored) setTimeout(capture, 150 + ([2,3,1,4].indexOf(Number(corner))*250));
+        // La coordenada se toma al presionar GPS o se ingresa manualmente.
       });
       document.getElementById("fieldBookSaveChecklist")?.addEventListener("click",async(event)=>{
         const btn=event.currentTarget; btn.disabled=true; btn.textContent="SAVING CHECKLIST...";
