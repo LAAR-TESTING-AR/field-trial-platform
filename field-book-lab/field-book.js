@@ -495,6 +495,49 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     guardarBlockShifts(aoiId, leerBlockShifts(aoiId).filter(item => item.id !== shiftId));
   }
 
+  function marcarHuellaShifts(aoiId) {
+    const shifts = leerBlockShifts(aoiId).filter(shift => Number(shift.offset) !== 0);
+    if (!shifts.length) return;
+
+    const buttons = [...contenido.querySelectorAll(".field-book-real-plot")];
+    const byKey = new Map(buttons.map(btn => [`${Number(btn.dataset.range)}|${Number(btn.dataset.column)}`, btn]));
+
+    shifts.forEach(shift => {
+      const column = Number(shift.column);
+      const from = Math.min(Number(shift.startRange), Number(shift.endRange));
+      const to = Math.max(Number(shift.startRange), Number(shift.endRange));
+      if (!Number.isFinite(column) || !Number.isFinite(from) || !Number.isFinite(to)) return;
+
+      for (let range = from; range <= to; range++) {
+        const btn = byKey.get(`${range}|${column}`);
+        if (!btn) continue;
+
+        const hasSiblingLeft = shifts.some(other =>
+          Number(other.offset) !== 0 &&
+          Number(other.column) === column - 1 &&
+          range >= Math.min(Number(other.startRange), Number(other.endRange)) &&
+          range <= Math.max(Number(other.startRange), Number(other.endRange))
+        );
+        const hasSiblingRight = shifts.some(other =>
+          Number(other.offset) !== 0 &&
+          Number(other.column) === column + 1 &&
+          range >= Math.min(Number(other.startRange), Number(other.endRange)) &&
+          range <= Math.max(Number(other.startRange), Number(other.endRange))
+        );
+
+        // Perímetro punteado persistente de la huella original del bloque.
+        btn.style.borderTopStyle = range === to ? "dashed" : btn.style.borderTopStyle;
+        btn.style.borderBottomStyle = range === from ? "dashed" : btn.style.borderBottomStyle;
+        btn.style.borderLeftStyle = hasSiblingLeft ? btn.style.borderLeftStyle : "dashed";
+        btn.style.borderRightStyle = hasSiblingRight ? btn.style.borderRightStyle : "dashed";
+        btn.style.borderTopColor = range === to ? "#d3a900" : btn.style.borderTopColor;
+        btn.style.borderBottomColor = range === from ? "#d3a900" : btn.style.borderBottomColor;
+        btn.style.borderLeftColor = hasSiblingLeft ? btn.style.borderLeftColor : "#d3a900";
+        btn.style.borderRightColor = hasSiblingRight ? btn.style.borderRightColor : "#d3a900";
+      }
+    });
+  }
+
   function aplicarMarcaBoton(boton, evento) {
     boton.querySelector(".field-book-status-mark")?.remove();
     boton.style.position = "relative";
@@ -684,47 +727,6 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       return { overlaps, outside };
     }
 
-    async function aplicarEventoASeleccion(status) {
-      const selection = selectedPlots();
-      if (!selection.length) return;
-      const label = status === "Lost" ? "LOST" : "REFILLED";
-      const comment = window.prompt(`Comentario para ${label} (${selection.length} parcelas):`, "") ?? "";
-      if (!window.confirm(`Aplicar ${label} a ${selection.length} parcelas seleccionadas?`)) return;
-
-      selection.forEach(el => {
-        guardarEvento(aoiId, rangeOf(el), columnOf(el), status, comment);
-        aplicarMarcaBoton(el, { status, comment });
-      });
-
-      let syncMessage = "";
-      try {
-        const context = contextoRemoto(aoiId);
-        selection.forEach(el => {
-          encolarPayload({
-            type: "plotEvent",
-            ...context,
-            range: rangeOf(el),
-            column: columnOf(el),
-            status,
-            comment: String(comment || "")
-          });
-        });
-        if (!navigator.onLine) throw new Error("Sin conexión");
-        await sincronizarPendientes();
-        syncMessage = pendientesSyncCount()
-          ? `${label} aplicado. Quedan elementos pendientes de sincronización.`
-          : `${label} aplicado y sincronizado en ${selection.length} parcelas.`;
-      } catch (error) {
-        console.warn(`Aplicación masiva ${label} pendiente de sincronización`, error);
-        syncMessage = `${label} aplicado localmente. Sincronización pendiente.`;
-      }
-
-      clearGesture();
-      renderizarAoi(aoiId);
-      abrirModuloFieldBook("layout");
-      alert(syncMessage);
-    }
-
     function showSelectionBar() {
       document.getElementById("fieldBookShiftGestureBar")?.remove();
       const { from, to } = selectedBounds();
@@ -735,14 +737,12 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       const cols = activeColumns();
       const columnLabel = cols.length === 2 ? `Columns ${cols[0]}-${cols[1]}` : `Column ${cols[0]}`;
       bar.innerHTML = `
-        <div><b>SELECCIÓN DE PARCELAS</b><span>${columnLabel} · Range ${from}-${to} · ${count} plots</span></div>
+        <div><b>SHIFT BLOCK</b><span>${columnLabel} · Range ${from}-${to} · ${count} plots</span></div>
         <div class="fb-shift-gesture-actions">
           <button type="button" data-action="individual" style="${state.selectionMode === 'individual' ? 'background:#174c31;color:#fff;' : ''}">INDIVIDUAL</button>
           <button type="button" data-action="machine" style="${state.selectionMode === 'machine' ? 'background:#174c31;color:#fff;' : ''}">MAQUINADA</button>
-          <button type="button" data-action="lost" style="background:#fdeaea;color:#8b2d2d;border-color:#8b2d2d;">X LOST</button>
-          <button type="button" data-action="refilled" style="background:#fff3d6;color:#995c00;border-color:#995c00;">R REFILLED</button>
           <button type="button" data-action="cancel">CANCEL</button>
-          <button type="button" data-action="help">SHIFT BLOCK ↕</button>
+          <button type="button" data-action="help">DRAG BLOCK ↕</button>
         </div>`;
       document.body.appendChild(bar);
       bar.querySelector('[data-action="individual"]').onclick = () => {
@@ -755,8 +755,6 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         markSelection();
         showSelectionBar();
       };
-      bar.querySelector('[data-action="lost"]').onclick = () => aplicarEventoASeleccion("Lost");
-      bar.querySelector('[data-action="refilled"]').onclick = () => aplicarEventoASeleccion("Refilled");
       bar.querySelector('[data-action="cancel"]').onclick = clearGesture;
       bar.querySelector('[data-action="help"]').onclick = () => {
         alert(state.selectionMode === "machine"
@@ -1343,6 +1341,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
             );
         }
 
+        // La huella completa se aplica una vez finalizado el marcado de todos los botones.
         btn.addEventListener("click", () => {
           const plot = porCoord.get(`${btn.dataset.range}|${btn.dataset.column}`);
           const d = document.getElementById("fieldBookRealDetail");
@@ -1407,6 +1406,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         });
       });
       // Shift Block gestual estable: selección y desplazamiento vertical limitado a una sola Column.
+      marcarHuellaShifts(aoiId);
       habilitarShiftGestual(aoiId, layout, porCoord);
       return;
     }
