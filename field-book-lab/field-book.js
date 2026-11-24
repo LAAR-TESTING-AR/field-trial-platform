@@ -809,7 +809,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         if (Date.now() < state.suppressClickUntil || state.mode === "selected" || state.mode === "moving") {
           event.preventDefault(); event.stopImmediatePropagation();
         }
-      }, { capture:true, signal });
+      }, { capture:true });
       el.addEventListener("pointerdown", event => {
         if (state.mode === "selected" && el.classList.contains("fb-shift-selected")) {
           document.getElementById("fieldBookShiftGestureBar")?.remove();
@@ -829,7 +829,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         } else {
           state.longPressTimer = setTimeout(() => beginSelection(el, event), 420);
         }
-      }, { signal });
+      });
     });
 
     document.addEventListener("pointermove", event => {
@@ -851,7 +851,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         const cellStep = Math.max(31, (sample?.getBoundingClientRect().height || 34) + 3);
         previewOffset(-Math.round((event.clientY - state.startY) / cellStep));
       }
-    }, { passive:false, signal });
+    }, { passive:false });
 
     document.addEventListener("pointerup", event => {
       if (state.pointerId !== event.pointerId) return;
@@ -866,7 +866,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       }
       state.pointerId = null;
       state.startRange = state.endRange = state.startColumn = state.endColumn = null;
-    }, { signal });
+    });
 
     document.addEventListener("pointercancel", event => {
       if (state.pointerId !== event.pointerId) return;
@@ -876,7 +876,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         state.pointerId = null;
         state.startRange = state.endRange = state.startColumn = state.endColumn = null;
       }
-    }, { signal });
+    });
   }
   function claveChecklistStorage(aoiId) { return `fieldBookLabChecklist:${aoiId}`; }
   function leerChecklist(aoiId) {
@@ -1596,9 +1596,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     }
   }
 
-  selectorAoi.addEventListener(
-    "change",
-    function () {
+  function seleccionarAoiActual() {
       const aoiId = String(selectorAoi.value || "").trim();
 
       if (!aoiId) {
@@ -1623,9 +1621,10 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       renderizarAoi(
         aoiId
       );
-    }
-  );
+  }
 
+  selectorAoi.onchange = seleccionarAoiActual;
+  selectorAoi.oninput = seleccionarAoiActual;
 
   iniciarFieldBookData();
 
