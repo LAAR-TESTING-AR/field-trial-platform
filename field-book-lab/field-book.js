@@ -30,7 +30,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   function claveOperacion(payload) {
     const type = String(payload?.type || "unknown");
     if (type === "visit") return `visit|${payload.visitId}`;
-    if (type === "plotEvent") return `plotEvent|${payload.visitId}|${payload.range}|${payload.column}`;
+    if (type === "plotEvent") return `plotEvent|${payload.visitId}|${payload.range}|${payload.column}|${payload.side ?? "legacy"}`;
     if (type === "blockShift") return `blockShift|${payload.visitId}|${payload.shiftId}`;
     if (type === "checklist") return `checklist|${payload.visitId}|${payload.checkId}`;
     return `${type}|${payload.visitId || payload.aoiId || "global"}|${Date.now()}`;
@@ -974,6 +974,54 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     });
   }
 
+
+  /* =========================================================
+     FIELD BOOK V3 - DUAL CONTAINER MODEL (DEV)
+     Range x Column x Side; Side order is Tray_ID ascending.
+  ========================================================= */
+  const FIELD_BOOK_CONTAINER_LAYOUTS_V3 = {"ANCY04NMETAT":{"aoiId":"ANCY04NMETAT","version":3,"plots":[{"range":2,"column":15,"sides":[{"barcode":"334398016","containerId":"334398016","range":2,"column":15,"experimentName":"LAIM184YLARLT","entryNumber":21,"germplasmName":"1019D181-48","euId":"497452168","trayId":3,"side":1,"isFiller":false},{"barcode":"334398015","containerId":"334398015","range":2,"column":15,"experimentName":"LAIM184YLARLT","entryNumber":21,"germplasmName":"1019D181-48","euId":"497452168","trayId":4,"side":2,"isFiller":false}]},{"range":2,"column":16,"sides":[{"barcode":"335187969","containerId":"335187969","range":2,"column":16,"experimentName":"LAIM184YLARLT","entryNumber":5,"germplasmName":"1019J221-48","euId":"497452152","trayId":1,"side":1,"isFiller":false},{"barcode":"335187558","containerId":"335187558","range":2,"column":16,"experimentName":"LAIM184YLARLT","entryNumber":5,"germplasmName":"1019J221-48","euId":"497452152","trayId":2,"side":2,"isFiller":false}]},{"range":2,"column":23,"sides":[{"barcode":"335075822","containerId":"335075822","range":2,"column":23,"experimentName":"LAIM184YLARLT","entryNumber":4,"germplasmName":"1017J041-48","euId":"497452151","trayId":7,"side":1,"isFiller":false},{"barcode":"335075823","containerId":"335075823","range":2,"column":23,"experimentName":"LAIM184YLARLT","entryNumber":4,"germplasmName":"1017J041-48","euId":"497452151","trayId":8,"side":2,"isFiller":false}]},{"range":2,"column":24,"sides":[{"barcode":"334410390","containerId":"334410390","range":2,"column":24,"experimentName":"LAAR18ZYLAALT","entryNumber":2,"germplasmName":"DK72-20PRO4","euId":"497519752","trayId":5,"side":1,"isFiller":false},{"barcode":"334410181","containerId":"334410181","range":2,"column":24,"experimentName":"LAAR18ZYLAALT","entryNumber":2,"germplasmName":"DK72-20PRO4","euId":"497519752","trayId":6,"side":2,"isFiller":false}]},{"range":2,"column":25,"sides":[{"barcode":"334928678","containerId":"334928678","range":2,"column":25,"experimentName":"LAAR186YGCALT","entryNumber":18966,"germplasmName":"LAAR1025975644","euId":"497458064","trayId":5,"side":1,"isFiller":false},{"barcode":"334928679","containerId":"334928679","range":2,"column":25,"experimentName":"LAAR186YGCALT","entryNumber":18966,"germplasmName":"LAAR1025975644","euId":"497458064","trayId":6,"side":2,"isFiller":false}]},{"range":2,"column":26,"sides":[{"barcode":"334656864","containerId":"334656864","range":2,"column":26,"experimentName":"LAAR186YGCALT","entryNumber":18328,"germplasmName":"LAAR1025972411","euId":"497457426","trayId":7,"side":1,"isFiller":false},{"barcode":"334656865","containerId":"334656865","range":2,"column":26,"experimentName":"LAAR186YGCALT","entryNumber":18328,"germplasmName":"LAAR1025972411","euId":"497457426","trayId":8,"side":2,"isFiller":false}]},{"range":6,"column":11,"sides":[{"barcode":"334406079","containerId":"334406079","range":6,"column":11,"experimentName":"LAIM184YLARLT","entryNumber":26,"germplasmName":"NK842VIPTERA3","euId":"497452231","trayId":3,"side":1,"isFiller":false},{"barcode":"334406078","containerId":"334406078","range":6,"column":11,"experimentName":"LAIM184YLARLT","entryNumber":26,"germplasmName":"NK842VIPTERA3","euId":"497452231","trayId":4,"side":2,"isFiller":false}]},{"range":6,"column":12,"sides":[{"barcode":"335074607","containerId":"335074607","range":6,"column":12,"experimentName":"LAIM184YLARLT","entryNumber":4,"germplasmName":"1017J041-48","euId":"497452209","trayId":1,"side":1,"isFiller":false},{"barcode":"335074608","containerId":"335074608","range":6,"column":12,"experimentName":"LAIM184YLARLT","entryNumber":4,"germplasmName":"1017J041-48","euId":"497452209","trayId":2,"side":2,"isFiller":false}]},{"range":6,"column":13,"sides":[{"barcode":"334385464","containerId":"334385464","range":6,"column":13,"experimentName":"LAIM184YLARLT","entryNumber":13,"germplasmName":"1020F302-48","euId":"497452218","trayId":1,"side":1,"isFiller":false},{"barcode":"334385465","containerId":"334385465","range":6,"column":13,"experimentName":"LAIM184YLARLT","entryNumber":13,"germplasmName":"1020F302-48","euId":"497452218","trayId":2,"side":2,"isFiller":false}]},{"range":6,"column":25,"sides":[{"barcode":"334743236","containerId":"334743236","range":6,"column":25,"experimentName":"LAAR186YGCALT","entryNumber":19096,"germplasmName":"LAAR1025971973","euId":"497458194","trayId":5,"side":1,"isFiller":false},{"barcode":"334743235","containerId":"334743235","range":6,"column":25,"experimentName":"LAAR186YGCALT","entryNumber":19096,"germplasmName":"LAAR1025971973","euId":"497458194","trayId":6,"side":2,"isFiller":false}]}]}};
+  const FB_V3_EVENTS_KEY = "fieldBookPlotEventsV3:";
+  const FB_V3_SHIFTS_KEY = "fieldBookBlockShiftsV3:";
+
+  function leerJsonLocal(key, fallback) { try { const v=JSON.parse(localStorage.getItem(key)||""); return v ?? fallback; } catch(_) { return fallback; } }
+  function guardarJsonLocal(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+  function v3EventKey(range,column,side){ return `${range}|${column}|${side}`; }
+  function v3LeerEventos(aoiId){ return leerJsonLocal(FB_V3_EVENTS_KEY+aoiId,{}); }
+  function v3LeerShifts(aoiId){ return leerJsonLocal(FB_V3_SHIFTS_KEY+aoiId,[]); }
+  function v3GuardarEventos(aoiId,value){ guardarJsonLocal(FB_V3_EVENTS_KEY+aoiId,value); }
+  function v3GuardarShifts(aoiId,value){ guardarJsonLocal(FB_V3_SHIFTS_KEY+aoiId,value); }
+  function v3Layout(aoiId){ return FIELD_BOOK_CONTAINER_LAYOUTS_V3[aoiId] || window.FIELD_BOOK_CONTAINER_LAYOUTS?.[aoiId] || null; }
+
+  async function v3GuardarPlotEvent(aoiId, sideData, status, comment) {
+    const contexto=contextoRemoto(aoiId);
+    const payload={type:"plotEvent",...contexto,range:Number(sideData.range),column:Number(sideData.column),side:Number(sideData.side),trayId:Number(sideData.trayId),containerId:String(sideData.containerId||""),barcode:String(sideData.barcode||""),status,comment:String(comment||"")};
+    await guardarConCola(payload);
+  }
+  async function v3GuardarShift(aoiId, shift) {
+    const contexto=contextoRemoto(aoiId);
+    await guardarConCola({type:"blockShift",...contexto,shiftId:shift.id,column:Number(shift.column),startRange:Number(shift.startRange),endRange:Number(shift.endRange),offset:Number(shift.offset),scope:String(shift.scope||"both"),comment:String(shift.comment||"")});
+  }
+
+  function v3RenderFieldMap(aoiId) {
+    const host=document.getElementById("fieldBookLayoutView");
+    const data=v3Layout(aoiId);
+    if(!host || !data) return false;
+    const plots=data.plots||[];
+    const by=new Map(plots.map(p=>[`${Number(p.range)}|${Number(p.column)}`,p]));
+    const cols=[...new Set(plots.map(p=>Number(p.column)))].sort((a,b)=>a-b);
+    const ranges=[...new Set(plots.map(p=>Number(p.range)))].sort((a,b)=>b-a);
+    const events=v3LeerEventos(aoiId), shifts=v3LeerShifts(aoiId);
+    host.innerHTML=`<section class="fbv3-map-shell"><div class="fbv3-map-head"><div><span class="section-label">FIELD MAP · DUAL CONTAINER</span><h3>${aoiId}</h3><p>One physical Column per machinery pass. Each cell contains two container sides ordered by Tray_ID.</p></div><div><span class="fbv3-legend planned">planned</span><span class="fbv3-legend shifted">actual shift</span><span class="fbv3-legend filler">border</span></div></div><div id="fbv3Grid" class="fbv3-grid"></div><aside id="fbv3Panel" class="fbv3-panel"><b>Select one side</b><p>Incidents and one-sided shifts are independent.</p></aside></section>`;
+    const grid=host.querySelector("#fbv3Grid"),panel=host.querySelector("#fbv3Panel");
+    let h=`<div class="fbv3-table" style="--fbv3-cols:${cols.length}"><div class="fbv3-row fbv3-header"><div></div>${cols.map(c=>`<div>C${c}</div>`).join("")}</div>`;
+    for(const r of ranges){h+=`<div class="fbv3-row"><div class="fbv3-range">R${r}</div>`;for(const c of cols){const p=by.get(`${r}|${c}`);if(!p){h+=`<div class="fbv3-machine empty"></div>`;continue}h+=`<div class="fbv3-machine" data-range="${r}" data-column="${c}">${[1,2].map(s=>{const d=(p.sides||[]).find(x=>Number(x.side)===s);if(!d)return `<span class="fbv3-side missing"></span>`;const ev=events[v3EventKey(r,c,s)];const cls=d.isFiller?" filler":ev?.status==="Refilled"?" refilled":ev?.status==="Lost"?" lost":ev?.status==="Observation"?" observation":"";return `<button class="fbv3-side${cls}" data-range="${r}" data-column="${c}" data-side="${s}">${r}-${c}</button>`}).join("")}${shifts.filter(q=>Number(q.column)===c&&Number(q.offset)!==0&&r>=Math.min(Number(q.startRange),Number(q.endRange))+Number(q.offset)&&r<=Math.max(Number(q.startRange),Number(q.endRange))+Number(q.offset)).map(q=>`<i class="fbv3-shift ${q.scope||'both'}"></i>`).join("")}</div>`}h+=`</div>`}h+=`<div class="fbv3-row fbv3-header"><div></div>${cols.map(c=>`<div>C${c}</div>`).join("")}</div></div>`;grid.innerHTML=h;
+    function sideData(r,c,s){return by.get(`${r}|${c}`)?.sides?.find(x=>Number(x.side)===s)}
+    async function setEvent(d,status,comment){const current=v3LeerEventos(aoiId);const key=v3EventKey(d.range,d.column,d.side);if(status==="Normal")delete current[key];else current[key]={status,comment,updatedAt:new Date().toISOString(),trayId:d.trayId,containerId:d.containerId,barcode:d.barcode};v3GuardarEventos(aoiId,current);v3RenderFieldMap(aoiId);try{await v3GuardarPlotEvent(aoiId,d,status,comment);}catch(error){alert(`Saved locally · Pending sync: ${error.message}`)}}
+    function openShift(d,scope){panel.innerHTML=`<b>SHIFT ${scope.toUpperCase()}</b><p>C${d.column} · Side ${d.side} · Tray ${d.trayId}</p><label>Start range<input id="v3From" type="number" value="${d.range}"></label><label>End range<input id="v3To" type="number" value="${d.range}"></label><label>Offset<input id="v3Offset" type="number" value="1"></label><textarea id="v3ShiftComment" placeholder="Comment"></textarea><button class="fbv3-action primary" id="v3ConfirmShift">CONFIRM SHIFT</button><button class="fbv3-action" id="v3CancelShift">CANCEL</button>`;panel.querySelector("#v3CancelShift").onclick=()=>v3RenderFieldMap(aoiId);panel.querySelector("#v3ConfirmShift").onclick=async()=>{const shift={id:`shift-${Date.now()}`,column:Number(d.column),startRange:Number(panel.querySelector('#v3From').value),endRange:Number(panel.querySelector('#v3To').value),offset:Number(panel.querySelector('#v3Offset').value),scope,comment:panel.querySelector('#v3ShiftComment').value.trim(),createdAt:new Date().toISOString()};const list=v3LeerShifts(aoiId);list.push(shift);v3GuardarShifts(aoiId,list);v3RenderFieldMap(aoiId);try{await v3GuardarShift(aoiId,shift);}catch(error){alert(`Shift saved locally · Pending sync: ${error.message}`)}}}
+    host.querySelectorAll(".fbv3-side:not(.missing)").forEach(b=>b.onclick=()=>{const d=sideData(Number(b.dataset.range),Number(b.dataset.column),Number(b.dataset.side));const ev=v3LeerEventos(aoiId)[v3EventKey(d.range,d.column,d.side)];panel.innerHTML=`<b>${d.range}-${d.column} · SIDE ${d.side}</b><div class="fbv3-pills"><span>Tray ${d.trayId}</span><span>Container ${d.containerId||'-'}</span></div><p><strong>${d.germplasmName||'-'}</strong><br><small>${d.experimentName||'No experiment'} · EU ${d.euId||0}</small></p>${d.isFiller?'<p class="fbv3-warning">Filler / border</p>':''}<textarea id="v3Comment" placeholder="Comment">${ev?.comment||''}</textarea><button class="fbv3-action" data-status="Refilled">REFILLED</button><button class="fbv3-action" data-status="Lost">LOST</button><button class="fbv3-action" data-status="Observation">OBSERVATION</button><button class="fbv3-action" data-status="Normal">RESTORE NORMAL</button><button class="fbv3-action primary" data-shift="side${d.side}">SHIFT SIDE ${d.side}</button><button class="fbv3-action primary" data-shift="both">SHIFT BOTH SIDES</button>`;panel.querySelectorAll('[data-status]').forEach(x=>x.onclick=()=>setEvent(d,x.dataset.status,panel.querySelector('#v3Comment').value.trim()));panel.querySelectorAll('[data-shift]').forEach(x=>x.onclick=()=>openShift(d,x.dataset.shift));});
+    return true;
+  }
+
   function abrirModuloFieldBook(vista) {
     const home = document.getElementById("fieldBookModuleHome");
     const toolbar = document.getElementById("fieldBookModuleToolbar");
@@ -982,6 +1030,9 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     if (toolbar) toolbar.style.display = "flex";
     mostrarCabeceraPrincipal(false);
     activarVistaFieldBook(vista);
+    if (vista === "layout" && fieldBookAoiActivo && v3Layout(fieldBookAoiActivo)) {
+      v3RenderFieldMap(fieldBookAoiActivo);
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
