@@ -1574,6 +1574,9 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     try {
       await cargarLayoutsDesdeSharePoint();
       completarSelectorAoi();
+      // Fuerza el placeholder tras cada carga. Evita que el navegador restaure
+      // visualmente un AOI sin disparar el evento change.
+      selectorAoi.value = "";
       selectorAoi.disabled = false;
 
       if (!Object.keys(layoutsEmbebidos).length) {
@@ -1596,8 +1599,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   selectorAoi.addEventListener(
     "change",
     function () {
-      const aoiId =
-        selectorAoi.value;
+      const aoiId = String(selectorAoi.value || "").trim();
 
       if (!aoiId) {
         contenido.innerHTML = `
