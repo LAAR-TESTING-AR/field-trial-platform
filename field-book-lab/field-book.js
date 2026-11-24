@@ -684,6 +684,47 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       return { overlaps, outside };
     }
 
+    async function aplicarEventoASeleccion(status) {
+      const selection = selectedPlots();
+      if (!selection.length) return;
+      const label = status === "Lost" ? "LOST" : "REFILLED";
+      const comment = window.prompt(`Comentario para ${label} (${selection.length} parcelas):`, "") ?? "";
+      if (!window.confirm(`Aplicar ${label} a ${selection.length} parcelas seleccionadas?`)) return;
+
+      selection.forEach(el => {
+        guardarEvento(aoiId, rangeOf(el), columnOf(el), status, comment);
+        aplicarMarcaBoton(el, { status, comment });
+      });
+
+      let syncMessage = "";
+      try {
+        const context = contextoRemoto(aoiId);
+        selection.forEach(el => {
+          encolarPayload({
+            type: "plotEvent",
+            ...context,
+            range: rangeOf(el),
+            column: columnOf(el),
+            status,
+            comment: String(comment || "")
+          });
+        });
+        if (!navigator.onLine) throw new Error("Sin conexión");
+        await sincronizarPendientes();
+        syncMessage = pendientesSyncCount()
+          ? `${label} aplicado. Quedan elementos pendientes de sincronización.`
+          : `${label} aplicado y sincronizado en ${selection.length} parcelas.`;
+      } catch (error) {
+        console.warn(`Aplicación masiva ${label} pendiente de sincronización`, error);
+        syncMessage = `${label} aplicado localmente. Sincronización pendiente.`;
+      }
+
+      clearGesture();
+      renderizarAoi(aoiId);
+      abrirModuloFieldBook("layout");
+      alert(syncMessage);
+    }
+
     function showSelectionBar() {
       document.getElementById("fieldBookShiftGestureBar")?.remove();
       const { from, to } = selectedBounds();
@@ -694,12 +735,14 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       const cols = activeColumns();
       const columnLabel = cols.length === 2 ? `Columns ${cols[0]}-${cols[1]}` : `Column ${cols[0]}`;
       bar.innerHTML = `
-        <div><b>SHIFT BLOCK</b><span>${columnLabel} · Range ${from}-${to} · ${count} plots</span></div>
+        <div><b>SELECCIÓN DE PARCELAS</b><span>${columnLabel} · Range ${from}-${to} · ${count} plots</span></div>
         <div class="fb-shift-gesture-actions">
           <button type="button" data-action="individual" style="${state.selectionMode === 'individual' ? 'background:#174c31;color:#fff;' : ''}">INDIVIDUAL</button>
           <button type="button" data-action="machine" style="${state.selectionMode === 'machine' ? 'background:#174c31;color:#fff;' : ''}">MAQUINADA</button>
+          <button type="button" data-action="lost" style="background:#fdeaea;color:#8b2d2d;border-color:#8b2d2d;">X LOST</button>
+          <button type="button" data-action="refilled" style="background:#fff3d6;color:#995c00;border-color:#995c00;">R REFILLED</button>
           <button type="button" data-action="cancel">CANCEL</button>
-          <button type="button" data-action="help">DRAG BLOCK ↕</button>
+          <button type="button" data-action="help">SHIFT BLOCK ↕</button>
         </div>`;
       document.body.appendChild(bar);
       bar.querySelector('[data-action="individual"]').onclick = () => {
@@ -712,6 +755,8 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         markSelection();
         showSelectionBar();
       };
+      bar.querySelector('[data-action="lost"]').onclick = () => aplicarEventoASeleccion("Lost");
+      bar.querySelector('[data-action="refilled"]').onclick = () => aplicarEventoASeleccion("Refilled");
       bar.querySelector('[data-action="cancel"]').onclick = clearGesture;
       bar.querySelector('[data-action="help"]').onclick = () => {
         alert(state.selectionMode === "machine"
