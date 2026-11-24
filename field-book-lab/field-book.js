@@ -504,8 +504,11 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
     shifts.forEach(shift => {
       const column = Number(shift.column);
-      const from = Math.min(Number(shift.startRange), Number(shift.endRange));
-      const to = Math.max(Number(shift.startRange), Number(shift.endRange));
+      const offset = Number(shift.offset) || 0;
+      const originalFrom = Math.min(Number(shift.startRange), Number(shift.endRange));
+      const originalTo = Math.max(Number(shift.startRange), Number(shift.endRange));
+      const from = originalFrom + offset;
+      const to = originalTo + offset;
       if (!Number.isFinite(column) || !Number.isFinite(from) || !Number.isFinite(to)) return;
 
       for (let range = from; range <= to; range++) {
@@ -515,17 +518,17 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         const hasSiblingLeft = shifts.some(other =>
           Number(other.offset) !== 0 &&
           Number(other.column) === column - 1 &&
-          range >= Math.min(Number(other.startRange), Number(other.endRange)) &&
-          range <= Math.max(Number(other.startRange), Number(other.endRange))
+          range >= Math.min(Number(other.startRange), Number(other.endRange)) + (Number(other.offset) || 0) &&
+          range <= Math.max(Number(other.startRange), Number(other.endRange)) + (Number(other.offset) || 0)
         );
         const hasSiblingRight = shifts.some(other =>
           Number(other.offset) !== 0 &&
           Number(other.column) === column + 1 &&
-          range >= Math.min(Number(other.startRange), Number(other.endRange)) &&
-          range <= Math.max(Number(other.startRange), Number(other.endRange))
+          range >= Math.min(Number(other.startRange), Number(other.endRange)) + (Number(other.offset) || 0) &&
+          range <= Math.max(Number(other.startRange), Number(other.endRange)) + (Number(other.offset) || 0)
         );
 
-        // Perímetro punteado persistente de la huella original del bloque.
+        // Perímetro punteado persistente de la nueva posición del bloque desplazado.
         btn.style.borderTopStyle = range === to ? "dashed" : btn.style.borderTopStyle;
         btn.style.borderBottomStyle = range === from ? "dashed" : btn.style.borderBottomStyle;
         btn.style.borderLeftStyle = hasSiblingLeft ? btn.style.borderLeftStyle : "dashed";
