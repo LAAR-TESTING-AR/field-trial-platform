@@ -600,23 +600,15 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     const plots = [...contenido.querySelectorAll(".field-book-real-plot")];
     if (!plots.length) return;
 
-    // Evita listeners duplicados cada vez que Field Map se vuelve a renderizar.
-    window.__fieldBookShiftGestureController?.abort?.();
-    const controller = new AbortController();
-    window.__fieldBookShiftGestureController = controller;
-    const signal = controller.signal;
-
     const state = {
       mode: "idle", // idle | selecting | selected | moving
-      selectionMode: "machine", // machine | individual
       pointerId: null,
+      column: null,
       startRange: null,
       endRange: null,
-      startColumn: null,
-      endColumn: null,
       offset: 0,
       startY: 0,
-      startX: 0,
+      moved: false,
       longPressTimer: null,
       suppressClickUntil: 0
     };
@@ -624,23 +616,14 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     const rangeOf = el => Number(el?.dataset?.range);
     const columnOf = el => Number(el?.dataset?.column);
     const plotAtPoint = (x, y) => document.elementFromPoint(x, y)?.closest?.(".field-book-real-plot") || null;
-    const bounds = () => ({
-      rangeFrom: Math.min(Number(state.startRange), Number(state.endRange)),
-      rangeTo: Math.max(Number(state.startRange), Number(state.endRange)),
-      columnFrom: Math.min(Number(state.startColumn), Number(state.endColumn)),
-      columnTo: Math.max(Number(state.startColumn), Number(state.endColumn))
+    const selectedBounds = () => ({
+      from: Math.min(Number(state.startRange), Number(state.endRange)),
+      to: Math.max(Number(state.startRange), Number(state.endRange))
     });
     const selectedPlots = () => {
-      if (state.selectionMode === "individual") {
-        return plots.filter(el => rangeOf(el) === Number(state.startRange) && columnOf(el) === Number(state.startColumn));
-      }
-      const b = bounds();
-      return plots.filter(el =>
-        rangeOf(el) >= b.rangeFrom && rangeOf(el) <= b.rangeTo &&
-        columnOf(el) >= b.columnFrom && columnOf(el) <= b.columnTo
-      );
+      const { from, to } = selectedBounds();
+      return plots.filter(el => columnOf(el) === Number(state.column) && rangeOf(el) >= from && rangeOf(el) <= to);
     };
-    const selectedColumns = () => [...new Set(selectedPlots().map(columnOf))].sort((a,b)=>a-b);
 
     function clearClasses() {
       plots.forEach(el => el.classList.remove("fb-shift-selected", "fb-shift-preview", "fb-shift-overlap"));
@@ -651,9 +634,11 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       clearClasses();
       state.mode = "idle";
       state.pointerId = null;
-      state.startRange = state.endRange = null;
-      state.startColumn = state.endColumn = null;
+      state.column = null;
+      state.startRange = null;
+      state.endRange = null;
       state.offset = 0;
+      state.moved = false;
       document.getElementById("fieldBookShiftGestureBar")?.remove();
     }
     function markSelection() {
@@ -661,9 +646,8 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       selectedPlots().forEach(el => el.classList.add("fb-shift-selected"));
     }
     function updateSelection(target) {
-      if (!target) return;
+      if (!target || columnOf(target) !== Number(state.column)) return;
       state.endRange = rangeOf(target);
-      state.endColumn = columnOf(target);
       markSelection();
     }
     function previewOffset(offset) {
@@ -675,13 +659,12 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       let outside = 0;
       selectedPlots().forEach(el => {
         const targetRange = rangeOf(el) + state.offset;
-        const col = columnOf(el);
-        const targetKey = `${targetRange}|${col}`;
+        const targetKey = `${targetRange}|${state.column}`;
         if (targetRange < Number(layout.rangeMin) || targetRange > Number(layout.rangeMax)) {
           outside += 1;
           return;
         }
-        const target = plots.find(p => rangeOf(p) === targetRange && columnOf(p) === col);
+        const target = plots.find(p => rangeOf(p) === targetRange && columnOf(p) === Number(state.column));
         if (target) target.classList.add("fb-shift-preview");
         const occupied = porCoord.get(targetKey);
         if (occupied && !originals.has(targetKey)) {
@@ -694,66 +677,46 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
     function showSelectionBar() {
       document.getElementById("fieldBookShiftGestureBar")?.remove();
-      const b = bounds();
+      const { from, to } = selectedBounds();
       const count = selectedPlots().length;
-      const columns = selectedColumns();
       const bar = document.createElement("div");
       bar.id = "fieldBookShiftGestureBar";
       bar.className = "fb-shift-gesture-bar";
-      const colLabel = columns.length === 1 ? `C${columns[0]}` : `C${columns[0]}-C${columns[columns.length-1]}`;
-      const rangeLabel = state.selectionMode === "individual" ? `R${state.startRange}` : `R${b.rangeFrom}-R${b.rangeTo}`;
       bar.innerHTML = `
-        <div class="fb-shift-gesture-info">
-          <b>SHIFT SELECTION</b>
-          <span>${count} plot${count===1?"":"s"} · ${rangeLabel} · ${colLabel}</span>
-        </div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap">
-          <button type="button" data-mode="individual" style="font-weight:900;${state.selectionMode==='individual'?'background:#174c31;color:#fff;':''}">INDIVIDUAL</button>
-          <button type="button" data-mode="machine" style="font-weight:900;${state.selectionMode==='machine'?'background:#174c31;color:#fff;':''}">MAQUINADA</button>
-          <button type="button" data-action="move">MOVE SELECTION</button>
+        <div><b>SHIFT BLOCK</b><span>Column ${state.column} · Range ${from}-${to} · ${count} plots</span></div>
+        <div class="fb-shift-gesture-actions">
           <button type="button" data-action="cancel">CANCEL</button>
+          <button type="button" data-action="help">DRAG BLOCK ↕</button>
         </div>`;
       document.body.appendChild(bar);
-      bar.querySelector('[data-mode="individual"]').onclick = () => {
-        state.selectionMode = "individual";
-        markSelection(); showSelectionBar();
-      };
-      bar.querySelector('[data-mode="machine"]').onclick = () => {
-        state.selectionMode = "machine";
-        markSelection(); showSelectionBar();
-      };
       bar.querySelector('[data-action="cancel"]').onclick = clearGesture;
-      bar.querySelector('[data-action="move"]').onclick = () => {
-        state.mode = "selected";
-        alert("Arrastrá verticalmente cualquiera de las parcelas seleccionadas. El movimiento se ajusta a Ranges completos.");
+      bar.querySelector('[data-action="help"]').onclick = () => {
+        alert("Drag any selected plot vertically. The movement snaps to complete Ranges. Release to preview and confirm the Shift Block.");
       };
     }
 
     function openConfirm() {
       if (!state.offset) { state.mode = "selected"; showSelectionBar(); return; }
       const info = previewOffset(state.offset);
-      const b = bounds();
-      const selected = selectedPlots();
-      const columns = selectedColumns();
+      const { from, to } = selectedBounds();
       document.getElementById("fieldBookShiftGestureConfirm")?.remove();
       const overlay = document.createElement("div");
       overlay.id = "fieldBookShiftGestureConfirm";
       overlay.className = "fb-shift-confirm-overlay";
-      const rangeFrom = Math.min(...selected.map(rangeOf));
-      const rangeTo = Math.max(...selected.map(rangeOf));
+      const destinationFrom = from + state.offset;
+      const destinationTo = to + state.offset;
       overlay.innerHTML = `<div class="fb-shift-confirm-card">
         <span class="section-label">SHIFT BLOCK · PREVIEW</span>
-        <h3>${state.selectionMode === "individual" ? "Individual" : "Maquinada"}</h3>
+        <h3>Column ${state.column}</h3>
         <div class="fb-shift-confirm-grid">
-          <span>Columns</span><b>${columns.length===1 ? columns[0] : `${columns[0]}-${columns[columns.length-1]}`}</b>
-          <span>Selected ranges</span><b>${rangeFrom}-${rangeTo}</b>
+          <span>Selected ranges</span><b>${from}-${to}</b>
           <span>Movement</span><b>${state.offset > 0 ? "+" : ""}${state.offset}</b>
-          <span>Actual position</span><b>${rangeFrom + state.offset}-${rangeTo + state.offset}</b>
-          <span>Plots shifted</span><b>${selected.length}</b>
+          <span>Actual position</span><b>${destinationFrom}-${destinationTo}</b>
+          <span>Plots shifted</span><b>${selectedPlots().length}</b>
           <span>Overlaps</span><b class="${info.overlaps ? 'is-warning' : ''}">${info.overlaps}</b>
           <span>Outside layout</span><b class="${info.outside ? 'is-danger' : ''}">${info.outside}</b>
         </div>
-        <p>La maquinada se guarda como un Shift Block por cada Column seleccionada para mantener compatibilidad con SharePoint.</p>
+        <p>Overlap and outside-layout positions are allowed and remain traceable. Existing destination plots are never deleted.</p>
         <textarea id="fieldBookShiftGestureComment" rows="3" placeholder="Shift comment..."></textarea>
         <div class="fb-shift-confirm-actions"><button data-action="back">BACK</button><button data-action="confirm">CONFIRM SHIFT</button></div>
       </div>`;
@@ -763,31 +726,26 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         const btn = event.currentTarget;
         btn.disabled = true; btn.textContent = "SAVING...";
         const comment = overlay.querySelector("#fieldBookShiftGestureComment").value.trim();
-        const timestamp = Date.now();
-        const shifts = columns.map((column, index) => {
-          const rangesInColumn = selected.filter(el => columnOf(el) === column).map(rangeOf);
-          return {
-            id: `shift-${timestamp}-${index}`,
-            column: Number(column),
-            startRange: Math.min(...rangesInColumn),
-            endRange: Math.max(...rangesInColumn),
-            offset: Number(state.offset),
-            comment,
-            selectionMode: state.selectionMode,
-            createdAt: new Date().toISOString()
-          };
-        });
-        guardarBlockShifts(aoiId, [...leerBlockShifts(aoiId), ...shifts]);
+        const shift = {
+          id: `shift-${Date.now()}`,
+          column: Number(state.column),
+          startRange: from,
+          endRange: to,
+          offset: Number(state.offset),
+          comment,
+          createdAt: new Date().toISOString()
+        };
+        const shifts = leerBlockShifts(aoiId);
+        shifts.push(shift);
+        guardarBlockShifts(aoiId, shifts);
         try {
-          await Promise.all(shifts.map(shift => guardarBlockShiftRemoto(aoiId, shift)));
-          const reopen = shifts[0];
+          await guardarBlockShiftRemoto(aoiId, shift);
           overlay.remove(); clearGesture();
-          reabrirFieldMapEnPlot(aoiId, reopen.startRange, reopen.column);
+          reabrirFieldMapEnPlot(aoiId, from, state.column || shift.column);
         } catch (error) {
           console.error(error);
-          const reopen = shifts[0];
           overlay.remove(); clearGesture();
-          reabrirFieldMapEnPlot(aoiId, reopen.startRange, reopen.column);
+          reabrirFieldMapEnPlot(aoiId, from, shift.column);
           alert(`Shift guardado localmente, pendiente de sincronización: ${error.message}`);
         }
       };
@@ -796,12 +754,14 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     function beginSelection(el, event) {
       state.mode = "selecting";
       state.pointerId = event.pointerId;
-      state.startRange = state.endRange = rangeOf(el);
-      state.startColumn = state.endColumn = columnOf(el);
+      state.column = columnOf(el);
+      state.startRange = rangeOf(el);
+      state.endRange = state.startRange;
       state.startY = event.clientY;
-      state.startX = event.clientX;
+      state.moved = true;
       markSelection();
-      try { el.setPointerCapture?.(event.pointerId); } catch (_) {}
+      state.suppressClickUntil = Date.now() + 700;
+      navigator.vibrate?.(18);
     }
 
     plots.forEach(el => {
@@ -809,24 +769,28 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         if (Date.now() < state.suppressClickUntil || state.mode === "selected" || state.mode === "moving") {
           event.preventDefault(); event.stopImmediatePropagation();
         }
-      }, { capture:true });
+      }, true);
+
       el.addEventListener("pointerdown", event => {
+        if (event.button != null && event.button !== 0) return;
         if (state.mode === "selected" && el.classList.contains("fb-shift-selected")) {
-          document.getElementById("fieldBookShiftGestureBar")?.remove();
           state.mode = "moving";
           state.pointerId = event.pointerId;
           state.startY = event.clientY;
+          state.offset = 0;
+          state.suppressClickUntil = Date.now() + 900;
           event.preventDefault();
           return;
         }
         if (state.mode !== "idle") return;
         state.pointerId = event.pointerId;
         state.startY = event.clientY;
-        state.startX = event.clientX;
+        state.moved = false;
         if (event.pointerType === "mouse") {
-          state.startRange = state.endRange = rangeOf(el);
-          state.startColumn = state.endColumn = columnOf(el);
+          // Mouse: selection starts as soon as the pointer is dragged.
+          state.column = columnOf(el); state.startRange = rangeOf(el); state.endRange = state.startRange;
         } else {
+          // Touch/pen: long press prevents accidental selection while scrolling.
           state.longPressTimer = setTimeout(() => beginSelection(el, event), 420);
         }
       });
@@ -834,50 +798,76 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
     document.addEventListener("pointermove", event => {
       if (state.pointerId !== event.pointerId) return;
-      if (state.mode === "idle" && event.pointerType === "mouse" && state.startColumn != null) {
-        if (Math.hypot(event.clientX-state.startX, event.clientY-state.startY) > 5) {
-          const original = plots.find(p => columnOf(p)===Number(state.startColumn) && rangeOf(p)===Number(state.startRange));
+      if (state.mode === "idle" && event.pointerType === "mouse" && state.column != null) {
+        if (Math.abs(event.clientY - state.startY) > 5) {
+          const original = plots.find(p => columnOf(p)===Number(state.column) && rangeOf(p)===Number(state.startRange));
           if (original) beginSelection(original, event);
         }
       }
       if (state.mode === "selecting") {
         event.preventDefault();
-        updateSelection(plotAtPoint(event.clientX, event.clientY));
+        const target = plotAtPoint(event.clientX, event.clientY);
+        updateSelection(target);
         return;
       }
       if (state.mode === "moving") {
         event.preventDefault();
         const sample = selectedPlots()[0];
         const cellStep = Math.max(31, (sample?.getBoundingClientRect().height || 34) + 3);
-        previewOffset(-Math.round((event.clientY - state.startY) / cellStep));
+        // Range values increase upward on the rendered map.
+        const offset = -Math.round((event.clientY - state.startY) / cellStep);
+        previewOffset(offset);
       }
-    }, { passive:false });
+    }, { passive: false });
 
     document.addEventListener("pointerup", event => {
       if (state.pointerId !== event.pointerId) return;
       clearTimeout(state.longPressTimer); state.longPressTimer = null;
       if (state.mode === "selecting") {
-        state.mode = "selected"; state.pointerId = null; state.suppressClickUntil = Date.now()+700;
-        showSelectionBar(); return;
+        state.mode = "selected";
+        state.pointerId = null;
+        state.suppressClickUntil = Date.now() + 700;
+        showSelectionBar();
+        return;
       }
       if (state.mode === "moving") {
-        state.pointerId = null; state.suppressClickUntil = Date.now()+700;
-        openConfirm(); return;
+        state.pointerId = null;
+        state.suppressClickUntil = Date.now() + 700;
+        openConfirm();
+        return;
       }
+      // Tap without drag/long press remains a normal plot click.
       state.pointerId = null;
-      state.startRange = state.endRange = state.startColumn = state.endColumn = null;
+      state.column = null; state.startRange = null; state.endRange = null;
     });
 
     document.addEventListener("pointercancel", event => {
       if (state.pointerId !== event.pointerId) return;
       clearTimeout(state.longPressTimer); state.longPressTimer = null;
       if (state.mode === "selecting" || state.mode === "moving") clearGesture();
-      else {
-        state.pointerId = null;
-        state.startRange = state.endRange = state.startColumn = state.endColumn = null;
-      }
+      else { state.pointerId=null; state.column=null; state.startRange=null; state.endRange=null; }
     });
   }
+
+  const checklistTemplate = [
+    { id:"PRE_COORD", section:"Antes de sembrar", label:"Coordenadas verificadas" },
+    { id:"PRE_MAP", section:"Antes de sembrar", label:"Plano de localidad disponible" },
+    { id:"PRE_DIM", section:"Antes de sembrar", label:"Largo y ancho verificados" },
+    { id:"PRE_LOT", section:"Antes de sembrar", label:"Lote / cuadra confirmados" },
+    { id:"PRE_EPP", section:"Antes de sembrar", label:"EPP completo" },
+    { id:"PRE_STAKES", section:"Antes de sembrar", label:"Estacas colocadas" },
+    { id:"CFG_SLIP", section:"Configuración", label:"Patinamiento de sembradora controlado" },
+    { id:"CFG_FERT", section:"Configuración", label:"Estado y dosis de fertilizante verificados" },
+    { id:"CFG_SENSOR", section:"Configuración", label:"Sensores verificados" },
+    { id:"CFG_DENS", section:"Configuración", label:"Densidad por configuración verificada" },
+    { id:"CFG_SPLIT", section:"Configuración", label:"Splitter / bloqueo verificado" },
+    { id:"CFG_DEPTH", section:"Configuración", label:"Profundidad de siembra verificada" },
+    { id:"CLS_STREETS", section:"Ejecución y cierre", label:"Calles verificadas" },
+    { id:"CLS_FLAGS", section:"Ejecución y cierre", label:"Banderas y carteles colocados" },
+    { id:"CLS_LAYOUT", section:"Ejecución y cierre", label:"Plano final revisado" },
+    { id:"CLS_ISSUES", section:"Ejecución y cierre", label:"Incidencias registradas" }
+  ];
+
   function claveChecklistStorage(aoiId) { return `fieldBookLabChecklist:${aoiId}`; }
   function leerChecklist(aoiId) {
     try { return JSON.parse(localStorage.getItem(claveChecklistStorage(aoiId)) || "{}"); }
@@ -1341,7 +1331,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
           });
         });
       });
-      // Shift Block gestual: selección y desplazamiento vertical limitado a una sola Column.
+      // Shift Block gestual estable: selección y desplazamiento vertical limitado a una sola Column.
       habilitarShiftGestual(aoiId, layout, porCoord);
       return;
     }
@@ -1574,9 +1564,6 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     try {
       await cargarLayoutsDesdeSharePoint();
       completarSelectorAoi();
-      // Fuerza el placeholder tras cada carga. Evita que el navegador restaure
-      // visualmente un AOI sin disparar el evento change.
-      selectorAoi.value = "";
       selectorAoi.disabled = false;
 
       if (!Object.keys(layoutsEmbebidos).length) {
@@ -1596,8 +1583,11 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     }
   }
 
-  function seleccionarAoiActual() {
-      const aoiId = String(selectorAoi.value || "").trim();
+  selectorAoi.addEventListener(
+    "change",
+    function () {
+      const aoiId =
+        selectorAoi.value;
 
       if (!aoiId) {
         contenido.innerHTML = `
@@ -1621,10 +1611,9 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       renderizarAoi(
         aoiId
       );
-  }
+    }
+  );
 
-  selectorAoi.onchange = seleccionarAoiActual;
-  selectorAoi.oninput = seleccionarAoiActual;
 
   iniciarFieldBookData();
 
