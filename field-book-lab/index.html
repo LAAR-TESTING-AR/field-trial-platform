@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Field Book | Field Trial Platform</title>
-  <link rel="stylesheet" href="field-book.css?v=20">
+  <link rel="stylesheet" href="field-book.css?v=30">
 </head>
 <body>
   <header class="lab-header">
@@ -76,17 +76,22 @@
         <p>Revisá la última página y completá el Field Book cuando corresponda.</p>
         <button id="fieldBookReturnToAoi" type="button">VOLVER A AOI</button>`;
       shell.appendChild(closePage);
-      closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", returnToAoiSelector);
+      closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", () => {
+        const selector = document.getElementById("fieldBookAoi");
+        selector.value = "";
+        selector.dispatchEvent(new Event("change", { bubbles: true }));
+        document.body.classList.remove("field-book-book-open", "field-book-module-open");
+        document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
+      });
       return closePage;
     }
 
     function arrangeCover(home) {
-      if (!home) return;
-      const grid=home.querySelector(".field-book-module-grid"); if(!grid)return;
-      const active=[...home.querySelectorAll("div")].find(el => /ACTIVE FIELD BOOK/i.test(el.textContent||"") && !el.classList.contains("field-book-module-grid"));
-      if(active){ active.classList.add("fb-active-field-book-card"); if(active.nextElementSibling!==grid) grid.parentElement.insertBefore(active,grid); }
+      if(!home)return; const grid=home.querySelector(".field-book-module-grid"); if(!grid)return;
+      const direct=[...home.children];
+      const active=direct.find(el=>/ACTIVE FIELD BOOK/i.test(el.textContent||""));
+      if(active){active.classList.add("fb-active-field-book-card"); active.parentElement.insertBefore(active,grid);}
     }
-
     function decorateCoverCards(home) {
       if (!home || home.dataset.visualCards === "1") return;
       home.dataset.visualCards = "1";
@@ -108,16 +113,13 @@
     }
 
     function isFieldBookStarted() { return !document.getElementById("fieldBookStartVisit"); }
-
     function returnToAoiSelector() {
-      const selector = document.getElementById("fieldBookAoi");
-      currentPage = 0;
-      if (selector) { selector.value = ""; selector.dispatchEvent(new Event("change", { bubbles:true })); }
-      document.body.classList.remove("field-book-book-open", "field-book-module-open");
+      const selector=document.getElementById("fieldBookAoi"); currentPage=0;
+      if(selector){selector.value="";selector.dispatchEvent(new Event("change",{bubbles:true}));}
+      document.body.classList.remove("field-book-book-open","field-book-module-open");
       document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
       window.scrollTo({top:0,behavior:"smooth"});
     }
-
     function ensureBook() {
       const content = document.getElementById("fieldBookContent");
       const shell = content?.firstElementChild;
@@ -141,14 +143,14 @@
         <button class="fb-page-curl fb-page-curl-right" type="button" aria-label="Página siguiente">
           <span>›</span><small>NEXT</small>
         </button>
-        <button class="fb-change-aoi" type="button" aria-label="Cambiar AOI" title="Cambiar AOI">↩ AOI</button>
-        <div class="fb-book-top-title">
+        <button class="fb-change-aoi" type="button" aria-label="Cambiar AOI">↩ AOI</button>
+          <div class="fb-book-top-title">
           <span id="fbBookTopTitle">FIELD BOOK</span>
           <strong id="fbBookTopAoi"></strong>
         </div>
         <div class="fb-book-page-meta">
-          <span id="fbBookPageLabel">COVER</span>
-          <b id="fbBookPageNumber">0 / 4</b>
+          <span id="fbBookPageLabel"></span>
+          <b id="fbBookPageNumber"></b>
         </div>`;
       shell.appendChild(chrome);
       makeClosePage(shell);
@@ -190,18 +192,16 @@
       const shell = document.querySelector(".fb-book-shell");
       if (!shell) return;
       shell.dataset.page = pages[currentPage].key;
-      shell.querySelector("#fbBookPageLabel").textContent = pages[currentPage].label;
-      shell.querySelector("#fbBookPageNumber").textContent = currentPage === 0 ? "COVER" : currentPage === 5 ? "END" : `${currentPage} / 4`;
+      shell.querySelector("#fbBookPageLabel").textContent = currentPage === 0 ? "" : pages[currentPage].label;
+      shell.querySelector("#fbBookPageNumber").textContent = currentPage === 0 ? "" : currentPage === 5 ? "END" : `${currentPage} / 4`;
       const topTitle = shell.querySelector("#fbBookTopTitle");
       const topAoi = shell.querySelector("#fbBookTopAoi");
       if (topTitle) topTitle.textContent = pages[currentPage].label;
       if (topAoi) topAoi.textContent = document.getElementById("fieldBookAoi")?.value || "";
-      const prevBtn=shell.querySelector(".fb-page-curl-left"), nextBtn=shell.querySelector(".fb-page-curl-right");
+      const prevBtn=shell.querySelector(".fb-page-curl-left"),nextBtn=shell.querySelector(".fb-page-curl-right");
       prevBtn.disabled=currentPage===0;
-      const started=isFieldBookStarted();
-      nextBtn.disabled=currentPage===pages.length-1 || (currentPage===1 && !started);
-      nextBtn.title=(currentPage===1 && !started)?"Iniciá Field Book para habilitar páginas 2–4":"Página siguiente";
-      shell.classList.toggle("fb-book-not-started",currentPage===1 && !started);
+      nextBtn.disabled=currentPage===pages.length-1 || (currentPage===1 && !isFieldBookStarted());
+      shell.classList.toggle("fb-book-not-started", currentPage===1 && !isFieldBookStarted());
     }
 
     function animateTurn(direction, callback) {
