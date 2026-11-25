@@ -367,3 +367,107 @@ body.field-book-book-open #fieldBookIssuesView { font-size:15px; }
   body.field-book-book-open .fb-book-shell { padding-top:70px !important; }
   .fb-page-curl { width:64px;height:64px; }
 }
+
+/* v6 - definitive cover contrast and true page header safe zone */
+
+/* COVER: do not recolor the whole legacy home to white. Repaint the light cards explicitly. */
+.fb-book-shell[data-page="cover"] .fb-book-cover {
+  color:#fff !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child {
+  color:#26352d !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child {
+  background:#f8fbf9 !important;
+  color:#26352d !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child .section-label,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child h2,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child strong,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child b {
+  color:#174c31 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child p,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child span:not(.section-label) {
+  color:#5f7167 !important;
+}
+.fb-book-shell[data-page="cover"] .field-book-module-card {
+  background:#fff !important;
+  color:#26352d !important;
+}
+.fb-book-shell[data-page="cover"] .field-book-module-card h3,
+.fb-book-shell[data-page="cover"] .field-book-module-card strong,
+.fb-book-shell[data-page="cover"] .field-book-module-card b {
+  color:#174c31 !important;
+}
+.fb-book-shell[data-page="cover"] .field-book-module-card p,
+.fb-book-shell[data-page="cover"] .field-book-module-card span:not([style*="background"]) {
+  color:#5f7167 !important;
+}
+
+/* INTERIOR PAGES: create a real header strip owned only by the book navigation. */
+.fb-book-shell:not([data-page="cover"]) {
+  padding:112px 22px 54px !important;
+}
+.fb-book-shell:not([data-page="cover"])::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:94px;
+  z-index:70;
+  background:linear-gradient(180deg,#fffef9 0%,#fbfaf4 100%);
+  border-bottom:1px solid #ded9c9;
+  pointer-events:none;
+}
+.fb-book-shell:not([data-page="cover"]) .fb-page-curl {
+  top:0;
+  z-index:130;
+}
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView,
+.fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView,
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView,
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView {
+  position:relative;
+  z-index:4;
+  padding-top:0 !important;
+  margin-top:0 !important;
+}
+
+/* Prevent any page title/card from drifting under the two folded corners. */
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView > :first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > :first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView > :first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView > :first-child {
+  margin-top:0 !important;
+}
+
+/* Fix remaining legacy white typography inside light interior content. */
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView *,
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView *,
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView * {
+  text-shadow:none !important;
+}
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView [style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView [style*="color: #fff"],
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView [style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView [style*="color: #fff"],
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView [style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView [style*="color: #fff"] {
+  color:#174c31 !important;
+}
+
+/* Preserve semantic white text only when the element itself has a dark/colored background. */
+.fb-book-shell:not([data-page="cover"]) [style*="background:#174c31"][style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) [style*="background:#0b6b3a"][style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) [style*="background:#9b2f2f"][style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) [style*="background:#d8a72b"][style*="color:#fff"],
+.fb-book-shell:not([data-page="cover"]) [style*="background:#66736b"][style*="color:#fff"] {
+  color:#fff !important;
+}
+
+@media (max-width:700px) {
+  .fb-book-shell:not([data-page="cover"]) { padding:86px 8px 48px !important; }
+  .fb-book-shell:not([data-page="cover"])::before { height:72px; }
+}
