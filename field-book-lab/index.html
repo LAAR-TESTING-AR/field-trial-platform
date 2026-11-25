@@ -39,7 +39,7 @@
   </main>
 
   <script src="data/settings/field-book-settings-data.js"></script>
-  <script src="field-book.js?v=12"></script>
+  <script src="field-book.js?v=13"></script>
   <script>
   (() => {
     const pages = [
@@ -79,7 +79,7 @@
       closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", () => {
         const selector = document.getElementById("fieldBookAoi");
         selector.value = "";
-        window.dispatchEvent(new Event("fieldbook:show-library"));
+        selector.dispatchEvent(new Event("change", { bubbles: true }));
         document.body.classList.remove("field-book-book-open", "field-book-module-open");
         document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
       });
@@ -114,11 +114,12 @@
 
     function isFieldBookStarted() { return !document.getElementById("fieldBookStartVisit"); }
     function returnToAoiSelector() {
-      const selector=document.getElementById("fieldBookAoi"); currentPage=0;
-      if(selector){selector.value="";selector.dispatchEvent(new Event("change",{bubbles:true}));}
-      document.body.classList.remove("field-book-book-open","field-book-module-open");
-      document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
-      window.scrollTo({top:0,behavior:"smooth"});
+      currentPage = 0;
+      document.body.classList.remove("field-book-book-open", "field-book-module-open");
+      const selector = document.getElementById("fieldBookAoi");
+      if (selector) selector.value = "";
+      window.dispatchEvent(new CustomEvent("fieldbook:show-library", { detail: { source: "book" } }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     function ensureBook() {
       const content = document.getElementById("fieldBookContent");
