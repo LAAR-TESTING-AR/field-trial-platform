@@ -12,23 +12,26 @@
   </header>
 
   <main class="field-book-app">
-    <section class="field-book-header">
-      <div>
-        <span class="section-label">FIELD TRIAL PLATFORM</span>
-        <h1>Field Book</h1>
-        <p>Planting execution &amp; trial layout</p>
+    <section class="fb-library-landing" id="fieldBookLanding">
+      <div class="fb-closed-book">
+        <div class="fb-closed-book-spine"></div>
+        <div class="fb-closed-book-content">
+          <span class="section-label">FIELD TRIAL PLATFORM</span>
+          <h1>Field Book</h1>
+          <p>Planting execution &amp; trial layout</p>
+          <div class="fb-cover-selector">
+            <label for="fieldBookAoi">Elegí la AOI para abrir el libro</label>
+            <select id="fieldBookAoi">
+              <option value="">Cargando AOI desde SharePoint...</option>
+            </select>
+          </div>
+          <div class="fb-cover-hint">Seleccioná una AOI para abrir su Field Book</div>
+        </div>
       </div>
     </section>
 
-    <section class="field-book-selector">
-      <label for="fieldBookAoi">AOI</label>
-      <select id="fieldBookAoi">
-        <option value="">Cargando AOI desde SharePoint...</option>
-      </select>
-    </section>
-
     <section id="fieldBookContent" class="field-book-content">
-      <div class="empty-state">
+      <div class="empty-state fb-hidden-initial">
         <strong>Field Book</strong>
         <span>Seleccioná una AOI para abrir el libro.</span>
       </div>
@@ -78,6 +81,7 @@
         selector.value = "";
         selector.dispatchEvent(new Event("change", { bubbles: true }));
         document.body.classList.remove("field-book-book-open", "field-book-module-open");
+        document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
       });
       return closePage;
     }
@@ -89,7 +93,11 @@
       if (!shell || !home || shell.dataset.bookReady === "1") return;
 
       shell.dataset.bookReady = "1";
+      document.getElementById("fieldBookLanding")?.classList.add("is-hidden");
       shell.classList.add("fb-book-shell");
+      // La navegación del libro reemplaza al toolbar heredado (FIELD BOOK / ONLINE).
+      const legacyToolbar = document.getElementById("fieldBookModuleToolbar");
+      if (legacyToolbar) legacyToolbar.style.display = "none";
       home.classList.add("fb-book-cover");
       document.body.classList.add("field-book-book-open");
 
@@ -148,6 +156,8 @@
       shell.querySelector("#fbBookPageNumber").textContent = currentPage === 0 ? "COVER" : currentPage === 5 ? "END" : `${currentPage} / 4`;
       shell.querySelector(".fb-page-curl-left").disabled = currentPage === 0;
       shell.querySelector(".fb-page-curl-right").disabled = currentPage === pages.length - 1;
+      const legacyToolbar = document.getElementById("fieldBookModuleToolbar");
+      if (legacyToolbar) legacyToolbar.style.display = "none";
     }
 
     function animateTurn(direction, callback) {
