@@ -155,3 +155,119 @@ body.field-book-module-open #fieldBookOverviewView { font-size:14px; }
 .fb-book-shell[data-page="issues"] #fieldBookIssuesView {
   margin: 0;
 }
+
+/* v3 - closed-book AOI landing. No oversized empty workspace before AOI selection. */
+.fb-library-landing {
+  min-height: calc(100vh - 92px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 34px 18px;
+}
+.fb-library-landing.is-hidden { display:none !important; }
+.fb-closed-book {
+  position: relative;
+  width: min(760px, 92vw);
+  min-height: 430px;
+  display: flex;
+  align-items: stretch;
+  border-radius: 8px 20px 20px 8px;
+  background: linear-gradient(145deg,#174c31 0%,#0b6b3a 72%,#07552e 100%);
+  color:#fff;
+  box-shadow:0 28px 60px rgba(23,48,34,.26), inset -2px 0 0 rgba(255,255,255,.16), inset 20px 0 34px rgba(0,0,0,.12);
+  overflow:hidden;
+}
+.fb-closed-book::after {
+  content:"";
+  position:absolute;
+  right:0;
+  top:0;
+  width:82px;
+  height:82px;
+  background:linear-gradient(225deg,#f5f1e4 0 48%,rgba(255,255,255,.10) 49% 100%);
+  clip-path:polygon(0 0,100% 0,100% 100%);
+  filter:drop-shadow(-5px 6px 5px rgba(0,0,0,.13));
+}
+.fb-closed-book-spine {
+  flex:0 0 38px;
+  background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(255,255,255,.05),rgba(0,0,0,.08));
+  box-shadow:8px 0 18px rgba(0,0,0,.12);
+}
+.fb-closed-book-content {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:54px 54px 48px;
+  text-align:center;
+}
+.fb-closed-book .section-label { color:#ccebd8;font-size:13px;letter-spacing:1.5px; }
+.fb-closed-book h1 { margin:7px 0 5px;font-size:48px;line-height:1;color:#fff;letter-spacing:-1px; }
+.fb-closed-book p { margin:6px 0 28px;color:rgba(255,255,255,.80);font-size:17px; }
+.fb-cover-selector {
+  width:min(560px,100%);
+  padding:14px;
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:14px;
+  background:rgba(255,255,255,.10);
+  backdrop-filter:blur(5px);
+}
+.fb-cover-selector label { display:block;margin-bottom:8px;color:#e8f5ed;font-size:13px;font-weight:900; }
+.fb-cover-selector select {
+  width:100%;
+  min-height:52px;
+  padding:11px 13px;
+  border:1px solid rgba(255,255,255,.72);
+  border-radius:10px;
+  background:#fff;
+  color:#174c31;
+  font-size:16px;
+  font-weight:850;
+}
+.fb-cover-hint { margin-top:15px;color:rgba(255,255,255,.72);font-size:12px;font-weight:750; }
+body:not(.field-book-book-open) #fieldBookContent { min-height:0; }
+body:not(.field-book-book-open) #fieldBookContent > .fb-hidden-initial { display:none !important; }
+body:not(.field-book-book-open) .field-book-app { padding:0; }
+
+@media (max-width:700px) {
+  .fb-library-landing { min-height:calc(100vh - 70px);padding:18px 10px; }
+  .fb-closed-book { min-height:390px;width:96vw; }
+  .fb-closed-book-spine { flex-basis:24px; }
+  .fb-closed-book-content { padding:42px 20px 34px; }
+  .fb-closed-book h1 { font-size:38px; }
+  .fb-closed-book p { font-size:15px; }
+}
+
+/* v4 - book chrome owns navigation; legacy toolbar stays hidden */
+body.field-book-book-open #fieldBookModuleToolbar {
+  display: none !important;
+}
+
+/* Keep page content clear of the folded corners. */
+.fb-book-shell {
+  padding-top: 72px !important;
+}
+.fb-page-curl {
+  width: 76px;
+  height: 76px;
+}
+.fb-page-curl-left span,
+.fb-page-curl-left small { left: 16px; }
+.fb-page-curl-right span,
+.fb-page-curl-right small { right: 16px; }
+
+/* Move global sync controls away from the top-right visual fold region. */
+body.field-book-book-open .lab-header {
+  padding-left: 24px;
+  padding-right: 104px;
+}
+body.field-book-book-open .field-book-sync-controls {
+  margin-right: 8px;
+}
+
+@media (max-width:700px) {
+  .fb-book-shell { padding-top:62px !important; }
+  body.field-book-book-open .lab-header { padding-right:76px; }
+  .fb-page-curl { width:62px;height:62px; }
+}
