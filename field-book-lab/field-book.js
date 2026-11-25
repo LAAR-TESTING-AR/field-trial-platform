@@ -354,6 +354,8 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     function openBook(aoiId) {
       library.style.display = "none";
       if (landing) landing.style.display = "none";
+      const content=document.getElementById("fieldBookContent");
+      if (content) content.style.removeProperty("display");
       selectorAoi.value = aoiId;
       selectorAoi.dispatchEvent(new Event("change", { bubbles:true }));
     }
@@ -384,7 +386,15 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       library.querySelectorAll("[data-select-aoi]").forEach(box => box.addEventListener("change",()=>{box.checked?selectedAois.add(box.dataset.selectAoi):selectedAois.delete(box.dataset.selectAoi);render();}));
       library.querySelector("#fbSelectAll")?.addEventListener("click",()=>{const allSelected=visibleBooks.every(book=>selectedAois.has(book.aoiId));visibleBooks.forEach(book=>allSelected?selectedAois.delete(book.aoiId):selectedAois.add(book.aoiId));render();});
     }
-    window.addEventListener("fieldbook:show-library",()=>{library.style.display="block";if(landing)landing.style.display="none";});
+    window.addEventListener("fieldbook:show-library",()=>{
+      document.body.classList.remove("field-book-book-open", "field-book-module-open");
+      if (landing) { landing.style.display="none"; landing.classList.add("is-hidden"); }
+      const content=document.getElementById("fieldBookContent");
+      if (content) content.style.display="none";
+      selectorAoi.value="";
+      library.style.display="block";
+      library.scrollIntoView({block:"start",behavior:"smooth"});
+    });
     render();
   }
 
