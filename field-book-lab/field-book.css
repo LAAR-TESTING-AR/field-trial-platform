@@ -407,3 +407,153 @@ body.field-book-book-open .section-label { font-size:12px; }
   .fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > div:first-child,
   .fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > section:first-child > div:first-child { padding-left:56px!important;padding-right:56px!important; }
 }
+
+
+/* =========================================================
+   BOOK v10 - DEFINITIVE PAGE SAFE ZONES + VISUAL COVER
+   Built directly over field-book.css_v5 current production file.
+   ========================================================= */
+
+/* The book corners are the only navigation chrome. */
+body.field-book-book-open #fieldBookModuleToolbar { display:none !important; }
+.fb-page-curl { width:64px !important; height:64px !important; z-index:150 !important; }
+.fb-page-curl::before { width:64px !important; height:64px !important; }
+.fb-page-curl span { top:8px !important; font-size:23px !important; }
+.fb-page-curl small { top:37px !important; font-size:8px !important; }
+.fb-page-curl-left span,.fb-page-curl-left small { left:13px !important; }
+.fb-page-curl-right span,.fb-page-curl-right small { right:13px !important; }
+
+/* Centered book title is safely inside both corners. */
+.fb-book-top-title {
+  left:140px !important;
+  right:140px !important;
+  top:10px !important;
+  min-height:48px !important;
+}
+.fb-book-top-title span { font-size:11px !important; }
+.fb-book-top-title strong { font-size:20px !important; }
+
+/* All four content pages get the SAME horizontal safe zone.
+   This fixes Overview + Checklist + Issues, not only Field Map. */
+.fb-book-shell:not([data-page="cover"]) .fb-book-page-view {
+  position:relative !important;
+  z-index:2 !important;
+  box-sizing:border-box !important;
+}
+.fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+.fb-book-shell[data-page="checklist"] #fieldBookChecklistView,
+.fb-book-shell[data-page="issues"] #fieldBookIssuesView {
+  padding-left:105px !important;
+  padding-right:105px !important;
+}
+/* Field Map keeps the map full width; only its top information row is protected. */
+.fb-book-shell[data-page="layout"] #fieldBookLayoutView {
+  padding-left:0 !important;
+  padding-right:0 !important;
+}
+.fb-book-shell[data-page="layout"] #fieldBookLayoutView > :first-child {
+  margin-left:105px !important;
+  margin-right:105px !important;
+}
+
+/* Extra protection for legacy page headings that are generated inside first child. */
+.fb-book-shell[data-page="overview"] #fieldBookOverviewView > :first-child,
+.fb-book-shell[data-page="checklist"] #fieldBookChecklistView > :first-child,
+.fb-book-shell[data-page="issues"] #fieldBookIssuesView > :first-child {
+  max-width:calc(100% - 0px) !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+}
+
+/* COVER cards - image-first, 2x2, based on the user's reference. */
+.fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:18px !important;
+  width:min(1080px,100%) !important;
+  margin:24px auto 0 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card {
+  display:grid !important;
+  grid-template-columns:155px minmax(0,1fr) !important;
+  grid-template-rows:auto 1fr auto !important;
+  column-gap:18px !important;
+  min-height:190px !important;
+  padding:16px !important;
+  border-radius:18px !important;
+  background:#fff !important;
+  color:#26352d !important;
+  overflow:hidden !important;
+  text-align:left !important;
+  align-items:center !important;
+}
+.fb-cover-card-art {
+  grid-column:1 !important;
+  grid-row:1 / 4 !important;
+  width:155px !important;
+  height:155px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  overflow:hidden !important;
+  border-radius:15px !important;
+  background:linear-gradient(145deg,#f0f9e8,#e0f2d7) !important;
+}
+.fb-cover-card-art img {
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card h3 {
+  grid-column:2 !important;
+  margin:0 0 8px !important;
+  color:#174c31 !important;
+  font-size:25px !important;
+  line-height:1.05 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card p {
+  grid-column:2 !important;
+  margin:0 !important;
+  color:#536159 !important;
+  font-size:14px !important;
+  line-height:1.4 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card > strong:last-child {
+  grid-column:2 !important;
+  margin-top:12px !important;
+  color:#0b6b3a !important;
+  font-size:12px !important;
+}
+
+/* Fix legacy light cover block contrast. */
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child {
+  background:#f8fbf9 !important;
+  color:#26352d !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child .section-label,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child h2,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child strong {
+  color:#174c31 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child p,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child span:not(.section-label) {
+  color:#5f7167 !important;
+}
+
+@media (max-width:900px) {
+  .fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid { grid-template-columns:1fr !important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card { grid-template-columns:120px minmax(0,1fr) !important; min-height:155px !important; }
+  .fb-cover-card-art { width:120px !important; height:120px !important; }
+}
+@media (max-width:700px) {
+  .fb-book-top-title { left:76px !important; right:76px !important; }
+  .fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+  .fb-book-shell[data-page="checklist"] #fieldBookChecklistView,
+  .fb-book-shell[data-page="issues"] #fieldBookIssuesView { padding-left:58px !important; padding-right:58px !important; }
+  .fb-book-shell[data-page="layout"] #fieldBookLayoutView > :first-child { margin-left:58px !important; margin-right:58px !important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card { grid-template-columns:88px minmax(0,1fr) !important; min-height:125px !important; padding:10px !important; column-gap:10px !important; }
+  .fb-cover-card-art { width:88px !important; height:88px !important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card h3 { font-size:19px !important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card p { font-size:12px !important; }
+}
