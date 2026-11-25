@@ -95,9 +95,6 @@
       shell.dataset.bookReady = "1";
       document.getElementById("fieldBookLanding")?.classList.add("is-hidden");
       shell.classList.add("fb-book-shell");
-      // La navegación del libro reemplaza al toolbar heredado (FIELD BOOK / ONLINE).
-      const legacyToolbar = document.getElementById("fieldBookModuleToolbar");
-      if (legacyToolbar) legacyToolbar.style.display = "none";
       home.classList.add("fb-book-cover");
       document.body.classList.add("field-book-book-open");
 
@@ -110,6 +107,10 @@
         <button class="fb-page-curl fb-page-curl-right" type="button" aria-label="Página siguiente">
           <span>›</span><small>NEXT</small>
         </button>
+        <div class="fb-book-top-title">
+          <span id="fbBookTopTitle">FIELD BOOK</span>
+          <strong id="fbBookTopAoi"></strong>
+        </div>
         <div class="fb-book-page-meta">
           <span id="fbBookPageLabel">COVER</span>
           <b id="fbBookPageNumber">0 / 4</b>
@@ -131,8 +132,9 @@
         });
       });
 
-      currentPage = 0;
-      updateChrome(0);
+      // A re-render (for example after editing a Checklist card) keeps the current book page.
+      const requestedPage = document.body.classList.contains("field-book-book-open") ? currentPage : 0;
+      updateChrome(requestedPage);
     }
 
     function pageElements() {
@@ -154,10 +156,12 @@
       shell.dataset.page = pages[currentPage].key;
       shell.querySelector("#fbBookPageLabel").textContent = pages[currentPage].label;
       shell.querySelector("#fbBookPageNumber").textContent = currentPage === 0 ? "COVER" : currentPage === 5 ? "END" : `${currentPage} / 4`;
+      const topTitle = shell.querySelector("#fbBookTopTitle");
+      const topAoi = shell.querySelector("#fbBookTopAoi");
+      if (topTitle) topTitle.textContent = pages[currentPage].label;
+      if (topAoi) topAoi.textContent = document.getElementById("fieldBookAoi")?.value || "";
       shell.querySelector(".fb-page-curl-left").disabled = currentPage === 0;
       shell.querySelector(".fb-page-curl-right").disabled = currentPage === pages.length - 1;
-      const legacyToolbar = document.getElementById("fieldBookModuleToolbar");
-      if (legacyToolbar) legacyToolbar.style.display = "none";
     }
 
     function animateTurn(direction, callback) {
