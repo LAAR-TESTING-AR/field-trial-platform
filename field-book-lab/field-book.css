@@ -144,3 +144,14 @@ body.field-book-module-open #fieldBookOverviewView { font-size:14px; }
   .fb-shift-gesture-bar { align-items:stretch;flex-direction:column;bottom:10px; }
   .fb-shift-gesture-actions button { flex:1; }
 }
+
+/* v2: the green home/cover exists only on COVER, never behind interior pages */
+.fb-book-shell:not([data-page="cover"]) #fieldBookModuleHome,
+.fb-book-shell:not([data-page="cover"]) .fb-book-cover {
+  display: none !important;
+}
+.fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+.fb-book-shell[data-page="checklist"] #fieldBookChecklistView,
+.fb-book-shell[data-page="issues"] #fieldBookIssuesView {
+  margin: 0;
+}
