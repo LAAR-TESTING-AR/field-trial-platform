@@ -271,3 +271,99 @@ body.field-book-book-open .field-book-sync-controls {
   body.field-book-book-open .lab-header { padding-right:76px; }
   .fb-page-curl { width:62px;height:62px; }
 }
+
+/* v5 - readability + protected corner zones on every interior page */
+body.field-book-book-open .fb-book-shell {
+  --fb-corner-safe: 94px;
+  padding-top: 82px !important;
+}
+
+/* The folds own the top corners. Interior content must never render below them. */
+body.field-book-book-open .fb-book-shell > :not(.fb-book-chrome):not(.fb-book-close-page) {
+  position: relative;
+  z-index: 2;
+}
+body.field-book-book-open .fb-book-shell [id$="View"] > :first-child,
+body.field-book-book-open .fb-book-shell [id$="View"] > header:first-child,
+body.field-book-book-open .fb-book-shell [id$="View"] > section:first-child {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+
+/* Strong readable ink on white/light paper. Overrides legacy white inline labels from LAB. */
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) {
+  color:#26352d;
+}
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h1,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h2,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h3,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) strong,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) b {
+  color:#173f2b;
+}
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) p,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) span:not(.section-label):not(.field-book-sync-count) {
+  color:#536159;
+}
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) .section-label {
+  color:#0b6b3a !important;
+  font-size:13px !important;
+}
+
+/* Legacy blocks sometimes carry inline white color. Force readable text inside light cards only. */
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"],
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background: #fff"],
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#f"],
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:linear-gradient(135deg,#f"] {
+  color:#26352d !important;
+}
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] p,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] span,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#f7"] span,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#edf"] span {
+  color:#536159 !important;
+}
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] strong,
+body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] b {
+  color:#173f2b !important;
+}
+
+/* Page titles begin inside the safe area and remain clearly readable. */
+body.field-book-book-open #fieldBookOverviewView,
+body.field-book-book-open #fieldBookLayoutView,
+body.field-book-book-open #fieldBookChecklistView,
+body.field-book-book-open #fieldBookIssuesView {
+  padding-top: 12px;
+}
+body.field-book-book-open #fieldBookOverviewView > :first-child,
+body.field-book-book-open #fieldBookLayoutView > :first-child,
+body.field-book-book-open #fieldBookChecklistView > :first-child,
+body.field-book-book-open #fieldBookIssuesView > :first-child {
+  margin-top: 0 !important;
+}
+
+/* Keep corner navigation compact and visually above content. */
+.fb-page-curl {
+  z-index:120;
+  width:82px;
+  height:82px;
+}
+.fb-page-curl span { top:12px;font-size:26px; }
+.fb-page-curl small { top:45px;font-size:9px; }
+.fb-page-curl-left span,.fb-page-curl-left small { left:18px; }
+.fb-page-curl-right span,.fb-page-curl-right small { right:18px; }
+
+/* Larger UI typography across the book. */
+body.field-book-book-open .fb-book-shell button,
+body.field-book-book-open .fb-book-shell input,
+body.field-book-book-open .fb-book-shell textarea,
+body.field-book-book-open .fb-book-shell select { font-size:max(12px, .82rem); }
+body.field-book-book-open #fieldBookOverviewView,
+body.field-book-book-open #fieldBookLayoutView,
+body.field-book-book-open #fieldBookChecklistView,
+body.field-book-book-open #fieldBookIssuesView { font-size:15px; }
+
+@media (max-width:700px) {
+  body.field-book-book-open .fb-book-shell { padding-top:70px !important; }
+  .fb-page-curl { width:64px;height:64px; }
+}
