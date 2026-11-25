@@ -239,235 +239,88 @@ body:not(.field-book-book-open) .field-book-app { padding:0; }
   .fb-closed-book p { font-size:15px; }
 }
 
-/* v4 - book chrome owns navigation; legacy toolbar stays hidden */
-body.field-book-book-open #fieldBookModuleToolbar {
-  display: none !important;
-}
+/* BOOK v7: clean corner-only pagination. No top overlay bar. */
+body.field-book-book-open #fieldBookModuleToolbar { display:none !important; }
+.fb-book-shell { padding:74px 20px 52px !important; }
 
-/* Keep page content clear of the folded corners. */
-.fb-book-shell {
-  padding-top: 72px !important;
-}
-.fb-page-curl {
-  width: 76px;
-  height: 76px;
-}
-.fb-page-curl-left span,
-.fb-page-curl-left small { left: 16px; }
-.fb-page-curl-right span,
-.fb-page-curl-right small { right: 16px; }
+/* Only the triangular corners own navigation. */
+.fb-page-curl { top:0;width:66px;height:66px;z-index:140; }
+.fb-page-curl::before { width:66px;height:66px; }
+.fb-page-curl span { top:9px;font-size:24px; }
+.fb-page-curl small { top:39px;font-size:8px; }
+.fb-page-curl-left span,.fb-page-curl-left small { left:14px; }
+.fb-page-curl-right span,.fb-page-curl-right small { right:14px; }
 
-/* Move global sync controls away from the top-right visual fold region. */
-body.field-book-book-open .lab-header {
-  padding-left: 24px;
-  padding-right: 104px;
-}
-body.field-book-book-open .field-book-sync-controls {
-  margin-right: 8px;
-}
-
-@media (max-width:700px) {
-  .fb-book-shell { padding-top:62px !important; }
-  body.field-book-book-open .lab-header { padding-right:76px; }
-  .fb-page-curl { width:62px;height:62px; }
-}
-
-/* v5 - readability + protected corner zones on every interior page */
-body.field-book-book-open .fb-book-shell {
-  --fb-corner-safe: 94px;
-  padding-top: 82px !important;
-}
-
-/* The folds own the top corners. Interior content must never render below them. */
-body.field-book-book-open .fb-book-shell > :not(.fb-book-chrome):not(.fb-book-close-page) {
-  position: relative;
-  z-index: 2;
-}
-body.field-book-book-open .fb-book-shell [id$="View"] > :first-child,
-body.field-book-book-open .fb-book-shell [id$="View"] > header:first-child,
-body.field-book-book-open .fb-book-shell [id$="View"] > section:first-child {
-  margin-left: 8px;
-  margin-right: 8px;
-}
-
-/* Strong readable ink on white/light paper. Overrides legacy white inline labels from LAB. */
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) {
-  color:#26352d;
-}
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h1,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h2,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) h3,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) strong,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) b {
-  color:#173f2b;
-}
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) p,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) span:not(.section-label):not(.field-book-sync-count) {
-  color:#536159;
-}
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) .section-label {
-  color:#0b6b3a !important;
-  font-size:13px !important;
-}
-
-/* Legacy blocks sometimes carry inline white color. Force readable text inside light cards only. */
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"],
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background: #fff"],
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#f"],
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:linear-gradient(135deg,#f"] {
-  color:#26352d !important;
-}
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] p,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] span,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#f7"] span,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#edf"] span {
-  color:#536159 !important;
-}
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] strong,
-body.field-book-book-open .fb-book-shell:not([data-page="cover"]) [style*="background:#fff"] b {
-  color:#173f2b !important;
-}
-
-/* Page titles begin inside the safe area and remain clearly readable. */
-body.field-book-book-open #fieldBookOverviewView,
-body.field-book-book-open #fieldBookLayoutView,
-body.field-book-book-open #fieldBookChecklistView,
-body.field-book-book-open #fieldBookIssuesView {
-  padding-top: 12px;
-}
-body.field-book-book-open #fieldBookOverviewView > :first-child,
-body.field-book-book-open #fieldBookLayoutView > :first-child,
-body.field-book-book-open #fieldBookChecklistView > :first-child,
-body.field-book-book-open #fieldBookIssuesView > :first-child {
-  margin-top: 0 !important;
-}
-
-/* Keep corner navigation compact and visually above content. */
-.fb-page-curl {
-  z-index:120;
-  width:82px;
-  height:82px;
-}
-.fb-page-curl span { top:12px;font-size:26px; }
-.fb-page-curl small { top:45px;font-size:9px; }
-.fb-page-curl-left span,.fb-page-curl-left small { left:18px; }
-.fb-page-curl-right span,.fb-page-curl-right small { right:18px; }
-
-/* Larger UI typography across the book. */
-body.field-book-book-open .fb-book-shell button,
-body.field-book-book-open .fb-book-shell input,
-body.field-book-book-open .fb-book-shell textarea,
-body.field-book-book-open .fb-book-shell select { font-size:max(12px, .82rem); }
-body.field-book-book-open #fieldBookOverviewView,
-body.field-book-book-open #fieldBookLayoutView,
-body.field-book-book-open #fieldBookChecklistView,
-body.field-book-book-open #fieldBookIssuesView { font-size:15px; }
-
-@media (max-width:700px) {
-  body.field-book-book-open .fb-book-shell { padding-top:70px !important; }
-  .fb-page-curl { width:64px;height:64px; }
-}
-
-/* v6 - definitive cover contrast and true page header safe zone */
-
-/* COVER: do not recolor the whole legacy home to white. Repaint the light cards explicitly. */
-.fb-book-shell[data-page="cover"] .fb-book-cover {
-  color:#fff !important;
-}
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child {
-  color:#26352d !important;
-}
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child {
-  background:#f8fbf9 !important;
-  color:#26352d !important;
-}
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child .section-label,
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child h2,
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child strong,
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child b {
-  color:#174c31 !important;
-}
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child p,
-.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child span:not(.section-label) {
-  color:#5f7167 !important;
-}
-.fb-book-shell[data-page="cover"] .field-book-module-card {
-  background:#fff !important;
-  color:#26352d !important;
-}
-.fb-book-shell[data-page="cover"] .field-book-module-card h3,
-.fb-book-shell[data-page="cover"] .field-book-module-card strong,
-.fb-book-shell[data-page="cover"] .field-book-module-card b {
-  color:#174c31 !important;
-}
-.fb-book-shell[data-page="cover"] .field-book-module-card p,
-.fb-book-shell[data-page="cover"] .field-book-module-card span:not([style*="background"]) {
-  color:#5f7167 !important;
-}
-
-/* INTERIOR PAGES: create a real header strip owned only by the book navigation. */
-.fb-book-shell:not([data-page="cover"]) {
-  padding:112px 22px 54px !important;
-}
-.fb-book-shell:not([data-page="cover"])::before {
-  content:"";
+/* Page heading sits safely BETWEEN the two folds, not below/behind them. */
+.fb-book-top-title {
   position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:94px;
-  z-index:70;
-  background:linear-gradient(180deg,#fffef9 0%,#fbfaf4 100%);
-  border-bottom:1px solid #ded9c9;
+  top:14px;
+  left:86px;
+  right:86px;
+  z-index:100;
+  min-height:44px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  color:#174c31;
+  text-align:center;
   pointer-events:none;
 }
-.fb-book-shell:not([data-page="cover"]) .fb-page-curl {
-  top:0;
-  z-index:130;
-}
+.fb-book-top-title span { color:#0b6b3a!important;font-size:11px;font-weight:950;letter-spacing:.13em; }
+.fb-book-top-title strong { color:#174c31!important;font-size:20px;font-weight:950;line-height:1.05; }
+
+/* Never draw a full-width page-navigation strip. */
+.fb-book-shell::before { display:none!important;content:none!important; }
+
+/* Interior content starts after the title area naturally. */
 .fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView,
 .fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView,
 .fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView,
 .fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView {
+  margin:0!important;
+  padding:0!important;
   position:relative;
-  z-index:4;
-  padding-top:0 !important;
-  margin-top:0 !important;
+  z-index:2;
 }
 
-/* Prevent any page title/card from drifting under the two folded corners. */
-.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView > :first-child,
-.fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > :first-child,
-.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView > :first-child,
-.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView > :first-child {
-  margin-top:0 !important;
+/* Hide legacy duplicated AOI header and tabs generated by JS. Book title/pagination replaces them. */
+.fb-book-shell:not([data-page="cover"]) > div:first-child > div:first-child,
+.fb-book-shell:not([data-page="cover"]) > div:first-child > div:nth-child(2) {
+  display:none!important;
 }
 
-/* Fix remaining legacy white typography inside light interior content. */
-.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView *,
-.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView *,
-.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView * {
-  text-shadow:none !important;
+/* Cover readability: explicit colors for light cards, no global white inheritance. */
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child {
+  background:#f8fbf9!important;
+  color:#26352d!important;
 }
-.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView [style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView [style*="color: #fff"],
-.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView [style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView [style*="color: #fff"],
-.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView [style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView [style*="color: #fff"] {
-  color:#174c31 !important;
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child .section-label,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child h2,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child strong {
+  color:#174c31!important;
 }
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child p,
+.fb-book-shell[data-page="cover"] .fb-book-cover > div:first-child > div:first-child span:not(.section-label) {
+  color:#5f7167!important;
+}
+.fb-book-shell[data-page="cover"] .field-book-module-card { background:#fff!important;color:#26352d!important; }
+.fb-book-shell[data-page="cover"] .field-book-module-card h3,
+.fb-book-shell[data-page="cover"] .field-book-module-card strong { color:#174c31!important; }
+.fb-book-shell[data-page="cover"] .field-book-module-card p { color:#5f7167!important; }
 
-/* Preserve semantic white text only when the element itself has a dark/colored background. */
-.fb-book-shell:not([data-page="cover"]) [style*="background:#174c31"][style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) [style*="background:#0b6b3a"][style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) [style*="background:#9b2f2f"][style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) [style*="background:#d8a72b"][style*="color:#fff"],
-.fb-book-shell:not([data-page="cover"]) [style*="background:#66736b"][style*="color:#fff"] {
-  color:#fff !important;
-}
+/* Increase useful typography without repainting semantic button colors. */
+body.field-book-book-open #fieldBookOverviewView,
+body.field-book-book-open #fieldBookLayoutView,
+body.field-book-book-open #fieldBookChecklistView,
+body.field-book-book-open #fieldBookIssuesView { font-size:15px; }
+body.field-book-book-open .section-label { font-size:12px; }
 
 @media (max-width:700px) {
-  .fb-book-shell:not([data-page="cover"]) { padding:86px 8px 48px !important; }
-  .fb-book-shell:not([data-page="cover"])::before { height:72px; }
+  .fb-book-shell { padding:64px 7px 48px!important; }
+  .fb-page-curl,.fb-page-curl::before { width:56px;height:56px; }
+  .fb-book-top-title { left:62px;right:62px;top:10px; }
+  .fb-book-top-title span { font-size:9px; }
+  .fb-book-top-title strong { font-size:16px; }
 }
