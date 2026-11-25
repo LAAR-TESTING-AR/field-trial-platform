@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Field Book | Field Trial Platform</title>
-  <link rel="stylesheet" href="field-book.css?v=41">
+  <link rel="stylesheet" href="field-book.css?v=42">
 </head>
 <body>
   <header class="lab-header">
@@ -19,13 +19,15 @@
           <span class="section-label">FIELD TRIAL PLATFORM</span>
           <h1>Field Book</h1>
           <p>Planting execution &amp; trial layout</p>
-          <div class="fb-cover-selector">
-            <label for="fieldBookAoi">Elegí la AOI para abrir el libro</label>
-            <select id="fieldBookAoi">
-              <option value="">Cargando AOI desde SharePoint...</option>
-            </select>
+          <div class="fb-library-loading" aria-live="polite">
+            <div class="fb-loading-mark">🌱</div>
+            <strong>Preparando Field Book Library</strong>
+            <span>Cargando campañas, cultivos y localidades...</span>
+            <div class="fb-loading-dots"><i></i><i></i><i></i></div>
           </div>
-          <div class="fb-cover-hint">Seleccioná una AOI para abrir su Field Book</div>
+          <select id="fieldBookAoi" aria-hidden="true" tabindex="-1" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+            <option value="">Cargando AOI desde SharePoint...</option>
+          </select>
         </div>
       </div>
     </section>
