@@ -639,3 +639,109 @@ body.field-book-book-open #fieldBookModuleToolbar { display:none !important; }
 .fb-book-shell[data-page="cover"] .fb-page-curl span{font-size:27px!important;top:8px!important}.fb-book-shell[data-page="cover"] .fb-page-curl small{font-size:9px!important;top:42px!important;font-weight:950!important}
 .fb-book-shell[data-page="cover"] .fb-page-curl:disabled{opacity:.28!important}
 @media(max-width:900px){.fb-book-shell[data-page="cover"] .fb-book-cover>div:first-child>div:first-child{width:100%!important;min-width:0!important}.fb-book-shell[data-page="cover"] .field-book-module-grid{grid-template-columns:1fr!important}}
+
+
+/* =========================================================
+   COVER LAYOUT v41 - FINAL TWO-POINT FIX
+   1. AOI summary centered above module grid
+   2. BACK/NEXT clearly visible on cover
+   ========================================================= */
+
+/* The cover itself is the layout container. Its two direct children are:
+   1) the ACTIVE FIELD BOOK card, 2) the module grid. */
+.fb-book-shell[data-page="cover"] #fieldBookModuleHome.fb-book-cover {
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:18px !important;
+  padding:78px 24px 36px !important;
+}
+
+/* AOI summary card, first direct child. */
+.fb-book-shell[data-page="cover"] #fieldBookModuleHome.fb-book-cover > div:first-child {
+  display:block !important;
+  order:1 !important;
+  flex:0 0 auto !important;
+  width:min(760px,82%) !important;
+  min-width:0 !important;
+  margin:0 auto !important;
+  align-self:center !important;
+}
+
+/* Four module cards below, exactly 2 x 2. */
+.fb-book-shell[data-page="cover"] #fieldBookModuleHome.fb-book-cover > .field-book-module-grid {
+  display:grid !important;
+  order:2 !important;
+  flex:0 0 auto !important;
+  width:min(1040px,100%) !important;
+  margin:0 auto !important;
+  grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  gap:14px !important;
+  align-self:center !important;
+}
+
+/* Remove any COVER caption. The physical cover does not need a page title. */
+.fb-book-shell[data-page="cover"] .fb-book-top-title,
+.fb-book-shell[data-page="cover"] .fb-book-page-meta {
+  display:none !important;
+}
+
+/* Make the folded corners and their labels clear against dark green. */
+.fb-book-shell[data-page="cover"] .fb-page-curl {
+  display:block !important;
+  visibility:visible !important;
+  width:92px !important;
+  height:92px !important;
+  z-index:999 !important;
+  color:#073d25 !important;
+  overflow:visible !important;
+}
+.fb-book-shell[data-page="cover"] .fb-page-curl::before {
+  display:block !important;
+  width:92px !important;
+  height:92px !important;
+  opacity:1 !important;
+  background:#fffdf3 !important;
+  filter:drop-shadow(0 5px 6px rgba(0,0,0,.24)) !important;
+}
+.fb-book-shell[data-page="cover"] .fb-page-curl span,
+.fb-book-shell[data-page="cover"] .fb-page-curl small {
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  color:#073d25 !important;
+  text-shadow:none !important;
+  z-index:1001 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-page-curl span {
+  top:12px !important;
+  font-size:31px !important;
+  line-height:1 !important;
+}
+.fb-book-shell[data-page="cover"] .fb-page-curl small {
+  top:52px !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:.06em !important;
+}
+.fb-book-shell[data-page="cover"] .fb-page-curl-left span,
+.fb-book-shell[data-page="cover"] .fb-page-curl-left small { left:16px !important; }
+.fb-book-shell[data-page="cover"] .fb-page-curl-right span,
+.fb-book-shell[data-page="cover"] .fb-page-curl-right small { right:16px !important; }
+/* BACK is disabled on cover, but still visible as a physical book corner. */
+.fb-book-shell[data-page="cover"] .fb-page-curl:disabled {
+  display:block !important;
+  visibility:visible !important;
+  opacity:.58 !important;
+}
+
+@media (max-width:900px) {
+  .fb-book-shell[data-page="cover"] #fieldBookModuleHome.fb-book-cover > div:first-child {
+    width:100% !important;
+  }
+  .fb-book-shell[data-page="cover"] #fieldBookModuleHome.fb-book-cover > .field-book-module-grid {
+    grid-template-columns:1fr !important;
+  }
+}
