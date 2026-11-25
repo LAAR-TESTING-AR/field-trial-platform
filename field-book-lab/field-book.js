@@ -332,11 +332,10 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   }
   function montarBibliotecaVisual() {
     document.getElementById("fieldBookVisualLibrary")?.remove();
-    const coverSelector = selectorAoi.closest(".fb-cover-selector") || selectorAoi.parentElement;
-    if (!coverSelector) return;
+    const landing = document.getElementById("fieldBookLanding");
+    const app = document.querySelector(".field-book-app") || document.body;
+    if (landing) landing.style.display = "none";
     selectorAoi.style.display = "none";
-    const label = coverSelector.querySelector("label");
-    if (label) label.style.display = "none";
     const books = Object.values(layoutsEmbebidos).map(layout => ({
       aoiId: layout.aoiId,
       campaign: layout.campaign || "Sin campaña",
@@ -347,11 +346,18 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     let selectedCampaign = campaigns[0] || "";
     let selectedCrop = "";
     let selectedSeason = "";
+    const selectedAois = new Set();
     const library = document.createElement("section");
     library.id = "fieldBookVisualLibrary";
-    library.style.cssText = "width:min(980px,94vw);margin:0 auto;padding:18px;border:1px solid rgba(255,255,255,.28);border-radius:16px;background:rgba(255,255,255,.10);color:#fff;text-align:left";
-    coverSelector.appendChild(library);
-    const render = () => {
+    library.style.cssText = "width:min(1180px,calc(100% - 28px));min-height:calc(100vh - 105px);margin:18px auto;padding:24px;box-sizing:border-box;border:1px solid #cbd9d1;border-radius:20px;background:linear-gradient(180deg,#f9fcfa,#edf5f0);color:#26352d;box-shadow:0 18px 42px rgba(23,76,49,.12)";
+    app.insertBefore(library, app.firstChild);
+    function openBook(aoiId) {
+      library.style.display = "none";
+      if (landing) landing.style.display = "none";
+      selectorAoi.value = aoiId;
+      selectorAoi.dispatchEvent(new Event("change", { bubbles:true }));
+    }
+    function render() {
       const campaignBooks = books.filter(book => book.campaign === selectedCampaign);
       const crops = [...new Set(campaignBooks.map(book => book.crop))].sort();
       if (!crops.includes(selectedCrop)) selectedCrop = crops[0] || "";
@@ -360,18 +366,25 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       if (!seasons.includes(selectedSeason)) selectedSeason = seasons[0] || "";
       const visibleBooks = cropBooks.filter(book => book.plantingSeason === selectedSeason);
       library.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-          <div><span style="font-size:11px;font-weight:950;letter-spacing:.12em;color:#d7eee0">FIELD BOOK LIBRARY</span><h2 style="margin:4px 0 0;color:#fff;font-size:25px">Elegí tus localidades</h2></div>
-          <select id="fbLibraryCampaign" style="min-height:40px;padding:8px 11px;border:1px solid rgba(255,255,255,.65);border-radius:9px;background:#fff;color:#174c31;font-weight:850">${campaigns.map(value => `<option value="${value}" ${value===selectedCampaign?'selected':''}>${value}</option>`).join("")}</select>
-        </div>
-        <div id="fbLibraryCrops" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:15px">${crops.map(crop => `<button type="button" data-crop="${crop}" style="padding:13px;border:2px solid ${crop===selectedCrop?'#fff':'rgba(255,255,255,.28)'};border-radius:12px;background:${crop===selectedCrop?'#fff':'rgba(255,255,255,.08)'};color:${crop===selectedCrop?'#174c31':'#fff'};font-size:13px;font-weight:950;cursor:pointer"><span style="display:block;font-size:28px;margin-bottom:5px">${iconoCultivo(crop)}</span>${crop.toUpperCase()}</button>`).join("")}</div>
-        <div id="fbLibrarySeasons" style="display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:13px">${seasons.map(season => `<button type="button" data-season="${season}" style="min-width:120px;padding:9px 14px;border:1px solid ${season===selectedSeason?'#fff':'rgba(255,255,255,.38)'};border-radius:999px;background:${season===selectedSeason?'#fff':'transparent'};color:${season===selectedSeason?'#174c31':'#fff'};font-size:11px;font-weight:950;cursor:pointer">${season.toUpperCase()}</button>`).join("")}</div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:16px">${visibleBooks.map(book => { const status=estadoLibroAoi(book.aoiId); return `<button type="button" data-aoi="${book.aoiId}" style="padding:15px;text-align:left;border:1px solid #d5e1da;border-radius:13px;background:#fff;color:#26352d;box-shadow:0 6px 16px rgba(0,0,0,.10);cursor:pointer"><span style="display:flex;align-items:center;justify-content:space-between;gap:8px"><strong style="color:#174c31;font-size:15px">📗 ${book.aoiId}</strong><b style="padding:4px 7px;border-radius:999px;background:${status.bg};color:${status.color};font-size:8px">${status.mark} ${status.label}</b></span><span style="display:block;margin-top:9px;color:#607067;font-size:10px">${book.crop} · ${book.plantingSeason}</span><span style="display:block;margin-top:11px;color:#0b6b3a;font-size:10px;font-weight:950">OPEN FIELD BOOK →</span></button>`; }).join("") || `<div style="grid-column:1/-1;padding:20px;text-align:center;color:#d7eee0">No hay AOI para esta combinación.</div>`}</div>`;
-      library.querySelector("#fbLibraryCampaign")?.addEventListener("change", event => { selectedCampaign=event.target.value; selectedCrop=""; selectedSeason=""; render(); });
+        <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid #d5e1da">
+          <div><span style="font-size:11px;font-weight:950;letter-spacing:.14em;color:#0b6b3a">FIELD BOOK LIBRARY</span><h1 style="margin:5px 0 4px;color:#174c31;font-size:32px">Elegí tus localidades</h1><p style="margin:0;color:#62736a;font-size:13px">Filtrá por campaña, cultivo y estación. Después seleccioná únicamente los libros que necesitás.</p></div>
+          <label style="display:grid;gap:5px;color:#607067;font-size:10px;font-weight:900">CAMPAIGN<select id="fbLibraryCampaign" style="min-width:220px;min-height:43px;padding:8px 11px;border:1px solid #aebfb5;border-radius:10px;background:#fff;color:#174c31;font-size:14px;font-weight:850">${campaigns.map(value => `<option value="${value}" ${value===selectedCampaign?'selected':''}>${value}</option>`).join("")}</select></label>
+        </header>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:18px">${crops.map(crop => `<button type="button" data-crop="${crop}" style="padding:14px;border:2px solid ${crop===selectedCrop?'#0b6b3a':'#d3dfd8'};border-radius:13px;background:${crop===selectedCrop?'#e7f5ec':'#fff'};color:#174c31;font-size:13px;font-weight:950;cursor:pointer"><span style="font-size:28px;margin-right:8px">${iconoCultivo(crop)}</span>${crop.toUpperCase()}</button>`).join("")}</div>
+        <div style="display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:14px">${seasons.map(season => `<button type="button" data-season="${season}" style="min-width:125px;padding:10px 15px;border:1px solid ${season===selectedSeason?'#174c31':'#b9c9c0'};border-radius:999px;background:${season===selectedSeason?'#174c31':'#fff'};color:${season===selectedSeason?'#fff':'#174c31'};font-size:11px;font-weight:950;cursor:pointer">${season.toUpperCase()}</button>`).join("")}</div>
+        <section style="margin-top:20px;border:1px solid #d1ddd6;border-radius:15px;background:#fff;overflow:hidden">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 15px;background:#f4f8f6;border-bottom:1px solid #dce5e0"><div><strong style="color:#174c31;font-size:14px">${selectedCrop} · ${selectedSeason}</strong><span style="margin-left:8px;color:#708078;font-size:11px">${visibleBooks.length} AOI</span></div><div style="display:flex;gap:8px"><button type="button" id="fbSelectAll" style="padding:7px 10px;border:1px solid #afc0b6;border-radius:7px;background:#fff;color:#174c31;font-size:9px;font-weight:900;cursor:pointer">SELECT ALL</button><span id="fbSelectedCount" style="padding:7px 10px;border-radius:7px;background:#e7f5ec;color:#0b6b3a;font-size:9px;font-weight:900">${selectedAois.size} selected</span></div></div>
+          <div style="max-height:46vh;overflow:auto">${visibleBooks.map(book => { const status=estadoLibroAoi(book.aoiId); return `<div style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 15px;border-bottom:1px solid #edf2ef"><input type="checkbox" data-select-aoi="${book.aoiId}" ${selectedAois.has(book.aoiId)?'checked':''} style="width:18px;height:18px;accent-color:#0b6b3a"><button type="button" data-open-aoi="${book.aoiId}" style="padding:0;border:0;background:transparent;text-align:left;cursor:pointer"><strong style="display:block;color:#174c31;font-size:14px">📗 ${book.aoiId}</strong><span style="display:block;margin-top:3px;color:#718078;font-size:10px">${book.crop} · ${book.plantingSeason}</span></button><span style="padding:5px 8px;border-radius:999px;background:${status.bg};color:${status.color};font-size:8px;font-weight:950">${status.mark} ${status.label}</span></div>`; }).join("") || `<div style="padding:28px;text-align:center;color:#718078">No hay AOI para esta combinación.</div>`}</div>
+        </section>
+        <footer style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px"><span style="color:#687970;font-size:11px">La descarga offline se habilitará en el próximo paso.</span><button type="button" id="fbDownloadSelected" disabled style="padding:11px 16px;border:0;border-radius:10px;background:#b9c6bf;color:#fff;font-size:11px;font-weight:950;cursor:not-allowed">DOWNLOAD SELECTED (${selectedAois.size})</button></footer>`;
+      library.querySelector("#fbLibraryCampaign")?.addEventListener("change", event => { selectedCampaign=event.target.value;selectedCrop="";selectedSeason="";render(); });
       library.querySelectorAll("[data-crop]").forEach(button => button.addEventListener("click",()=>{selectedCrop=button.dataset.crop;selectedSeason="";render();}));
       library.querySelectorAll("[data-season]").forEach(button => button.addEventListener("click",()=>{selectedSeason=button.dataset.season;render();}));
-      library.querySelectorAll("[data-aoi]").forEach(button => button.addEventListener("click",()=>{selectorAoi.value=button.dataset.aoi;selectorAoi.dispatchEvent(new Event("change",{bubbles:true}));}));
-    };
+      library.querySelectorAll("[data-open-aoi]").forEach(button => button.addEventListener("click",()=>openBook(button.dataset.openAoi)));
+      library.querySelectorAll("[data-select-aoi]").forEach(box => box.addEventListener("change",()=>{box.checked?selectedAois.add(box.dataset.selectAoi):selectedAois.delete(box.dataset.selectAoi);render();}));
+      library.querySelector("#fbSelectAll")?.addEventListener("click",()=>{const allSelected=visibleBooks.every(book=>selectedAois.has(book.aoiId));visibleBooks.forEach(book=>allSelected?selectedAois.delete(book.aoiId):selectedAois.add(book.aoiId));render();});
+    }
+    window.addEventListener("fieldbook:show-library",()=>{library.style.display="block";if(landing)landing.style.display="none";});
     render();
   }
 
