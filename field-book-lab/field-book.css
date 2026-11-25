@@ -626,3 +626,16 @@ body.field-book-book-open #fieldBookModuleToolbar { display:none !important; }
 .fb-book-not-started .fb-page-curl-right{opacity:.20!important;cursor:not-allowed!important}
 @media(max-width:900px){.fb-active-field-book-card{width:100%!important;min-width:0!important}.fb-book-shell[data-page="cover"] .field-book-module-grid{grid-template-columns:1fr!important}}
 @media(max-width:700px){.fb-book-top-title{left:74px!important;right:74px!important}.fb-change-aoi{left:58px;bottom:10px}.fb-book-shell[data-page="overview"] #fieldBookOverviewView,.fb-book-shell[data-page="layout"] #fieldBookLayoutView,.fb-book-shell[data-page="checklist"] #fieldBookChecklistView,.fb-book-shell[data-page="issues"] #fieldBookIssuesView{padding-top:60px!important}}
+
+
+/* COVER FIX requested: AOI top + 2x2 modules + visible corner labels */
+.fb-book-shell[data-page="cover"] .fb-book-cover{align-items:flex-start!important;justify-content:flex-start!important;padding:72px 22px 34px!important}
+.fb-book-shell[data-page="cover"] .fb-book-cover>div:first-child{width:min(1040px,100%)!important;margin:0 auto!important;display:grid!important;grid-template-columns:1fr!important;align-content:start!important;gap:16px!important}
+.fb-book-shell[data-page="cover"] .fb-book-cover>div:first-child>div:first-child{grid-row:1!important;width:76%!important;min-width:650px!important;margin:0 auto!important;align-self:center!important}
+.fb-book-shell[data-page="cover"] .field-book-module-grid{grid-row:2!important;width:100%!important;margin:0!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+.fb-book-shell[data-page="cover"] .fb-page-curl{z-index:250!important;opacity:1!important;visibility:visible!important;width:72px!important;height:72px!important;color:#083d25!important}
+.fb-book-shell[data-page="cover"] .fb-page-curl::before{width:72px!important;height:72px!important;background:#fffdf3!important;opacity:1!important;filter:drop-shadow(0 4px 5px rgba(0,0,0,.18))!important}
+.fb-book-shell[data-page="cover"] .fb-page-curl span,.fb-book-shell[data-page="cover"] .fb-page-curl small{color:#083d25!important;opacity:1!important;text-shadow:none!important}
+.fb-book-shell[data-page="cover"] .fb-page-curl span{font-size:27px!important;top:8px!important}.fb-book-shell[data-page="cover"] .fb-page-curl small{font-size:9px!important;top:42px!important;font-weight:950!important}
+.fb-book-shell[data-page="cover"] .fb-page-curl:disabled{opacity:.28!important}
+@media(max-width:900px){.fb-book-shell[data-page="cover"] .fb-book-cover>div:first-child>div:first-child{width:100%!important;min-width:0!important}.fb-book-shell[data-page="cover"] .field-book-module-grid{grid-template-columns:1fr!important}}
