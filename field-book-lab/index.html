@@ -86,6 +86,26 @@
       return closePage;
     }
 
+    function decorateCoverCards(home) {
+      if (!home || home.dataset.visualCards === "1") return;
+      home.dataset.visualCards = "1";
+      const visuals = {
+        overview: { src:"fb-overview.png", alt:"Overview" },
+        layout: { src:"fb-field-map.png", alt:"Field Map" },
+        checklist: { src:"fb-checklist.png", alt:"Checklist" },
+        issues: { src:"fb-issues.png", alt:"Issues" }
+      };
+      home.querySelectorAll(".field-book-module-card").forEach(card => {
+        const cfg = visuals[card.dataset.module];
+        if (!cfg || card.querySelector(".fb-cover-card-art")) return;
+        const art = document.createElement("div");
+        art.className = "fb-cover-card-art";
+        art.innerHTML = `<img src="${cfg.src}" alt="${cfg.alt}">`;
+        card.insertBefore(art, card.firstChild);
+        card.classList.add("fb-cover-visual-card");
+      });
+    }
+
     function ensureBook() {
       const content = document.getElementById("fieldBookContent");
       const shell = content?.firstElementChild;
@@ -96,6 +116,7 @@
       document.getElementById("fieldBookLanding")?.classList.add("is-hidden");
       shell.classList.add("fb-book-shell");
       home.classList.add("fb-book-cover");
+      decorateCoverCards(home);
       document.body.classList.add("field-book-book-open");
 
       const chrome = document.createElement("div");
