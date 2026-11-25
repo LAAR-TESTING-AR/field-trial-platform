@@ -560,43 +560,36 @@ body.field-book-book-open #fieldBookModuleToolbar { display:none !important; }
 
 
 /* =========================================================
-   BOOK v14 FINAL - POLISHED ARTWORK + UNIFIED PAGE HEADERS
+   BOOK v15 - AOI escape + navigation lock until START
    ========================================================= */
-.fb-cover-card-art::before,.fb-cover-card-art::after{content:none!important;display:none!important}
-.fb-cover-card-art img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important;opacity:1!important}
-.fb-cover-card-art{background:linear-gradient(145deg,#f2fae9,#e0f2d7)!important;overflow:hidden!important}
-.fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;width:min(1080px,100%)!important;margin:24px auto 0!important}
-.fb-book-shell[data-page="cover"] .fb-cover-visual-card{display:grid!important;grid-template-columns:160px minmax(0,1fr)!important;grid-template-rows:auto 1fr auto!important;column-gap:18px!important;min-height:195px!important;padding:16px!important;border-radius:18px!important;background:#fff!important;color:#26352d!important;overflow:hidden!important;text-align:left!important;align-items:center!important}
-.fb-cover-card-art{grid-column:1!important;grid-row:1/4!important;width:160px!important;height:160px!important;border-radius:15px!important}
-.fb-book-shell[data-page="cover"] .fb-cover-visual-card h3{grid-column:2!important;margin:0 0 8px!important;color:#174c31!important;font-size:25px!important}
-.fb-book-shell[data-page="cover"] .fb-cover-visual-card p{grid-column:2!important;margin:0!important;color:#536159!important;font-size:14px!important;line-height:1.4!important}
-.fb-book-shell[data-page="cover"] .fb-cover-visual-card>strong:last-child{grid-column:2!important;margin-top:12px!important;color:#0b6b3a!important;font-size:12px!important}
-
-/* Same centered PAGE LABEL + AOI on Overview, Field Map, Checklist and Issues. */
-.fb-book-top-title{display:flex!important;left:132px!important;right:132px!important;top:10px!important;min-height:48px!important}
-.fb-book-top-title span{color:#0b6b3a!important;font-size:11px!important;font-weight:950!important;letter-spacing:.13em!important}
-.fb-book-top-title strong{color:#174c31!important;font-size:20px!important;font-weight:950!important;line-height:1.05!important}
-.fb-page-curl,.fb-page-curl::before{width:64px!important;height:64px!important}
-
-/* All module content starts clear of the book title and corner folds. */
-.fb-book-shell[data-page="overview"] #fieldBookOverviewView,
-.fb-book-shell[data-page="checklist"] #fieldBookChecklistView{padding-left:100px!important;padding-right:100px!important;padding-top:34px!important}
-.fb-book-shell[data-page="layout"] #fieldBookLayoutView{padding-top:34px!important}
-.fb-book-shell[data-page="layout"] #fieldBookLayoutView>:first-child{margin-left:100px!important;margin-right:100px!important}
-/* Issues keeps ISSUES / AOI; summary begins below it rather than underneath it. */
-.fb-book-shell[data-page="issues"] #fieldBookIssuesView{padding-left:100px!important;padding-right:100px!important;padding-top:72px!important}
-.fb-book-shell[data-page="issues"] #fieldBookIssuesView>:first-child{margin-top:0!important;position:relative!important;z-index:4!important}
-
-@media(max-width:900px){
- .fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid{grid-template-columns:1fr!important}
- .fb-book-shell[data-page="cover"] .fb-cover-visual-card{grid-template-columns:120px minmax(0,1fr)!important;min-height:155px!important}
- .fb-cover-card-art{width:120px!important;height:120px!important}
+.fb-change-aoi {
+  position:absolute;
+  left:78px;
+  bottom:14px;
+  z-index:145;
+  min-height:34px;
+  padding:6px 11px;
+  border:1px solid #b8c9be;
+  border-radius:999px;
+  background:#ffffff;
+  color:#174c31;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.04em;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(23,76,49,.08);
+}
+.fb-change-aoi:hover { background:#edf7f1;transform:translateY(-1px); }
+.fb-book-not-started .fb-page-curl-right { opacity:.22!important;cursor:not-allowed!important; }
+.fb-book-not-started .fb-book-page-meta::before {
+  content:"START FIELD BOOK para habilitar páginas 2–4";
+  margin-right:8px;
+  color:#8a6400;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:0;
 }
 @media(max-width:700px){
- .fb-book-top-title{left:74px!important;right:74px!important}
- .fb-book-shell[data-page="overview"] #fieldBookOverviewView,.fb-book-shell[data-page="checklist"] #fieldBookChecklistView,.fb-book-shell[data-page="issues"] #fieldBookIssuesView{padding-left:58px!important;padding-right:58px!important}
- .fb-book-shell[data-page="layout"] #fieldBookLayoutView>:first-child{margin-left:58px!important;margin-right:58px!important}
- .fb-book-shell[data-page="issues"] #fieldBookIssuesView{padding-top:60px!important}
- .fb-book-shell[data-page="cover"] .fb-cover-visual-card{grid-template-columns:88px minmax(0,1fr)!important;min-height:125px!important;padding:10px!important;column-gap:10px!important}
- .fb-cover-card-art{width:88px!important;height:88px!important}
+  .fb-change-aoi{left:58px;bottom:10px;font-size:9px;padding:5px 8px}
+  .fb-book-not-started .fb-book-page-meta::before{display:none}
 }
