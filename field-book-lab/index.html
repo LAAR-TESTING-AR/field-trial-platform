@@ -4,75 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Field Book | Field Trial Platform</title>
-  <link rel="stylesheet" href="field-book.css?v=3">
-  <style>
-    body.field-book-module-open .field-book-app {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-
-    body.field-book-module-open .field-book-content {
-      margin: 0;
-      border: 0;
-      box-shadow: none;
-      background: transparent;
-    }
-
-    body.field-book-module-open #fieldBookContent > div {
-      padding: 0 !important;
-    }
-
-    .field-book-module-card {
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .field-book-module-card:not(:disabled):hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 26px rgba(23,76,49,.13) !important;
-    }
-
-    @media (max-width: 760px) {
-      .field-book-module-grid {
-        grid-template-columns: 1fr !important;
-      }
-
-      body.field-book-module-open #fieldBookLayoutView {
-        grid-template-columns: 1fr !important;
-      }
-
-      body.field-book-module-open #fieldBookLayoutView > aside {
-        max-height: none !important;
-      }
-    }
-  
-    @media (max-width: 900px) {
-      body.field-book-module-open #fieldBookLayoutView {
-        grid-template-columns: 1fr !important;
-      }
-
-      body.field-book-module-open #fieldBookLayoutView > section > div:first-child {
-        grid-template-columns: 1fr !important;
-      }
-
-      body.field-book-module-open #fieldBookLayoutView > aside {
-        max-height: none !important;
-      }
-    }
-</style>
+  <link rel="stylesheet" href="field-book.css?v=5">
 </head>
 <body>
   <header class="lab-header">
-    <div class="lab-title">FIELD BOOK LAB</div>
-    <div class="lab-status">Ambiente de desarrollo</div>
+    <div class="lab-title">FIELD BOOK</div>
   </header>
+
   <main class="field-book-app">
-    <section class="lab-warning">
-      <strong>FIELD BOOK LAB</strong>
-      <span>Ambiente de prueba. No utilizar para operación real.</span>
-    </section>
     <section class="field-book-header">
       <div>
         <span class="section-label">FIELD TRIAL PLATFORM</span>
@@ -80,20 +19,192 @@
         <p>Planting execution &amp; trial layout</p>
       </div>
     </section>
+
     <section class="field-book-selector">
       <label for="fieldBookAoi">AOI</label>
       <select id="fieldBookAoi">
         <option value="">Cargando AOI desde SharePoint...</option>
       </select>
     </section>
+
     <section id="fieldBookContent" class="field-book-content">
       <div class="empty-state">
-        <strong>Field Book Lab</strong>
-        <span>Seleccioná una AOI para comenzar.</span>
+        <strong>Field Book</strong>
+        <span>Seleccioná una AOI para abrir el libro.</span>
       </div>
     </section>
   </main>
+
   <script src="data/settings/field-book-settings-data.js"></script>
-  <script src="field-book.js?v=4"></script>
+  <script src="field-book.js?v=11"></script>
+  <script>
+  (() => {
+    const pages = [
+      { key: "cover", label: "COVER" },
+      { key: "overview", label: "OVERVIEW" },
+      { key: "layout", label: "FIELD MAP" },
+      { key: "checklist", label: "CHECKLIST" },
+      { key: "issues", label: "ISSUES" },
+      { key: "close", label: "CLOSE" }
+    ];
+    let currentPage = 0;
+    let locked = false;
+
+    function setVisible(el, visible, display = "block") {
+      if (!el) return;
+      el.hidden = !visible;
+      el.style.display = visible ? display : "none";
+    }
+
+    function findModuleButton(key) {
+      return document.querySelector(`.field-book-module-card[data-module="${key}"]`);
+    }
+
+    function makeClosePage(shell) {
+      let closePage = shell.querySelector("#fieldBookBookClosePage");
+      if (closePage) return closePage;
+      closePage = document.createElement("section");
+      closePage.id = "fieldBookBookClosePage";
+      closePage.className = "fb-book-close-page";
+      closePage.innerHTML = `
+        <div class="fb-book-close-mark">✓</div>
+        <span class="section-label">FIELD BOOK</span>
+        <h2>Cerrar libro de campo</h2>
+        <p>Revisá la última página y completá el Field Book cuando corresponda.</p>
+        <button id="fieldBookReturnToAoi" type="button">VOLVER A AOI</button>`;
+      shell.appendChild(closePage);
+      closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", () => {
+        const selector = document.getElementById("fieldBookAoi");
+        selector.value = "";
+        selector.dispatchEvent(new Event("change", { bubbles: true }));
+        document.body.classList.remove("field-book-book-open", "field-book-module-open");
+      });
+      return closePage;
+    }
+
+    function ensureBook() {
+      const content = document.getElementById("fieldBookContent");
+      const shell = content?.firstElementChild;
+      const home = document.getElementById("fieldBookModuleHome");
+      if (!shell || !home || shell.dataset.bookReady === "1") return;
+
+      shell.dataset.bookReady = "1";
+      shell.classList.add("fb-book-shell");
+      home.classList.add("fb-book-cover");
+      document.body.classList.add("field-book-book-open");
+
+      const chrome = document.createElement("div");
+      chrome.className = "fb-book-chrome";
+      chrome.innerHTML = `
+        <button class="fb-page-curl fb-page-curl-left" type="button" aria-label="Página anterior">
+          <span>‹</span><small>BACK</small>
+        </button>
+        <button class="fb-page-curl fb-page-curl-right" type="button" aria-label="Página siguiente">
+          <span>›</span><small>NEXT</small>
+        </button>
+        <div class="fb-book-page-meta">
+          <span id="fbBookPageLabel">COVER</span>
+          <b id="fbBookPageNumber">0 / 4</b>
+        </div>`;
+      shell.appendChild(chrome);
+      makeClosePage(shell);
+
+      chrome.querySelector(".fb-page-curl-left").addEventListener("click", () => goTo(currentPage - 1));
+      chrome.querySelector(".fb-page-curl-right").addEventListener("click", () => goTo(currentPage + 1));
+
+      home.querySelectorAll(".field-book-module-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const index = pages.findIndex(page => page.key === card.dataset.module);
+          if (index >= 0) setTimeout(() => updateChrome(index), 0);
+        });
+      });
+
+      currentPage = 0;
+      updateChrome(0);
+    }
+
+    function pageElements() {
+      return {
+        home: document.getElementById("fieldBookModuleHome"),
+        toolbar: document.getElementById("fieldBookModuleToolbar"),
+        overview: document.getElementById("fieldBookOverviewView"),
+        layout: document.getElementById("fieldBookLayoutView"),
+        checklist: document.getElementById("fieldBookChecklistView"),
+        issues: document.getElementById("fieldBookIssuesView"),
+        close: document.getElementById("fieldBookBookClosePage")
+      };
+    }
+
+    function updateChrome(index) {
+      currentPage = Math.max(0, Math.min(pages.length - 1, index));
+      const shell = document.querySelector(".fb-book-shell");
+      if (!shell) return;
+      shell.dataset.page = pages[currentPage].key;
+      shell.querySelector("#fbBookPageLabel").textContent = pages[currentPage].label;
+      shell.querySelector("#fbBookPageNumber").textContent = currentPage === 0 ? "COVER" : currentPage === 5 ? "END" : `${currentPage} / 4`;
+      shell.querySelector(".fb-page-curl-left").disabled = currentPage === 0;
+      shell.querySelector(".fb-page-curl-right").disabled = currentPage === pages.length - 1;
+    }
+
+    function animateTurn(direction, callback) {
+      const shell = document.querySelector(".fb-book-shell");
+      if (!shell || locked) return;
+      locked = true;
+      shell.classList.remove("fb-turn-next", "fb-turn-back");
+      shell.classList.add(direction > 0 ? "fb-turn-next" : "fb-turn-back");
+      setTimeout(() => {
+        callback();
+        shell.classList.remove("fb-turn-next", "fb-turn-back");
+        shell.classList.add("fb-page-arrive");
+        setTimeout(() => { shell.classList.remove("fb-page-arrive"); locked = false; }, 260);
+      }, 210);
+    }
+
+    function goTo(index) {
+      const target = Math.max(0, Math.min(pages.length - 1, index));
+      if (target === currentPage || locked) return;
+      const direction = target > currentPage ? 1 : -1;
+      animateTurn(direction, () => {
+        const els = pageElements();
+        const page = pages[target].key;
+
+        setVisible(els.close, false);
+        if (page === "cover") {
+          document.getElementById("fieldBookBackHome")?.click();
+          setVisible(els.home, true);
+        } else if (page === "close") {
+          setVisible(els.home, false);
+          setVisible(els.toolbar, false);
+          setVisible(els.overview, false);
+          setVisible(els.layout, false);
+          setVisible(els.checklist, false);
+          setVisible(els.issues, false);
+          setVisible(els.close, true, "flex");
+        } else {
+          const card = findModuleButton(page);
+          const fallback = {
+            overview: "fieldBookTabOverview",
+            layout: "fieldBookTabLayout",
+            checklist: "fieldBookTabChecklist",
+            issues: "fieldBookTabIssues"
+          }[page];
+          if (card && !card.disabled) card.click();
+          else document.getElementById(fallback)?.click();
+        }
+        updateChrome(target);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    const observer = new MutationObserver(() => ensureBook());
+    observer.observe(document.getElementById("fieldBookContent"), { childList: true, subtree: true });
+    document.addEventListener("keydown", event => {
+      if (!document.body.classList.contains("field-book-book-open")) return;
+      if (event.key === "ArrowRight") goTo(currentPage + 1);
+      if (event.key === "ArrowLeft") goTo(currentPage - 1);
+    });
+    ensureBook();
+  })();
+  </script>
 </body>
 </html>
