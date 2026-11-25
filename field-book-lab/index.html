@@ -115,7 +115,11 @@
       home.querySelectorAll(".field-book-module-card").forEach(card => {
         card.addEventListener("click", () => {
           const index = pages.findIndex(page => page.key === card.dataset.module);
-          if (index >= 0) setTimeout(() => updateChrome(index), 0);
+          if (index >= 0) setTimeout(() => {
+            const els = pageElements();
+            setVisible(els.home, false);
+            updateChrome(index);
+          }, 0);
         });
       });
 
@@ -181,6 +185,9 @@
           setVisible(els.issues, false);
           setVisible(els.close, true, "flex");
         } else {
+          // Interior pages show only the actual page content, never the green cover/home.
+          setVisible(els.home, false);
+          setVisible(els.close, false);
           const card = findModuleButton(page);
           const fallback = {
             overview: "fieldBookTabOverview",
