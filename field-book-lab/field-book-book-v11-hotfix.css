@@ -1,0 +1,77 @@
+/* FIELD BOOK BOOK v11 HOTFIX
+   Add this file AFTER field-book.css in index.html.
+   Fixes: broken cover art + Issues title/KPI overlap. */
+
+/* 1) COVER: never depend on external PNG paths. */
+.fb-cover-card-art {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  background: linear-gradient(145deg,#f2fae9,#dcefd3) !important;
+}
+.fb-cover-card-art img { display: none !important; }
+.fb-cover-card-art::before {
+  content: "";
+  position: absolute;
+  width: 68%;
+  height: 68%;
+  border: 8px solid #0b6b3a;
+  border-radius: 22px;
+  background: rgba(255,255,255,.72);
+  box-shadow: 0 7px 16px rgba(11,107,58,.12);
+}
+.fb-cover-card-art::after {
+  position: relative;
+  z-index: 2;
+  color: #0b6b3a;
+  font-size: 64px;
+  line-height: 1;
+  font-weight: 950;
+}
+.fb-cover-visual-card[data-module="overview"] .fb-cover-card-art::after { content: "⚙"; }
+.fb-cover-visual-card[data-module="layout"] .fb-cover-card-art::after { content: "⌖"; }
+.fb-cover-visual-card[data-module="checklist"] .fb-cover-card-art::after { content: "✓"; }
+.fb-cover-visual-card[data-module="issues"] .fb-cover-card-art::before {
+  border-color: #e0a51c;
+  background: #fff3cc;
+  transform: rotate(45deg);
+  border-radius: 18px;
+}
+.fb-cover-visual-card[data-module="issues"] .fb-cover-card-art::after {
+  content: "!";
+  color: #b87900;
+}
+
+/* 2) ISSUES: remove the duplicated centered BOOK title that overlays KPI cards. */
+.fb-book-shell[data-page="issues"] .fb-book-top-title {
+  display: none !important;
+}
+.fb-book-shell[data-page="issues"] #fieldBookIssuesView {
+  padding-top: 20px !important;
+  padding-left: 92px !important;
+  padding-right: 92px !important;
+}
+.fb-book-shell[data-page="issues"] #fieldBookIssuesView > :first-child {
+  margin-top: 0 !important;
+  position: relative !important;
+  z-index: 5 !important;
+}
+
+/* 3) Keep Overview and Checklist headings clear of both page folds too. */
+.fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+.fb-book-shell[data-page="checklist"] #fieldBookChecklistView {
+  padding-left: 92px !important;
+  padding-right: 92px !important;
+}
+
+@media (max-width:700px) {
+  .fb-cover-card-art::after { font-size: 42px; }
+  .fb-book-shell[data-page="issues"] #fieldBookIssuesView,
+  .fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+  .fb-book-shell[data-page="checklist"] #fieldBookChecklistView {
+    padding-left: 58px !important;
+    padding-right: 58px !important;
+  }
+}
