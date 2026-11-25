@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Field Book | Field Trial Platform</title>
-  <link rel="stylesheet" href="field-book.css?v=5">
+  <link rel="stylesheet" href="field-book.css?v=10">
 </head>
 <body>
   <header class="lab-header">
@@ -90,10 +90,10 @@
       if (!home || home.dataset.visualCards === "1") return;
       home.dataset.visualCards = "1";
       const visuals = {
-        overview: { src:"fb-overview.png", alt:"Overview" },
-        layout: { src:"fb-field-map.png", alt:"Field Map" },
-        checklist: { src:"fb-checklist.png", alt:"Checklist" },
-        issues: { src:"fb-issues.png", alt:"Issues" }
+        overview: { src:"assets/fb-overview.png", alt:"Overview" },
+        layout: { src:"assets/fb-field-map.png", alt:"Field Map" },
+        checklist: { src:"assets/fb-checklist.png", alt:"Checklist" },
+        issues: { src:"assets/fb-issues.png", alt:"Issues" }
       };
       home.querySelectorAll(".field-book-module-card").forEach(card => {
         const cfg = visuals[card.dataset.module];
