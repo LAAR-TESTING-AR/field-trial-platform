@@ -191,6 +191,13 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
   // Mantiene compatibilidad con window.FIELD_BOOK_LAYOUTS si existiera una copia local de prueba.
   const layoutsEmbebidos = window.FIELD_BOOK_LAYOUTS || {};
 
+  const OFFLINE_DB="FieldBookOfflineDB",OFFLINE_STORE="fieldBooks";
+  function openOfflineDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(OFFLINE_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(OFFLINE_STORE))r.result.createObjectStore(OFFLINE_STORE,{keyPath:"aoiId"});};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+  async function getOfflineBooks(){const db=await openOfflineDB();const rows=await new Promise((resolve,reject)=>{const r=db.transaction(OFFLINE_STORE).objectStore(OFFLINE_STORE).getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});db.close();return rows;}
+  async function saveOfflineBook(aoiId){const db=await openOfflineDB();await new Promise((resolve,reject)=>{const tx=db.transaction(OFFLINE_STORE,"readwrite");tx.objectStore(OFFLINE_STORE).put({aoiId,downloadedAt:new Date().toISOString(),data:layoutsEmbebidos[aoiId]});tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();}
+  async function removeOfflineBook(aoiId){const db=await openOfflineDB();await new Promise((resolve,reject)=>{const tx=db.transaction(OFFLINE_STORE,"readwrite");tx.objectStore(OFFLINE_STORE).delete(aoiId);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();}
+  async function loadOfflineBooks(){const rows=await getOfflineBooks();rows.forEach(x=>{if(x?.data)layoutsEmbebidos[x.aoiId]=x.data;});return rows;}
+
   function endpointDatosConfigurado() {
     return Boolean(
       FIELD_BOOK_DATA_URL &&
@@ -330,7 +337,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     if (visit.status === "In progress") return { label:"IN PROGRESS", color:"#995c00", bg:"#fff3d6", mark:"●" };
     return { label:"NOT STARTED", color:"#66736b", bg:"#eef1ef", mark:"○" };
   }
-  function montarBibliotecaVisual() {
+  async function montarBibliotecaVisual() {
     document.getElementById("fieldBookVisualLibrary")?.remove();
     const landing = document.getElementById("fieldBookLanding");
     const app = document.querySelector(".field-book-app") || document.body;
@@ -347,6 +354,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     let selectedCrop = "";
     let selectedSeason = "";
     const selectedAois = new Set();
+    let offlineIds=new Set((await getOfflineBooks()).map(x=>x.aoiId));
     const library = document.createElement("section");
     library.id = "fieldBookVisualLibrary";
     library.style.cssText = "width:min(1180px,calc(100% - 28px));min-height:calc(100vh - 105px);margin:18px auto;padding:24px;box-sizing:border-box;border:1px solid #cbd9d1;border-radius:20px;background:linear-gradient(180deg,#f9fcfa,#edf5f0);color:#26352d;box-shadow:0 18px 42px rgba(23,76,49,.12)";
@@ -376,15 +384,17 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
         <div style="display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:14px">${seasons.map(season => `<button type="button" data-season="${season}" style="min-width:125px;padding:10px 15px;border:1px solid ${season===selectedSeason?'#174c31':'#b9c9c0'};border-radius:999px;background:${season===selectedSeason?'#174c31':'#fff'};color:${season===selectedSeason?'#fff':'#174c31'};font-size:11px;font-weight:950;cursor:pointer">${season.toUpperCase()}</button>`).join("")}</div>
         <section style="margin-top:20px;border:1px solid #d1ddd6;border-radius:15px;background:#fff;overflow:hidden">
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 15px;background:#f4f8f6;border-bottom:1px solid #dce5e0"><div><strong style="color:#174c31;font-size:14px">${selectedCrop} · ${selectedSeason}</strong><span style="margin-left:8px;color:#708078;font-size:11px">${visibleBooks.length} AOI</span></div><div style="display:flex;gap:8px"><button type="button" id="fbSelectAll" style="padding:7px 10px;border:1px solid #afc0b6;border-radius:7px;background:#fff;color:#174c31;font-size:9px;font-weight:900;cursor:pointer">SELECT ALL</button><span id="fbSelectedCount" style="padding:7px 10px;border-radius:7px;background:#e7f5ec;color:#0b6b3a;font-size:9px;font-weight:900">${selectedAois.size} selected</span></div></div>
-          <div style="max-height:46vh;overflow:auto">${visibleBooks.map(book => { const status=estadoLibroAoi(book.aoiId); return `<div style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 15px;border-bottom:1px solid #edf2ef"><input type="checkbox" data-select-aoi="${book.aoiId}" ${selectedAois.has(book.aoiId)?'checked':''} style="width:18px;height:18px;accent-color:#0b6b3a"><button type="button" data-open-aoi="${book.aoiId}" style="padding:0;border:0;background:transparent;text-align:left;cursor:pointer"><strong style="display:block;color:#174c31;font-size:14px">📗 ${book.aoiId}</strong><span style="display:block;margin-top:3px;color:#718078;font-size:10px">${book.crop} · ${book.plantingSeason}</span></button><span style="padding:5px 8px;border-radius:999px;background:${status.bg};color:${status.color};font-size:8px;font-weight:950">${status.mark} ${status.label}</span></div>`; }).join("") || `<div style="padding:28px;text-align:center;color:#718078">No hay AOI para esta combinación.</div>`}</div>
+          <div style="max-height:46vh;overflow:auto">${visibleBooks.map(book => { const status=estadoLibroAoi(book.aoiId); return `<div style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 15px;border-bottom:1px solid #edf2ef"><input type="checkbox" data-select-aoi="${book.aoiId}" ${selectedAois.has(book.aoiId)?'checked':''} style="width:18px;height:18px;accent-color:#0b6b3a"><button type="button" data-open-aoi="${book.aoiId}" style="padding:0;border:0;background:transparent;text-align:left;cursor:pointer"><strong style="display:block;color:#174c31;font-size:14px">📗 ${book.aoiId}</strong><span style="display:block;margin-top:3px;color:#718078;font-size:10px">${book.crop} · ${book.plantingSeason}</span></button><div style="display:flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:wrap"><span style="padding:5px 8px;border-radius:999px;background:${offlineIds.has(book.aoiId)?'#e7f5ec':'#eef1ef'};color:${offlineIds.has(book.aoiId)?'#0b6b3a':'#66736b'};font-size:8px;font-weight:950">${offlineIds.has(book.aoiId)?'✓ OFFLINE READY':'☁ ONLINE ONLY'}</span>${offlineIds.has(book.aoiId)?`<button type="button" data-remove-offline="${book.aoiId}" style="padding:5px 7px;border:1px solid #b8c5bd;border-radius:7px;background:#fff;color:#66736b;font-size:8px;font-weight:900;cursor:pointer">REMOVE</button>`:''}<span style="padding:5px 8px;border-radius:999px;background:${status.bg};color:${status.color};font-size:8px;font-weight:950">${status.mark} ${status.label}</span></div></div>`; }).join("") || `<div style="padding:28px;text-align:center;color:#718078">No hay AOI para esta combinación.</div>`}</div>
         </section>
-        <footer style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px"><span style="color:#687970;font-size:11px">La descarga offline se habilitará en el próximo paso.</span><button type="button" id="fbDownloadSelected" disabled style="padding:11px 16px;border:0;border-radius:10px;background:#b9c6bf;color:#fff;font-size:11px;font-weight:950;cursor:not-allowed">DOWNLOAD SELECTED (${selectedAois.size})</button></footer>`;
+        <footer style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:15px"><span style="color:#687970;font-size:11px">${offlineIds.size} Field Book${offlineIds.size===1?'':'s'} disponibles offline.</span><button type="button" id="fbDownloadSelected" ${selectedAois.size?'':'disabled'} style="padding:11px 16px;border:0;border-radius:10px;background:${selectedAois.size?'#0b6b3a':'#b9c6bf'};color:#fff;font-size:11px;font-weight:950;cursor:${selectedAois.size?'pointer':'not-allowed'}">DOWNLOAD SELECTED (${selectedAois.size})</button></footer>`;
       library.querySelector("#fbLibraryCampaign")?.addEventListener("change", event => { selectedCampaign=event.target.value;selectedCrop="";selectedSeason="";render(); });
       library.querySelectorAll("[data-crop]").forEach(button => button.addEventListener("click",()=>{selectedCrop=button.dataset.crop;selectedSeason="";render();}));
       library.querySelectorAll("[data-season]").forEach(button => button.addEventListener("click",()=>{selectedSeason=button.dataset.season;render();}));
       library.querySelectorAll("[data-open-aoi]").forEach(button => button.addEventListener("click",()=>openBook(button.dataset.openAoi)));
       library.querySelectorAll("[data-select-aoi]").forEach(box => box.addEventListener("change",()=>{box.checked?selectedAois.add(box.dataset.selectAoi):selectedAois.delete(box.dataset.selectAoi);render();}));
       library.querySelector("#fbSelectAll")?.addEventListener("click",()=>{const allSelected=visibleBooks.every(book=>selectedAois.has(book.aoiId));visibleBooks.forEach(book=>allSelected?selectedAois.delete(book.aoiId):selectedAois.add(book.aoiId));render();});
+    library.querySelector("#fbDownloadSelected")?.addEventListener("click",async e=>{if(!selectedAois.size)return;const b=e.currentTarget;b.disabled=true;b.textContent="DOWNLOADING...";try{for(const id of selectedAois)await saveOfflineBook(id);offlineIds=new Set((await getOfflineBooks()).map(x=>x.aoiId));selectedAois.clear();render();alert("Field Books disponibles offline.");}catch(error){console.error(error);alert(`No se pudo descargar: ${error.message}`);render();}});
+    library.querySelectorAll("[data-remove-offline]").forEach(b=>b.addEventListener("click",async()=>{if(!confirm(`Eliminar descarga offline de ${b.dataset.removeOffline}?`))return;await removeOfflineBook(b.dataset.removeOffline);offlineIds=new Set((await getOfflineBooks()).map(x=>x.aoiId));render();}));
     }
     window.addEventListener("fieldbook:show-library",()=>{
       document.body.classList.remove("field-book-book-open", "field-book-module-open");
@@ -1842,15 +1852,10 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
         selectorAoi.disabled = true;
       }
     } catch (error) {
-      console.error("Field Book: error cargando layouts", error);
-      selectorAoi.innerHTML = '<option value="">Error cargando AOI</option>';
-      selectorAoi.disabled = true;
-      contenido.innerHTML = `
-        <div class="empty-state">
-          <strong>No se pudieron cargar los layouts</strong>
-          <span>${error.message}</span>
-        </div>
-      `;
+      console.warn("Field Book: cargando descargas offline",error);
+      const rows=await loadOfflineBooks();
+      if(rows.length){completarSelectorAoi();selectorAoi.disabled=false;actualizarSyncUI(`Offline · ${rows.length} Field Books available`);}
+      else{selectorAoi.disabled=true;contenido.innerHTML=`<div class="empty-state"><strong>No hay conexión ni descargas offline</strong><span>Conectate y descargá al menos una AOI.</span></div>`;}
     }
   }
 
