@@ -79,7 +79,7 @@
       closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", () => {
         const selector = document.getElementById("fieldBookAoi");
         selector.value = "";
-        selector.dispatchEvent(new Event("change", { bubbles: true }));
+        window.dispatchEvent(new Event("fieldbook:show-library"));
         document.body.classList.remove("field-book-book-open", "field-book-module-open");
         document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
       });
