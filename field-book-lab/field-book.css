@@ -324,3 +324,86 @@ body.field-book-book-open .section-label { font-size:12px; }
   .fb-book-top-title span { font-size:9px; }
   .fb-book-top-title strong { font-size:16px; }
 }
+
+/* BOOK v8 - visual-first cover cards */
+.fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid {
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:18px!important;
+  width:min(1040px,100%);
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card {
+  display:grid!important;
+  grid-template-columns:150px minmax(0,1fr)!important;
+  grid-template-rows:auto 1fr auto!important;
+  column-gap:18px!important;
+  min-height:195px!important;
+  padding:16px 18px!important;
+  border-radius:18px!important;
+  overflow:hidden;
+  text-align:left!important;
+  align-items:center;
+}
+.fb-cover-card-art {
+  grid-column:1;
+  grid-row:1 / 4;
+  width:150px;
+  height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:14px;
+  background:linear-gradient(145deg,#f1fae9,#dff3d8);
+}
+.fb-cover-card-art img { width:100%;height:100%;object-fit:contain;display:block; }
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card h3 {
+  grid-column:2!important;
+  font-size:25px!important;
+  line-height:1.05!important;
+  margin:0 0 8px!important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card p {
+  grid-column:2!important;
+  font-size:14px!important;
+  line-height:1.35!important;
+  margin:0!important;
+}
+.fb-book-shell[data-page="cover"] .fb-cover-visual-card > strong:last-child {
+  grid-column:2!important;
+  margin-top:12px!important;
+  font-size:12px!important;
+}
+
+/* Definitive fold clearance: move only each page's own top header inward horizontally. */
+.fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView > div:first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView > section:first-child > div:first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView > div:first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > div:first-child,
+.fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > section:first-child > div:first-child {
+  padding-left:86px!important;
+  padding-right:86px!important;
+}
+
+/* Book-generated centered title stays farther from both folds. */
+.fb-book-top-title { left:118px!important;right:118px!important; }
+
+@media (max-width:900px) {
+  .fb-book-shell[data-page="cover"] .fb-book-cover .field-book-module-grid { grid-template-columns:1fr!important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card { grid-template-columns:120px minmax(0,1fr)!important;min-height:160px!important; }
+  .fb-cover-card-art { width:120px;height:120px; }
+}
+@media (max-width:600px) {
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card { grid-template-columns:86px minmax(0,1fr)!important;min-height:126px!important;padding:11px!important;column-gap:11px!important; }
+  .fb-cover-card-art { width:86px;height:86px; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card h3 { font-size:19px!important; }
+  .fb-book-shell[data-page="cover"] .fb-cover-visual-card p { font-size:12px!important; }
+  .fb-book-top-title { left:72px!important;right:72px!important; }
+  .fb-book-shell:not([data-page="cover"]) #fieldBookOverviewView > div:first-child,
+  .fb-book-shell:not([data-page="cover"]) #fieldBookChecklistView > section:first-child > div:first-child,
+  .fb-book-shell:not([data-page="cover"]) #fieldBookIssuesView > div:first-child,
+  .fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > div:first-child,
+  .fb-book-shell:not([data-page="cover"]) #fieldBookLayoutView > section:first-child > div:first-child { padding-left:56px!important;padding-right:56px!important; }
+}
