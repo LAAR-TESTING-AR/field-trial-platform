@@ -902,3 +902,86 @@ html,body{max-width:100%;overflow-x:hidden}
   .fb-book-page-meta{position:relative!important;left:auto!important;bottom:auto!important;transform:none!important;width:100%!important;min-height:38px!important;margin:18px auto 0!important;padding:10px 0!important;display:flex!important;justify-content:center!important;align-items:center!important;clear:both!important;background:rgba(255,254,249,.98)!important;z-index:5!important}
   #fieldBookLayoutView,#fieldBookChecklistView,#fieldBookIssuesView{padding-bottom:12px!important}
 }
+
+
+/* =========================================================
+   V13 - UNIFIED MOBILE MAP VIEWPORTS
+   Field Map and Issues use the same mobile geometry.
+   ========================================================= */
+@media(max-width:700px){
+  /* Keep both map sections safely inside the paper. */
+  #fieldBookLayoutView,
+  #fieldBookIssuesView{overflow-x:hidden!important;max-width:100%!important}
+
+  /* Field Map: the main section gets a visible paper margin. */
+  #fieldBookLayoutView>section{
+    width:calc(100% - 12px)!important;
+    max-width:calc(100% - 12px)!important;
+    margin-left:6px!important;
+    margin-right:6px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+
+  /* On phones the Field Map top split becomes one column without shrinking the plot viewport. */
+  #fieldBookLayoutView>section>div:first-child{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  /* Field Map plot viewport: internal horizontal pan, 100% visible frame. */
+  #fieldBookLayoutView>section>div:nth-last-child(1),
+  #fieldBookLayoutView>section>div[style*="overflow:auto"]{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Issues map card and its inner desktop split. */
+  #fieldBookIssuesView>section:last-child{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  #fieldBookIssuesView>section:last-child>div:last-child{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    gap:12px!important;
+  }
+
+  /* Issues plot viewport: same internal horizontal pan as Field Map. */
+  #fieldBookIssuesView>section:last-child>div:last-child>div:first-child{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    box-sizing:border-box!important;
+    touch-action:pan-x pan-y!important;
+  }
+
+  /* Plot Information always follows the map and stays inside the paper. */
+  #fieldBookIssuesView>section:last-child>div:last-child>aside{
+    position:static!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+  }
+}
