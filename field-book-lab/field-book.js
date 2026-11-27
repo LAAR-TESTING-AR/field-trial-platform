@@ -1592,6 +1592,9 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
             try { await guardarPlotEventRemoto(aoiId,plot.range,plot.column,statusSeleccionado,comment); if(msg){msg.textContent="✓ Sincronizado con SharePoint DEV";msg.style.color="#0b6b3a";msg.style.fontWeight="800";} }
             catch(error) { console.error(error); if(msg){msg.textContent="⚠ Guardado local · Pending sync";msg.style.color="#995c00";msg.style.fontWeight="800";} }
             saveBtn.disabled=false; saveBtn.textContent=original;
+            // Refresh the selected plot immediately so Current issue and Restore to Normal
+            // reflect the incident just saved without requiring the user to leave/reselect it.
+            btn.click();
           });
 
           actionsPanel.querySelector("#fieldBookRestoreNormal")?.addEventListener("click", async() => {
