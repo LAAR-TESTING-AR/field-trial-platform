@@ -1,4 +1,4 @@
-const CACHE_NAME = "field-trial-platform-v20261127";
+const CACHE_NAME = "field-trial-platform-v20261127-02";
 const BASE_PATH = "/field-trial-platform/";
 
 const APP_SHELL = [
@@ -73,10 +73,14 @@ const APP_SHELL = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(async cache => {
+      // Cachea cada recurso por separado. Un archivo opcional faltante no impide
+      // instalar el Service Worker completo.
+      await Promise.allSettled(
+        APP_SHELL.map(recurso => cache.add(new Request(recurso, { cache: "reload" })))
+      );
+      await self.skipWaiting();
+    })
   );
 });
 
@@ -167,6 +171,7 @@ self.addEventListener("fetch", event => {
 
   if (url.pathname.endsWith("/Sitios_test.csv")) {
     const claveSitios = `${BASE_PATH}Sitios_test.csv`;
+    const solicitudCanonica = new Request(claveSitios);
 
     event.respondWith(
       fetch(request, { cache: "no-store" })
@@ -177,14 +182,24 @@ self.addEventListener("fetch", event => {
 
           const copia = response.clone();
           event.waitUntil(
-            caches.open(CACHE_NAME).then(cache => {
-              return cache.put(claveSitios, copia);
-            })
+            caches.open(CACHE_NAME).then(cache =>
+              cache.put(solicitudCanonica, copia)
+            )
           );
 
           return response;
         })
-        .catch(() => caches.match(claveSitios))
+        .catch(async () => {
+          // Planting y Harvesting agregan ?v=Date.now(). Siempre se busca la
+          // copia canonica sin parametros para que los filtros, AOI y puntos
+          // puedan cargarse sin conexion.
+          const cacheActual = await caches.open(CACHE_NAME);
+          return (
+            (await cacheActual.match(solicitudCanonica, { ignoreSearch: true })) ||
+            (await caches.match(claveSitios, { ignoreSearch: true })) ||
+            Response.error()
+          );
+        })
     );
     return;
   }
