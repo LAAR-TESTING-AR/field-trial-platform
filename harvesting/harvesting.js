@@ -462,6 +462,11 @@ function coincideConBusqueda(sitio) {
   );
 }
 
+
+// DROP DETAIL
+function escDrop(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");}
+function abrirDropDetail(base=sitios){document.getElementById("dropDetailOverlay")?.remove();const ds=base.filter(esDrop).slice().sort((a,b)=>limpiarTexto(a.Location).localeCompare(limpiarTexto(b.Location),"es",{sensitivity:"base"}));const ov=document.createElement("div");ov.id="dropDetailOverlay";ov.style.cssText="position:fixed;inset:0;z-index:40000;background:rgba(10,25,17,.52);display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box";const p=document.createElement("div");p.style.cssText="width:min(680px,100%);max-height:90vh;overflow:hidden;background:#fff;border-radius:18px;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.32)";const cards=ds.map(s=>{const loc=escDrop(limpiarTexto(s.Location)||"Sin localidad"),aoi=escDrop(limpiarTexto(s["AOI ID"])||"Sin AOI"),reason=escDrop(limpiarTexto(s["Drop reason"])),com=escDrop(limpiarTexto(s.Comments||s.Comment));return `<article style="padding:13px 14px;border:1px solid #e2e7e4;border-radius:12px;background:#fbfcfb"><div style="display:flex;justify-content:space-between;gap:10px"><b style="color:#173f2a">${loc}</b><span style="padding:3px 8px;border-radius:999px;background:#202020;color:#fff;font-size:10px;font-weight:900">DROP</span></div><div style="margin-top:3px;color:#68756d;font-size:11px">AOI · ${aoi}</div><div style="margin-top:10px;font-size:11px;font-weight:900;color:#59665e">DROP REASON</div><div style="margin-top:3px;font-size:13px">${reason||"Sin razón registrada"}</div>${com?`<div style="margin-top:9px;font-size:11px;font-weight:900;color:#59665e">COMMENTS</div><div style="margin-top:3px;font-size:13px;line-height:1.35">${com}</div>`:""}</article>`}).join("");p.innerHTML=`<div style="display:flex;padding:17px 18px 14px;border-bottom:1px solid #e5ebe7"><div style="flex:1"><div style="font-size:20px;font-weight:900;color:#173f2a">Detalle de localidades Drop</div><div style="margin-top:3px;color:#6c786f;font-size:12px">${ds.length} ${ds.length===1?"localidad":"localidades"} · Harvest status = Drop</div></div><button data-close-drop style="width:36px;height:36px;border:0;border-radius:50%;font-size:22px">×</button></div><div style="padding:14px 18px 18px;overflow:auto;display:grid;gap:10px">${cards||"Sin localidades Drop"}</div>`;ov.appendChild(p);document.body.appendChild(ov);document.body.style.overflow="hidden";const c=()=>{ov.remove();document.body.style.overflow=""};ov.onclick=e=>{if(e.target===ov)c()};p.querySelector("[data-close-drop]").onclick=c;}
+function activarDropKpi(){const n=document.getElementById("drop"),t=n?.parentElement;if(!t||t.dataset.dropReady)return;t.dataset.dropReady="1";t.style.cursor="pointer";t.title="Ver localidades Drop y sus razones";t.setAttribute("role","button");t.setAttribute("tabindex","0");const a=()=>abrirDropDetail(obtenerSitiosFiltrados());t.onclick=a;t.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();a()}};}
 function ordenarValores(valores) {
   return [...new Set(
     valores
@@ -935,6 +940,7 @@ function actualizarDashboard(sitiosFiltrados) {
   document.getElementById("pendientes").textContent =
     pendientes;
 
+  activarDropKpi();
   const totalFiltrado = sitiosFiltrados.length;
   const porcentajeDrop =
     totalFiltrado > 0
