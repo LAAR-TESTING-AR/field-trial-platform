@@ -1163,3 +1163,26 @@ html,body{max-width:100%;overflow-x:hidden}
     top:66px!important;
   }
 }
+
+/* V14E - iPad: detach AOI control from the Field Actions flow and pin it to book header */
+@media (min-width:701px) and (max-width:1180px){
+  .fb-book-shell{position:relative!important}
+  .fb-book-shell .fb-change-aoi{
+    position:absolute!important;
+    left:24px!important;
+    top:62px!important;
+    right:auto!important;
+    bottom:auto!important;
+    margin:0!important;
+    z-index:500!important;
+    transform:none!important;
+  }
+  .fb-book-shell[data-page="layout"] #fieldBookLayoutView>aside .fb-change-aoi{
+    position:fixed!important;
+    left:24px!important;
+    top:230px!important;
+    bottom:auto!important;
+    right:auto!important;
+    z-index:500!important;
+  }
+}
