@@ -5,7 +5,7 @@ function limpiarTexto(valor) {
 }
 
 function esDrop(sitio) {
-  return limpiarTexto(sitio["Harvest Status"]).toLowerCase() === "drop";
+  return limpiarTexto(sitio["Harvest status"]).toLowerCase() === "drop";
 }
 
 function estaSembrado(sitio) {
