@@ -857,3 +857,48 @@ html,body{max-width:100%;overflow-x:hidden}
   #fieldBookIssuesView [style*="grid-template-columns: repeat(4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   #fieldBookChecklistView{font-size:14px!important}
 }
+
+
+/* =========================================================
+   V12 - MOBILE REFINEMENT OVER ACTIVE V11
+   ========================================================= */
+@media (max-width:700px){
+  .fb-book-shell{padding-left:4px!important;padding-right:4px!important;overflow-x:hidden!important}
+  .fb-book-shell[data-page="overview"] #fieldBookOverviewView,
+  .fb-book-shell[data-page="layout"] #fieldBookLayoutView,
+  .fb-book-shell[data-page="checklist"] #fieldBookChecklistView,
+  .fb-book-shell[data-page="issues"] #fieldBookIssuesView{
+    width:100%!important;max-width:100%!important;padding-left:8px!important;padding-right:8px!important;padding-top:74px!important;
+  }
+  /* AOI below the left fold, not over BACK. */
+  .fb-change-aoi{left:18px!important;top:56px!important;bottom:auto!important;min-height:28px!important;padding:5px 9px!important;font-size:10px!important;z-index:130!important}
+  .fb-book-top-title{left:70px!important;right:70px!important}
+
+  /* Overview four KPIs: 2 x 2. */
+  #fieldBookOverviewView [style*="grid-template-columns:repeat(4"],
+  #fieldBookOverviewView [style*="grid-template-columns: repeat(4"],
+  #fieldBookOverviewView [class*="stats"],
+  #fieldBookOverviewView [class*="metrics"]{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important;max-width:100%!important}
+  #fieldBookOverviewView [class*="stat"],#fieldBookOverviewView [class*="metric"]{min-width:0!important;width:auto!important;max-width:100%!important}
+
+  /* Field map uses the whole sheet. Detail remains stacked. */
+  #fieldBookLayoutView>*,#fieldBookLayoutView [class*="layout"]{width:100%!important;max-width:100%!important;min-width:0!important;margin-left:0!important;margin-right:0!important}
+  #fieldBookLayoutView [class*="detail"],#fieldBookLayoutView [id*="Detail"]{position:static!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;transform:none!important}
+
+  /* Map scroll belongs to the map, never to the page. Preserve column widths. */
+  #fieldBookLayoutView [class*="map"],#fieldBookIssuesView [class*="map"]{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:auto!important;overflow-y:visible!important;-webkit-overflow-scrolling:touch}
+  #fieldBookLayoutView [style*="grid-template-columns"],#fieldBookIssuesView [style*="grid-template-columns"]{width:max-content!important;min-width:100%!important;max-width:none!important}
+  #fieldBookLayoutView [class*="column"],#fieldBookIssuesView [class*="column"]{white-space:nowrap!important;flex-wrap:nowrap!important;width:max-content!important;min-width:100%!important}
+
+  /* Issues summary: 2 x 2. */
+  #fieldBookIssuesView [style*="grid-template-columns:repeat(4"],
+  #fieldBookIssuesView [style*="grid-template-columns: repeat(4"],
+  #fieldBookIssuesView [class*="kpi"],#fieldBookIssuesView [class*="summary"] [style*="display:grid"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;max-width:100%!important}
+
+  /* Plot information follows Issues map. */
+  #fieldBookIssuesView [class*="detail"],#fieldBookIssuesView [id*="Detail"]{position:static!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-top:12px!important;transform:none!important}
+
+  /* Dedicated footer lane, no overlap with status/help/save text. */
+  .fb-book-page-meta{position:relative!important;left:auto!important;bottom:auto!important;transform:none!important;width:100%!important;min-height:38px!important;margin:18px auto 0!important;padding:10px 0!important;display:flex!important;justify-content:center!important;align-items:center!important;clear:both!important;background:rgba(255,254,249,.98)!important;z-index:5!important}
+  #fieldBookLayoutView,#fieldBookChecklistView,#fieldBookIssuesView{padding-bottom:12px!important}
+}
