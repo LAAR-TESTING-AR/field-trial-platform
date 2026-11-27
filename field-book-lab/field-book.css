@@ -1103,3 +1103,65 @@ html,body{max-width:100%;overflow-x:hidden}
     margin-right:0!important;
   }
 }
+
+/* =========================================================
+   V15 FINAL - FIELD MAP CENTERING ONLY
+   Stable JS V16 remains untouched.
+   Match the visually-good Issues Map frame without changing app logic.
+   ========================================================= */
+@media(max-width:700px){
+  /* Cancel earlier Field Map outer-section offsets. */
+  #fieldBookLayoutView>section{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Exact centered frame. Equal visible gutter on both sides. */
+  #fieldBookLayoutView .fb-field-map-viewport{
+    display:block!important;
+    width:calc(100% - 20px)!important;
+    max-width:calc(100% - 20px)!important;
+    min-width:0!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding:8px!important;
+    border:1px solid #d9e3dd!important;
+    border-radius:9px!important;
+    background:#fff!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+  }
+
+  /* Keep header/grid together and let only the viewport scroll. */
+  #fieldBookLayoutView .fb-field-map-viewport>.fb-plot-column-header{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:3px!important;
+    margin:0 0 5px 41px!important;
+    width:max-content!important;
+    min-width:max-content!important;
+    max-width:none!important;
+    white-space:nowrap!important;
+  }
+  #fieldBookLayoutView .fb-field-map-viewport>.fb-plot-column-header>div{
+    flex:0 0 52px!important;
+    width:52px!important;
+    min-width:52px!important;
+    max-width:52px!important;
+  }
+  #fieldBookLayoutView .fb-field-map-viewport>div:last-child{
+    width:max-content!important;
+    min-width:max-content!important;
+    max-width:none!important;
+  }
+}
