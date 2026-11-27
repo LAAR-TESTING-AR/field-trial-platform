@@ -1135,3 +1135,54 @@ html,body{max-width:100%;overflow-x:hidden}
     max-width:none!important;
   }
 }
+
+
+/* =========================================================
+   FINAL MOBILE FIELD MAP FRAME
+   Root cause: Field Map outer section had accumulated 58px/section
+   layout rules that Issues Map never had. This resets the PARENT card,
+   not the inner scroll viewport.
+   ========================================================= */
+@media(max-width:700px){
+  .fb-book-shell[data-page="layout"] #fieldBookLayoutView{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+    padding-top:74px!important;
+    overflow-x:hidden!important;
+    box-sizing:border-box!important;
+  }
+  .fb-book-shell[data-page="layout"] #fieldBookLayoutView>.fb-field-map-card{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:15px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .fb-book-shell[data-page="layout"] .fb-field-map-card>div:first-child{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    gap:10px!important;
+  }
+  .fb-book-shell[data-page="layout"] .fb-field-map-card>.fb-field-map-viewport{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:8px!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
