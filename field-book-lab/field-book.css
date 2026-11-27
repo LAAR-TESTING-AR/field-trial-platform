@@ -985,3 +985,80 @@ html,body{max-width:100%;overflow-x:hidden}
     margin:0!important;
   }
 }
+
+
+/* =========================================================
+   V14 - BALANCED MAP VIEWPORT + CHECKLIST KPI CARDS
+   Explicit classes override earlier wildcard mobile rules.
+   ========================================================= */
+@media(max-width:700px){
+  /* Both maps share one exact viewport model. */
+  .fb-plot-map-viewport{
+    display:block!important;
+    width:calc(100% - 20px)!important;
+    max-width:calc(100% - 20px)!important;
+    min-width:0!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    padding:8px!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+  }
+  /* Never let generic "column" rules wrap the real column header. */
+  .fb-plot-column-header{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    width:max-content!important;
+    min-width:max-content!important;
+    max-width:none!important;
+    white-space:nowrap!important;
+  }
+  .fb-plot-column-header>div{
+    flex:0 0 52px!important;
+    width:52px!important;
+    min-width:52px!important;
+    max-width:52px!important;
+  }
+  /* Issues and Field Map preserve identical grid geometry. */
+  .fb-field-map-viewport>div:last-child,
+  .fb-issues-map-viewport>div:last-child{
+    width:max-content!important;
+    min-width:max-content!important;
+    max-width:none!important;
+  }
+  /* Field Map section itself centered with equal paper margin. */
+  #fieldBookLayoutView>section{
+    width:calc(100% - 16px)!important;
+    max-width:calc(100% - 16px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  /* Checklist metrics become compact 2 x 2 cards. */
+  .fb-checklist-kpis{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    width:100%!important;
+  }
+  .fb-checklist-kpis>div{
+    min-width:0!important;
+    padding:9px 10px!important;
+    border:1px solid #d5dfd9!important;
+    border-radius:10px!important;
+    background:#fff!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr!important;
+    grid-template-rows:auto auto!important;
+    column-gap:8px!important;
+    align-items:center!important;
+  }
+  .fb-checklist-kpis span{grid-row:1/3;font-size:15px;font-weight:950;color:#174c31}
+  .fb-checklist-kpis b{font-size:18px;line-height:1;color:#26352d}
+  .fb-checklist-kpis small{font-size:8px;font-weight:900;text-transform:uppercase;color:#6c7a72;letter-spacing:.04em}
+  .fb-checklist-kpis>div:nth-child(2) span{color:#8a6400}
+  .fb-checklist-kpis>div:nth-child(3) span{color:#9b2f2f}
+  .fb-checklist-kpis>div:nth-child(4) span{color:#66736b}
+}
