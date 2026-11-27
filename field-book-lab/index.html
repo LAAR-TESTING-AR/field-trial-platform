@@ -41,7 +41,7 @@
   </main>
 
   <script src="data/settings/field-book-settings-data.js"></script>
-  <script src="field-book.js?v=13"></script>
+  <script src="field-book.js?v=14"></script>
   <script>
   (() => {
     const pages = [
@@ -261,6 +261,21 @@
       });
     }
 
+    window.addEventListener("fieldbook:go-to-page", event => {
+      const requestedKey = event.detail?.page;
+      const requestedIndex = pages.findIndex(page => page.key === requestedKey);
+      if (requestedIndex < 0) return;
+      ensureBook();
+      const els = pageElements();
+      const card = findModuleButton(requestedKey);
+      const fallback = { overview:"fieldBookTabOverview", layout:"fieldBookTabLayout", checklist:"fieldBookTabChecklist", issues:"fieldBookTabIssues" }[requestedKey];
+      setVisible(els.home, false);
+      setVisible(els.close, false);
+      if (card && !card.disabled) card.click();
+      else document.getElementById(fallback)?.click();
+      updateChrome(requestedIndex);
+      window.scrollTo({ top:0, behavior:"smooth" });
+    });
     const observer = new MutationObserver(() => ensureBook());
     observer.observe(document.getElementById("fieldBookContent"), { childList: true, subtree: true });
     document.addEventListener("keydown", event => {
