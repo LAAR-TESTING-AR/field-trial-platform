@@ -1144,3 +1144,22 @@ html,body{max-width:100%;overflow-x:hidden}
   .fb-book-shell[data-page="layout"] .fb-field-map-card>.fb-field-map-viewport{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;overflow-x:auto!important;overflow-y:auto!important;box-sizing:border-box!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-x pan-y!important}
   .fb-book-shell[data-page="layout"] #fieldBookLayoutView>aside{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:14px 0 0!important;max-height:none!important;box-sizing:border-box!important}
 }
+
+/* V14D - AOI return stays at the top on tablet and desktop */
+@media (min-width:701px){
+  .fb-change-aoi{
+    position:absolute!important;
+    left:24px!important;
+    top:62px!important;
+    bottom:auto!important;
+    right:auto!important;
+    z-index:180!important;
+    margin:0!important;
+  }
+}
+@media (min-width:1181px){
+  .fb-change-aoi{
+    left:30px!important;
+    top:66px!important;
+  }
+}
