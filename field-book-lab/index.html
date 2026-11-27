@@ -79,11 +79,7 @@
         <button id="fieldBookReturnToAoi" type="button">VOLVER A AOI</button>`;
       shell.appendChild(closePage);
       closePage.querySelector("#fieldBookReturnToAoi").addEventListener("click", () => {
-        const selector = document.getElementById("fieldBookAoi");
-        selector.value = "";
-        selector.dispatchEvent(new Event("change", { bubbles: true }));
-        document.body.classList.remove("field-book-book-open", "field-book-module-open");
-        document.getElementById("fieldBookLanding")?.classList.remove("is-hidden");
+        returnToAoiSelector();
       });
       return closePage;
     }
