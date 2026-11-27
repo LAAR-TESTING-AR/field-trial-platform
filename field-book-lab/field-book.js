@@ -1461,7 +1461,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       });
       conectarIssuesMap(aoiId, layoutReal);
       crearHomeModularFieldBook(aoiId, layout, procesoIniciado);
-      document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
+      document.getElementById("fieldBookStartVisit")?.addEventListener("click",async(event)=>{const btn=event.currentTarget,original=btn.textContent;btn.disabled=true;btn.textContent="STARTING...";try{const v=await guardarVisitRemota(aoiId,"In progress");guardarVisit(aoiId,v);renderizarAoi(aoiId);requestAnimationFrame(()=>window.dispatchEvent(new CustomEvent("fieldbook:go-to-page",{detail:{page:"layout"}})));}catch(error){console.error(error);alert(`No se pudo iniciar Field Book: ${error.message}`);btn.disabled=false;btn.textContent=original;}});
       document.getElementById("fieldBookCompleteVisit")?.addEventListener("click",async(event)=>{const m=metricasChecklist(aoiId);if(m.pending){const accepted=window.confirm(`Hay ${m.pending} ítems del Checklist pendientes.
 
 Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán registrados como responsabilidad del operario.
