@@ -1224,17 +1224,17 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     const ranges = [];
     for (let c = layout.columnMin; c <= layout.columnMax; c++) columnas.push(c);
     for (let r = layout.rangeMax; r >= layout.rangeMin; r--) ranges.push(r);
-    const header = columnas.map(c => `<div style="width:44px;min-width:44px;text-align:center;font-size:9px;font-weight:800;color:#6c7a72">${c}</div>`).join("");
+    const header = columnas.map(c => `<div style="width:52px;min-width:52px;text-align:center;font-size:9px;font-weight:900;color:#44594d">C${c}</div>`).join("");
     const filas = ranges.map(r => `<div style="display:flex;gap:3px;margin-bottom:3px;align-items:center"><div style="position:sticky;left:0;z-index:2;width:38px;min-width:38px;text-align:center;background:#eef6f1;color:#174c31;font-size:10px;font-weight:900;padding:9px 0;border-radius:5px">R${r}</div>${columnas.map(c => {
       const plot=porCoord.get(`${r}|${c}`);
-      if(!plot) return `<div style="width:44px;min-width:44px;height:28px;border:1px dashed #e2e9e5;border-radius:4px"></div>`;
+      if(!plot) return `<div style="width:52px;min-width:52px;height:34px;border:1px dashed #e2e9e5;border-radius:5px"></div>`;
       const esBuffer=plot.type === "BUFFER" || String(plot.experimentName || "").toLowerCase() === "buffer";
       const color=esBuffer ? "#e2e5e3" : (colorPorExperimento.get(plot.experimentName) || "#e7ece9");
       const evento=eventos[claveEvento(aoiId,r,c)];
       const shift=shiftParaPlot(aoiId,r,c);
       const marca=evento ? estadosEjecucion[evento.status]?.simbolo : shift ? simboloShift(shift.offset) : "";
       const cfg=evento ? estadosEjecucion[evento.status] : shift ? shiftConfig : null;
-      return `<button type="button" class="field-book-issues-plot" data-range="${r}" data-column="${c}" style="position:relative;width:44px;min-width:44px;height:28px;border:1px solid ${cfg ? cfg.color : '#bfcac3'};border-radius:4px;background:${color};font-size:8px;font-weight:800;cursor:pointer;white-space:nowrap">${r}-${c}${marca ? `<span style="position:absolute;right:1px;top:1px;min-width:12px;height:12px;border-radius:3px;background:${cfg.fondo};color:${cfg.color};font-size:9px;line-height:12px;font-weight:900">${marca}</span>` : ""}</button>`;
+      return `<button type="button" class="field-book-issues-plot" data-range="${r}" data-column="${c}" style="position:relative;width:52px;min-width:52px;height:34px;border:1px solid ${cfg ? cfg.color : '#bfcac3'};border-radius:5px;background:${color};font-size:9px;font-weight:900;cursor:pointer;white-space:nowrap">${r}-${c}${marca ? `<span style="position:absolute;right:1px;top:1px;min-width:12px;height:12px;border-radius:3px;background:${cfg.fondo};color:${cfg.color};font-size:9px;line-height:12px;font-weight:900">${marca}</span>` : ""}</button>`;
     }).join("")}</div>`).join("");
     return `<section style="margin-top:15px;padding:15px;border:1px solid #d9e3dd;border-radius:11px;background:#f8fbf9"><span class="section-label">ISSUES MAP · READ ONLY</span><p style="margin:5px 0 10px;color:#6c7a72;font-size:11px">Vista informativa. La edición de incidencias se realiza únicamente en Field Map.</p><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,300px);gap:12px"><div style="overflow:auto;max-height:62vh;padding:8px;border:1px solid #d9e3dd;border-radius:9px;background:#fff"><div style="display:flex;gap:3px;margin:0 0 5px 41px;width:max-content">${header}</div><div style="width:max-content">${filas}</div></div><aside style="padding:12px;border:1px solid #bfd4c7;border-radius:9px;background:#fff"><span class="section-label">PLOT INFORMATION</span><div id="fieldBookIssuesPlotInfo" style="margin-top:8px;color:#6c7a72;font-size:11px">Tocá una parcela para consultar el material y su incidencia.</div></aside></div></section>`;
   }
