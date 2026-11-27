@@ -1062,3 +1062,44 @@ html,body{max-width:100%;overflow-x:hidden}
   .fb-checklist-kpis>div:nth-child(3) span{color:#9b2f2f}
   .fb-checklist-kpis>div:nth-child(4) span{color:#66736b}
 }
+
+/* =========================================================
+   V15 - FIELD MAP MATCHES ISSUES MAP ON MOBILE
+   Same viewport width, centering, padding and clipping.
+   ========================================================= */
+@media(max-width:700px){
+  /* Remove extra field-map-only horizontal squeezing introduced by earlier versions. */
+  #fieldBookLayoutView>section{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    overflow:visible!important;
+  }
+
+  /* Field Map viewport is intentionally identical to Issues viewport. */
+  .fb-field-map-viewport,
+  .fb-issues-map-viewport{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding:8px!important;
+    border-radius:9px!important;
+    overflow-x:auto!important;
+    overflow-y:auto!important;
+    box-sizing:border-box!important;
+    -webkit-overflow-scrolling:touch!important;
+    touch-action:pan-x pan-y!important;
+  }
+
+  /* Both grids start from the same inner left inset. */
+  .fb-field-map-viewport>.fb-plot-column-header,
+  .fb-issues-map-viewport>.fb-plot-column-header{
+    margin-left:41px!important;
+    margin-right:0!important;
+  }
+}
