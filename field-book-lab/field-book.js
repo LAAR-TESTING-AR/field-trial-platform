@@ -1453,7 +1453,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
   function esExperimentoCheckDiagonal(nombre) {
     const value = String(nombre || "").trim().toUpperCase();
-    return value.length >= 7 && value.charAt(6) === "Z";
+    return value.length >= 7 && ["Z", "V"].includes(value.charAt(6));
   }
 
   function calcularStakePlan(layoutReal) {
