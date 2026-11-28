@@ -1473,7 +1473,18 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       for(let i=0;i<real.length-1;i+=1)columnasIntermediasStake(real[i],real[i+1]).forEach(c=>runs.add(c));
     }
     const byCol=new Map();layoutReal.plots.forEach(p=>{const c=Number(p.column);if(!byCol.has(c))byCol.set(c,[]);byCol.get(c).push(p);});const stakes=new Set();
-    [...runs].sort((a,b)=>a-b).forEach(c=>{const ps=(byCol.get(c)||[]).sort((a,b)=>Number(a.range)-Number(b.range));let segment=[];const flush=()=>{if(!segment.length)return;segment.forEach((p,i)=>{if(cropType==="corn"||i%2===0)stakes.add(`${p.range}|${p.column}`);});segment=[];};ps.forEach(p=>{if(esPlotBufferStake(p)){flush();return;}const prev=segment[segment.length-1];if(prev&&Number(p.range)!==Number(prev.range)+1)flush();segment.push(p);});flush();});
+    [...runs].sort((a,b)=>a-b).forEach(c=>{
+      const ps=(byCol.get(c)||[]).sort((a,b)=>Number(a.range)-Number(b.range));
+      if(cropType==="corn"){
+        // Every plot cell crossed by a Corn stake run gets a yellow point,
+        // including the first and last Range. Buffer/Filler cells are excluded.
+        ps.forEach(p=>{if(!esPlotBufferStake(p)) stakes.add(`${p.range}|${p.column}`);});
+        return;
+      }
+      let segment=[];
+      const flush=()=>{if(!segment.length)return;segment.forEach((p,i)=>{if(i%2===0)stakes.add(`${p.range}|${p.column}`);});segment=[];};
+      ps.forEach(p=>{if(esPlotBufferStake(p)){flush();return;}const prev=segment[segment.length-1];if(prev&&Number(p.range)!==Number(prev.range)+1)flush();segment.push(p);});flush();
+    });
     return { cropType, referenceRange, runs:[...runs].sort((a,b)=>a-b), stakes };
   }
 
