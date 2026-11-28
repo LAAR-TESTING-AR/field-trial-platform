@@ -1458,34 +1458,124 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
 
   function calcularStakePlan(layoutReal) {
     const cropType = tipoCultivoStake(layoutReal?.crop);
-    if (!layoutReal || !Array.isArray(layoutReal.plots) || cropType === "other") return { cropType, runs: [], stakes: new Set() };
-    const referenceRange = 2;
-    const ref = layoutReal.plots.filter(p => Number(p.range) === referenceRange).sort((a,b)=>Number(a.column)-Number(b.column));
-    if (!ref.length) return { cropType, runs: [], stakes: new Set() };
-    const segments=[]; let current=null, lastReal=null, afterBuffer=true;
-    const close=(reason,nextStart=null)=>{if(!current)return;current.end=Number(lastReal?.column??current.start);current.endReason=reason;current.nextStartColumn=nextStart;segments.push(current);current=null;};
-    ref.forEach(plot=>{const col=Number(plot.column);if(esPlotBufferStake(plot)){close("buffer");lastReal=null;afterBuffer=true;return;}const name=String(plot.experimentName||"").trim();if(esExperimentoCheckDiagonal(name)){if(current)current.end=col;return;}if(!current){current={name,start:col,end:col,startsAfterBuffer:afterBuffer};lastReal=plot;afterBuffer=false;return;}if(normalizar(name)!==normalizar(current.name)){close("next-experiment",col);current={name,start:col,end:col,startsAfterBuffer:false};lastReal=plot;return;}current.end=col;lastReal=plot;});close("edge");
-    const boundaries=new Set();segments.forEach(seg=>boundaries.add(seg.start));segments.forEach(seg=>{if(seg.endReason==="buffer"||seg.endReason==="edge")boundaries.add(seg.end);});
-    const real=[...boundaries].sort((a,b)=>a-b);const runs=new Set(real);
-    if(cropType==="corn"){
-      for(let i=0;i<real.length-1;i+=1){const from=real[i],to=real[i+1],distance=to-from;if(distance<=20)continue;let candidate=from+20;while(candidate<to){const remainder=to-candidate;if(remainder<=10)break;runs.add(candidate);candidate+=20;}}
-    }else{
-      for(let i=0;i<real.length-1;i+=1)columnasIntermediasStake(real[i],real[i+1]).forEach(c=>runs.add(c));
+    if (!layoutReal || !Array.isArray(layoutReal.plots) || cropType === "other") {
+      return { cropType, runs: [], stakes: new Set() };
     }
-    const byCol=new Map();layoutReal.plots.forEach(p=>{const c=Number(p.column);if(!byCol.has(c))byCol.set(c,[]);byCol.get(c).push(p);});const stakes=new Set();
-    [...runs].sort((a,b)=>a-b).forEach(c=>{
-      const ps=(byCol.get(c)||[]).sort((a,b)=>Number(a.range)-Number(b.range));
-      if(cropType==="corn"){
-        // Every plot cell crossed by a Corn stake run gets a yellow point,
-        // including the first and last Range. Buffer/Filler cells are excluded.
-        ps.forEach(p=>{if(!esPlotBufferStake(p)) stakes.add(`${p.range}|${p.column}`);});
+
+    const referenceRange = 2;
+    const referencePlots = layoutReal.plots
+      .filter(plot => Number(plot.range) === referenceRange)
+      .sort((a,b) => Number(a.column) - Number(b.column));
+    if (!referencePlots.length) return { cropType, runs: [], stakes: new Set() };
+
+    // Range 2 defines real experiment blocks. Z/V checks are transparent.
+    const segments = [];
+    let current = null;
+    let lastRealPlot = null;
+    const closeSegment = reason => {
+      if (!current) return;
+      current.end = Number(lastRealPlot?.column ?? current.start);
+      current.endReason = reason;
+      segments.push(current);
+      current = null;
+    };
+
+    referencePlots.forEach(plot => {
+      const column = Number(plot.column);
+      if (esPlotBufferStake(plot)) {
+        closeSegment("buffer");
+        lastRealPlot = null;
         return;
       }
-      let segment=[];
-      const flush=()=>{if(!segment.length)return;segment.forEach((p,i)=>{if(i%2===0)stakes.add(`${p.range}|${p.column}`);});segment=[];};
-      ps.forEach(p=>{if(esPlotBufferStake(p)){flush();return;}const prev=segment[segment.length-1];if(prev&&Number(p.range)!==Number(prev.range)+1)flush();segment.push(p);});flush();
+      const experimentName = String(plot.experimentName || "").trim();
+      if (esExperimentoCheckDiagonal(experimentName)) {
+        if (current) current.end = column;
+        return;
+      }
+      if (!current) {
+        current = { name: experimentName, start: column, end: column };
+        lastRealPlot = plot;
+        return;
+      }
+      if (normalizar(experimentName) !== normalizar(current.name)) {
+        closeSegment("next-experiment");
+        current = { name: experimentName, start: column, end: column };
+        lastRealPlot = plot;
+        return;
+      }
+      current.end = column;
+      lastRealPlot = plot;
     });
-    return { cropType, referenceRange, runs:[...runs].sort((a,b)=>a-b), stakes };
+    closeSegment("edge");
+
+    const runColumns = new Set();
+
+    if (cropType === "corn") {
+      // CORN: starts are real boundaries. Ends count only before Buffer/edge.
+      const boundaries = new Set();
+      segments.forEach(segment => boundaries.add(segment.start));
+      segments.forEach(segment => {
+        if (segment.endReason === "buffer" || segment.endReason === "edge") {
+          boundaries.add(segment.end);
+        }
+      });
+      const realBoundaries = [...boundaries].sort((a,b) => a-b);
+      realBoundaries.forEach(column => runColumns.add(column));
+      for (let i=0; i<realBoundaries.length-1; i+=1) {
+        const from = realBoundaries[i], to = realBoundaries[i+1];
+        if (to - from <= 20) continue;
+        let candidate = from + 20;
+        while (candidate < to) {
+          const remainder = to - candidate;
+          if (remainder <= 10) break;
+          runColumns.add(candidate);
+          candidate += 20;
+        }
+      }
+    } else {
+      // SOYBEAN: each experiment starts a run. Continue at exact +10 Columns.
+      // If Buffer/edge closes the block before the next +10, move the final run
+      // to the last real Column before that Buffer/edge.
+      // A direct experiment change is represented only by the next experiment start.
+      segments.forEach(segment => {
+        runColumns.add(segment.start);
+        let candidate = segment.start + 10;
+        while (candidate <= segment.end) {
+          runColumns.add(candidate);
+          candidate += 10;
+        }
+        if ((segment.endReason === "buffer" || segment.endReason === "edge") &&
+            !runColumns.has(segment.end)) {
+          runColumns.add(segment.end);
+        }
+      });
+    }
+
+    const plotsByColumn = new Map();
+    layoutReal.plots.forEach(plot => {
+      const column = Number(plot.column);
+      if (!plotsByColumn.has(column)) plotsByColumn.set(column, []);
+      plotsByColumn.get(column).push(plot);
+    });
+
+    const stakes = new Set();
+    [...runColumns].sort((a,b) => a-b).forEach(column => {
+      const columnPlots = (plotsByColumn.get(column) || [])
+        .sort((a,b) => Number(a.range) - Number(b.range));
+      columnPlots.forEach(plot => {
+        if (esPlotBufferStake(plot)) return;
+        if (cropType === "corn" || Number(plot.range) % 2 === 0) {
+          stakes.add(`${plot.range}|${plot.column}`);
+        }
+      });
+    });
+
+    return {
+      cropType,
+      referenceRange,
+      runs: [...runColumns].sort((a,b) => a-b),
+      stakes
+    };
   }
 
   function aplicarStakePlan(layoutReal) {
