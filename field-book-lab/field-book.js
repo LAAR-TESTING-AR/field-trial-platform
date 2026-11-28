@@ -1553,8 +1553,12 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
             };
           });
           guardarChecklist(aoiId, draft);
+          const scrollY = window.scrollY;
           renderizarAoi(aoiId);
-          setTimeout(()=>abrirModuloFieldBook("checklist"),0);
+          requestAnimationFrame(() => {
+            abrirModuloFieldBook("checklist");
+            requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: "auto" }));
+          });
         };
         card.querySelector("[data-reset-pending]")?.addEventListener("click", event => {
           event.stopPropagation();
