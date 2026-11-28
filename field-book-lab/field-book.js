@@ -1474,7 +1474,9 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     let lastRealPlot = null;
     const closeSegment = reason => {
       if (!current) return;
-      current.end = Number(lastRealPlot?.column ?? current.start);
+      // current.end already tracks the physical last column, including transparent Z/V checks.
+      // Do not overwrite it with lastRealPlot, otherwise the final run before Buffer can move left.
+      current.end = Number(current.end ?? lastRealPlot?.column ?? current.start);
       current.endReason = reason;
       segments.push(current);
       current = null;
@@ -1588,7 +1590,9 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
       // CORN: every visible plot cell crossed by the marked run gets a dot.
       // This is based on the rendered plot buttons themselves, so first/last Range
       // and any plot omitted from the normalized planning array are still marked.
-      const needsDot = plan.cropType === "corn" ? isRun : plan.stakes.has(`${range}|${column}`);
+      const needsDot = plan.cropType === "corn"
+        ? isRun
+        : (plan.cropType === "soybean" ? (isRun && range % 2 === 0) : plan.stakes.has(`${range}|${column}`));
       if (needsDot) {
         btn.classList.add("field-book-stake-point");
         if (!btn.querySelector(".field-book-stake-dot")) {
