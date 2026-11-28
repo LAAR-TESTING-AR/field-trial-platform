@@ -1266,3 +1266,18 @@ html,body{max-width:100%;overflow-x:hidden}
 .field-book-real-plot.field-book-stake-point{position:relative!important}
 .field-book-stake-dot{position:absolute;left:-7px;top:50%;transform:translateY(-50%);z-index:5;width:11px;height:11px;border:2px solid #725f00;border-radius:50%;background:#ffe600;color:#725f00;font-size:0;box-shadow:0 0 0 2px #fff}
 @media(max-width:700px){.field-book-stake-summary{align-items:flex-start}.field-book-stake-summary span{min-width:100%;order:3}.field-book-real-plot.field-book-stake-run{border-left-width:3px!important}}
+
+
+/* V14H - stake marker at the beginning of each plot cell */
+.field-book-real-plot.field-book-stake-point{position:relative!important}
+.field-book-stake-dot{
+  left:-7px!important;
+  top:-7px!important;
+  transform:none!important;
+  width:11px!important;
+  height:11px!important;
+  border:2px solid #725f00!important;
+  border-radius:50%!important;
+  background:#ffe600!important;
+  box-shadow:0 0 0 2px #fff!important;
+}
