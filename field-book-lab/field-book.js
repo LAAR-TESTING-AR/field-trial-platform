@@ -1195,6 +1195,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
             <button type="button" data-status="Observation" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #d8a72b;border-radius:7px;background:${response.status==='Observation'?'#d8a72b':'#fff'};color:${response.status==='Observation'?'#fff':'#8a6400'};font-size:8px;font-weight:950;cursor:pointer">! OBS</button>
             <button type="button" data-status="Problem" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #ca6b6b;border-radius:7px;background:${response.status==='Problem'?'#9b2f2f':'#fff'};color:${response.status==='Problem'?'#fff':'#9b2f2f'};font-size:8px;font-weight:950;cursor:pointer">× PROB</button>
             <button type="button" data-status="N/A" ${checklistReadOnly?'disabled':''} style="padding:7px 3px;border:1px solid #aeb9b2;border-radius:7px;background:${response.status==='N/A'?'#66736b':'#fff'};color:${response.status==='N/A'?'#fff':'#66736b'};font-size:8px;font-weight:950;cursor:pointer">N/A</button>
+            ${response.status !== 'Pending' && !checklistReadOnly ? `<button type="button" class="fb-check-reset" data-reset-pending="1" style="grid-column:1/-1;padding:7px 5px;border:1px dashed #7b8b82;border-radius:7px;background:#f7f9f8;color:#58675f;font-size:8px;font-weight:950;cursor:pointer">↺ RESET TO PENDING</button>` : ''}
           </div>
           <div class="fb-check-comment-wrap" style="display:${needsComment?'block':'none'};margin-top:8px">
             <textarea class="field-book-check-comment" rows="2" placeholder="Comment..." ${checklistReadOnly?'disabled':''} style="width:100%;box-sizing:border-box;padding:7px;border:1px solid #cad6cf;border-radius:7px;background:#fff;font-size:9px;resize:vertical">${String(response.comment || '').replace(/</g,'&lt;')}</textarea>
@@ -1555,6 +1556,13 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
           renderizarAoi(aoiId);
           setTimeout(()=>abrirModuloFieldBook("checklist"),0);
         };
+        card.querySelector("[data-reset-pending]")?.addEventListener("click", event => {
+          event.stopPropagation();
+          card.querySelector(".field-book-check-status").value = "Pending";
+          const comment = card.querySelector(".field-book-check-comment");
+          if (comment) comment.value = "";
+          saveDraftAndRefresh();
+        });
         card.querySelectorAll("[data-status]").forEach(action => {
           action.addEventListener("click", event => {
             event.stopPropagation();
