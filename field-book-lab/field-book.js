@@ -1493,10 +1493,17 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     if (!plan.runs.length) return;
     contenido.querySelectorAll(".field-book-real-plot").forEach(btn => {
       const range = Number(btn.dataset.range), column = Number(btn.dataset.column);
-      if (plan.runs.includes(column)) btn.classList.add("field-book-stake-run");
-      if (plan.stakes.has(`${range}|${column}`)) {
+      const isRun = plan.runs.includes(column);
+      if (isRun) btn.classList.add("field-book-stake-run");
+      // CORN: every visible plot cell crossed by the marked run gets a dot.
+      // This is based on the rendered plot buttons themselves, so first/last Range
+      // and any plot omitted from the normalized planning array are still marked.
+      const needsDot = plan.cropType === "corn" ? isRun : plan.stakes.has(`${range}|${column}`);
+      if (needsDot) {
         btn.classList.add("field-book-stake-point");
-        btn.insertAdjacentHTML("beforeend", '<span class="field-book-stake-dot" title="Stake point">●</span>');
+        if (!btn.querySelector(".field-book-stake-dot")) {
+          btn.insertAdjacentHTML("beforeend", '<span class="field-book-stake-dot" title="Stake point">●</span>');
+        }
       }
     });
     const viewport = contenido.querySelector(".fb-field-map-viewport");
