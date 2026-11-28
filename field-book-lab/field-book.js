@@ -1420,6 +1420,106 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     });
   }
 
+
+  /* =========================================================
+     STAKE RUNS V1 - automatic visual calculation
+     Corn: stake at every active Range on a run.
+     Soybean: stake one Range, skip one, restarting after Buffer/Filler.
+     Runs: experiment start/end plus intermediate divisions every 8-10 Columns.
+  ========================================================= */
+  function esPlotBufferStake(plot) {
+    return !plot || plot.type === "BUFFER" || normalizar(plot.experimentName) === "buffer";
+  }
+
+  function tipoCultivoStake(crop) {
+    const value = normalizar(crop);
+    if (value.includes("soy") || value.includes("soja")) return "soybean";
+    if (value.includes("corn") || value.includes("maiz") || value.includes("maíz")) return "corn";
+    return "other";
+  }
+
+  function columnasIntermediasStake(desde, hasta) {
+    const ancho = hasta - desde;
+    if (ancho <= 10) return [];
+    const segmentos = Math.ceil(ancho / 10);
+    const paso = ancho / segmentos;
+    const result = [];
+    for (let i = 1; i < segmentos; i += 1) {
+      const col = Math.round(desde + paso * i);
+      if (col > desde && col < hasta && !result.includes(col)) result.push(col);
+    }
+    return result;
+  }
+
+  function calcularStakePlan(layoutReal) {
+    const cropType = tipoCultivoStake(layoutReal?.crop);
+    if (!layoutReal || !Array.isArray(layoutReal.plots) || cropType === "other") {
+      return { cropType, runs: [], stakes: new Set() };
+    }
+    const experimentos = new Map();
+    layoutReal.plots.forEach(plot => {
+      if (esPlotBufferStake(plot)) return;
+      const name = String(plot.experimentName || "Sin experimento").trim();
+      if (!experimentos.has(name)) experimentos.set(name, []);
+      experimentos.get(name).push(plot);
+    });
+    const runColumns = new Set();
+    experimentos.forEach(plots => {
+      const cols = plots.map(p => Number(p.column)).filter(Number.isFinite);
+      if (!cols.length) return;
+      const min = Math.min(...cols), max = Math.max(...cols);
+      runColumns.add(min);
+      runColumns.add(max);
+      columnasIntermediasStake(min, max).forEach(col => runColumns.add(col));
+    });
+    const porColumna = new Map();
+    layoutReal.plots.forEach(plot => {
+      const col = Number(plot.column);
+      if (!porColumna.has(col)) porColumna.set(col, []);
+      porColumna.get(col).push(plot);
+    });
+    const stakes = new Set();
+    [...runColumns].sort((a,b)=>a-b).forEach(column => {
+      const activos = (porColumna.get(column) || [])
+        .filter(plot => !esPlotBufferStake(plot))
+        .sort((a,b)=>Number(a.range)-Number(b.range));
+      let segment = [];
+      const flush = () => {
+        if (!segment.length) return;
+        segment.forEach((plot,index) => {
+          if (cropType === "corn" || index % 2 === 0) stakes.add(`${plot.range}|${plot.column}`);
+        });
+        segment = [];
+      };
+      activos.forEach(plot => {
+        const previous = segment[segment.length - 1];
+        const sameExperiment = !previous || String(previous.experimentName) === String(plot.experimentName);
+        const consecutive = !previous || Number(plot.range) === Number(previous.range) + 1;
+        if (!sameExperiment || !consecutive) flush();
+        segment.push(plot);
+      });
+      flush();
+    });
+    return { cropType, runs: [...runColumns].sort((a,b)=>a-b), stakes };
+  }
+
+  function aplicarStakePlan(layoutReal) {
+    const plan = calcularStakePlan(layoutReal);
+    if (!plan.runs.length) return;
+    contenido.querySelectorAll(".field-book-real-plot").forEach(btn => {
+      const range = Number(btn.dataset.range), column = Number(btn.dataset.column);
+      if (plan.runs.includes(column)) btn.classList.add("field-book-stake-run");
+      if (plan.stakes.has(`${range}|${column}`)) {
+        btn.classList.add("field-book-stake-point");
+        btn.insertAdjacentHTML("beforeend", '<span class="field-book-stake-dot" title="Stake point">●</span>');
+      }
+    });
+    const viewport = contenido.querySelector(".fb-field-map-viewport");
+    if (viewport && !viewport.parentElement.querySelector(".field-book-stake-summary")) {
+      viewport.insertAdjacentHTML("beforebegin", `<div class="field-book-stake-summary"><strong>STAKE RUNS</strong><span>${plan.cropType === "soybean" ? "SOYBEAN · one Range on / one off" : "CORN · every active Range"}</span><b>${plan.runs.length} runs · ${plan.stakes.size} stakes</b></div>`);
+    }
+  }
+
   function renderizarAoi(
     aoiId
   ) {
@@ -1616,6 +1716,7 @@ Si continuás, el Field Book se cerrará igualmente y los pendientes quedarán r
       });
       // Shift Block gestual estable: selección y desplazamiento vertical limitado a una sola Column.
       marcarHuellaShifts(aoiId);
+      aplicarStakePlan(layoutReal);
       habilitarShiftGestual(aoiId, layout, porCoord);
       return;
     }
