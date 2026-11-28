@@ -1451,6 +1451,11 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     return result;
   }
 
+  function esExperimentoCheckDiagonal(nombre) {
+    const value = String(nombre || "").trim().toUpperCase();
+    return value.length >= 7 && value.charAt(6) === "Z";
+  }
+
   function calcularStakePlan(layoutReal) {
     const cropType = tipoCultivoStake(layoutReal?.crop);
     if (!layoutReal || !Array.isArray(layoutReal.plots) || cropType === "other") {
@@ -1458,7 +1463,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     }
     const experimentos = new Map();
     layoutReal.plots.forEach(plot => {
-      if (esPlotBufferStake(plot)) return;
+      if (esPlotBufferStake(plot) || esExperimentoCheckDiagonal(plot.experimentName)) return;
       const name = String(plot.experimentName || "Sin experimento").trim();
       if (!experimentos.has(name)) experimentos.set(name, []);
       experimentos.get(name).push(plot);
@@ -1481,7 +1486,7 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     const stakes = new Set();
     [...runColumns].sort((a,b)=>a-b).forEach(column => {
       const activos = (porColumna.get(column) || [])
-        .filter(plot => !esPlotBufferStake(plot))
+        .filter(plot => !esPlotBufferStake(plot) && !esExperimentoCheckDiagonal(plot.experimentName))
         .sort((a,b)=>Number(a.range)-Number(b.range));
       let segment = [];
       const flush = () => {
