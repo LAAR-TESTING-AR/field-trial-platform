@@ -1281,3 +1281,14 @@ html,body{max-width:100%;overflow-x:hidden}
   background:#ffe600!important;
   box-shadow:0 0 0 2px #fff!important;
 }
+
+/* V16 - Stake dots at the lower-left corner of each plot cell */
+.field-book-real-plot.field-book-stake-point{
+  position:relative!important;
+}
+.field-book-stake-dot{
+  left:-7px!important;
+  top:auto!important;
+  bottom:-7px!important;
+  transform:none!important;
+}
