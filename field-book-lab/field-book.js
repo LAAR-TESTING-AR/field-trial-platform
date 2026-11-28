@@ -1461,51 +1461,125 @@ const FIELD_BOOK_SAVE_URL = "https://614eb69dae3de7e79ee743c51a72c5.1c.environme
     if (!layoutReal || !Array.isArray(layoutReal.plots) || cropType === "other") {
       return { cropType, runs: [], stakes: new Set() };
     }
-    const experimentos = new Map();
-    layoutReal.plots.forEach(plot => {
-      if (esPlotBufferStake(plot) || esExperimentoCheckDiagonal(plot.experimentName)) return;
-      const name = String(plot.experimentName || "Sin experimento").trim();
-      if (!experimentos.has(name)) experimentos.set(name, []);
-      experimentos.get(name).push(plot);
-    });
+
+    /*
+      STAKE RUNS V2
+      - Range 2 is the horizontal reference line.
+      - Only real Experiment changes in Range 2 create boundaries.
+      - 7th character Z (Diagonal Check) and V (Genetic Discriminator)
+        are transparent and never create a boundary.
+      - Buffer/Filler closes the current block and restarts the next one.
+      - Long experiment spans receive intermediate runs every ~8-10 Columns.
+    */
+    const referenceRange = 2;
+    const referencePlots = layoutReal.plots
+      .filter(plot => Number(plot.range) === referenceRange)
+      .sort((a, b) => Number(a.column) - Number(b.column));
+
+    if (!referencePlots.length) {
+      return { cropType, runs: [], stakes: new Set() };
+    }
+
     const runColumns = new Set();
-    experimentos.forEach(plots => {
-      const cols = plots.map(p => Number(p.column)).filter(Number.isFinite);
-      if (!cols.length) return;
-      const min = Math.min(...cols), max = Math.max(...cols);
-      runColumns.add(min);
-      runColumns.add(max);
-      columnasIntermediasStake(min, max).forEach(col => runColumns.add(col));
+    let segmentStart = null;
+    let segmentEnd = null;
+    let currentExperiment = "";
+
+    const closeSegment = () => {
+      if (segmentStart == null || segmentEnd == null) return;
+      runColumns.add(segmentStart);
+      if (segmentEnd !== segmentStart) runColumns.add(segmentEnd);
+      columnasIntermediasStake(segmentStart, segmentEnd)
+        .forEach(column => runColumns.add(column));
+      segmentStart = null;
+      segmentEnd = null;
+      currentExperiment = "";
+    };
+
+    referencePlots.forEach(plot => {
+      const column = Number(plot.column);
+
+      if (esPlotBufferStake(plot)) {
+        closeSegment();
+        return;
+      }
+
+      const experimentName = String(plot.experimentName || "").trim();
+
+      // Z/V checks remain physically inside the block but are transparent
+      // for experiment-change detection.
+      if (esExperimentoCheckDiagonal(experimentName)) {
+        if (segmentStart != null) segmentEnd = column;
+        return;
+      }
+
+      if (segmentStart == null) {
+        segmentStart = column;
+        segmentEnd = column;
+        currentExperiment = experimentName;
+        return;
+      }
+
+      if (normalizar(experimentName) !== normalizar(currentExperiment)) {
+        closeSegment();
+        segmentStart = column;
+        segmentEnd = column;
+        currentExperiment = experimentName;
+        return;
+      }
+
+      segmentEnd = column;
     });
-    const porColumna = new Map();
+
+    closeSegment();
+
+    const plotsByColumn = new Map();
     layoutReal.plots.forEach(plot => {
-      const col = Number(plot.column);
-      if (!porColumna.has(col)) porColumna.set(col, []);
-      porColumna.get(col).push(plot);
+      const column = Number(plot.column);
+      if (!plotsByColumn.has(column)) plotsByColumn.set(column, []);
+      plotsByColumn.get(column).push(plot);
     });
+
     const stakes = new Set();
-    [...runColumns].sort((a,b)=>a-b).forEach(column => {
-      const activos = (porColumna.get(column) || [])
-        .filter(plot => !esPlotBufferStake(plot) && !esExperimentoCheckDiagonal(plot.experimentName))
-        .sort((a,b)=>Number(a.range)-Number(b.range));
+    [...runColumns].sort((a, b) => a - b).forEach(column => {
+      const columnPlots = (plotsByColumn.get(column) || [])
+        .sort((a, b) => Number(a.range) - Number(b.range));
+
       let segment = [];
-      const flush = () => {
+      const flushVerticalSegment = () => {
         if (!segment.length) return;
-        segment.forEach((plot,index) => {
-          if (cropType === "corn" || index % 2 === 0) stakes.add(`${plot.range}|${plot.column}`);
+        segment.forEach((plot, index) => {
+          if (cropType === "corn" || index % 2 === 0) {
+            stakes.add(`${plot.range}|${plot.column}`);
+          }
         });
         segment = [];
       };
-      activos.forEach(plot => {
+
+      columnPlots.forEach(plot => {
+        if (esPlotBufferStake(plot)) {
+          flushVerticalSegment();
+          return;
+        }
+
         const previous = segment[segment.length - 1];
-        const sameExperiment = !previous || String(previous.experimentName) === String(plot.experimentName);
         const consecutive = !previous || Number(plot.range) === Number(previous.range) + 1;
-        if (!sameExperiment || !consecutive) flush();
+        if (!consecutive) flushVerticalSegment();
+
+        // Z/V plots do not interrupt a vertical run. They are part of the
+        // physical pass, but never define a new horizontal boundary.
         segment.push(plot);
       });
-      flush();
+
+      flushVerticalSegment();
     });
-    return { cropType, runs: [...runColumns].sort((a,b)=>a-b), stakes };
+
+    return {
+      cropType,
+      referenceRange,
+      runs: [...runColumns].sort((a, b) => a - b),
+      stakes
+    };
   }
 
   function aplicarStakePlan(layoutReal) {
